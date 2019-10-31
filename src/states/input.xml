@@ -1,0 +1,163 @@
+<scxml initial="Main" name="speechioInput" version="0.9" xmlns="http://www.w3.org/2005/07/scxml">
+
+  <state id="Main" name="Main" initial="Default">
+
+    <datamodel>
+      <data id="logger" expr="null"/>
+    </datamodel>
+
+    <!-- transition event="event" name="event">
+      <script>
+          if( mmir.app.isTactileEvent(_event.data) ){
+              mmir.speechioInput.raise('touch', _event.data);
+          }
+          else if( mmir.app.isSpeechEvent(_event.data) ){
+              mmir.speechioInput.raise('speech', _event.data);
+          }
+      </script>
+    </transition-->
+
+    <transition event="touch" name="touch" target="Touch" />
+
+    <transition event="speech" name="speech" target="Speech" />
+
+    <!-- default state TODO remove? -->
+    <state id="Default" name="Default">
+      <onentry>
+        <script>
+            logger = mmir.require('mmirf/logger').create('mmirf/speechioInput');
+            if(logger.isi()) logger.info('SpeechIO-InputEngine is in Default state.');
+        </script>
+      </onentry>
+    </state>
+
+    <!-- process Touch input events: -->
+    <state id="Touch" name="Touch">
+
+      <datamodel>
+        <data id="touch_data" expr="null"/>
+      </datamodel>
+
+      <onentry>
+        <script>
+            if(logger.isi()) logger.info('entrered Touch with '+ JSON.stringify(_event.data));
+        </script>
+      </onentry>
+
+      <initial>
+        <transition target="TouchInitial"/>
+      </initial>
+
+      <state id="TouchInitial" name="TouchInitial">
+        <onentry>
+          <assign location="touch_data" expr="_event.data" />
+          <!-- script>if(logger.isd()) logger.log('entering initial speech processing state with :'+JSON.stringify(_event))</script-->
+        </onentry>
+
+        <transition cond="touch_data &amp;&amp; (!touch_data.interpretation || !touch_data.interpretation['function'])" target="RawTouch"/>
+        <transition cond="touch_data &amp;&amp; touch_data.interpretation &amp;&amp; touch_data.interpretation['function'] &amp;&amp; typeof touch_data.interpretation['function'].understanding !== 'undefined'" target="TouchUnderstanding"/>
+        <transition cond="touch_data==null" target="TouchUnknown">
+          <script>if(logger.isw()) logger.warn('could not process event :'+JSON.stringify(touch_data))</script>
+        </transition>
+      </state>
+
+      <state id="RawTouch" name="RawTouch">
+        <onentry>
+          <script>
+              if(logger.isw()) logger.warn('entered Touch.Raw with '+ JSON.stringify(touch_data));
+
+              mmir.speechioManager.raise('touch-raw', touch_data);
+          </script>
+        </onentry>
+      </state>
+
+      <state id="TouchUnderstanding" name="TouchUnderstanding">
+        <onentry>
+          <script>
+
+                  var emma = mmir.emma._extractEmmaFuncData(touch_data, 'understanding');
+                  if(logger.isi()) logger.info('entered Touch.Understanding with '+ JSON.stringify(emma));
+
+                  mmir.speechioManager.raise(emma.name, emma.data);
+          </script>
+        </onentry>
+      </state>
+
+      <state id="TouchUnknown" name="TouchUnknown">
+        <onentry>
+              <script>
+                  if(logger.ise()) logger.error('entered Touch.UNKNOWN with '+ JSON.stringify(touch_data));
+              </script>
+        </onentry>
+      </state>
+
+    </state><!-- END OF: <state id="Touch"> -->
+
+    <!-- process Speech input events: -->
+    <state id="Speech" name="Speech">
+
+      <datamodel>
+        <data id="speech_data" expr="null"/>
+      </datamodel>
+
+      <!-- onentry>
+        <script>if(logger.isd()) logger.log('entering Speech state with :'+JSON.stringify(_event))</script>
+        <!- - script src="../../app/test_script.js" /- ->
+      </onentry-->
+
+      <onexit>
+        <assign location="speech_data" expr="null" />
+        <!-- script>if(logger.isd()) logger.log('exiting speech processing state with :'+JSON.stringify(_event))</script-->
+      </onexit>
+
+      <initial>
+        <transition target="SpeechInitial"/>
+      </initial>
+
+      <state id="SpeechInitial" name="SpeechInitial">
+        <onentry>
+          <assign location="speech_data" expr="_event.data" />
+          <!-- script>if(logger.isd()) logger.log('entering initial speech processing state with :'+JSON.stringify(_event))</script-->
+        </onentry>
+
+        <transition cond="speech_data &amp;&amp; typeof speech_data.interpretation['function'].recognition !== 'undefined' &amp;&amp; typeof speech_data.interpretation['function'].understanding === 'undefined'" target="Recognition"/>
+        <transition cond="speech_data &amp;&amp; typeof speech_data.interpretation['function'].understanding !== 'undefined'" target="Understanding"/>
+        <transition cond="speech_data==null" target="Unknown">
+          <script>if(logger.isw()) logger.warn('could not process event :'+JSON.stringify(speech_data))</script>
+        </transition>
+      </state>
+
+      <transition event="recognition" name="recognition" target="Recognition" />
+      <transition event="understanding" name="understanding" target="Understanding" />
+
+      <state id="Unknown" name="Unknown">
+        <onentry>
+          <script>
+              if(logger.isw()) logger.warn('entered Speech.Unknown with '+ JSON.stringify(speech_data?speech_data:null));
+          </script>
+        </onentry>
+      </state>
+
+      <state id="Recognition" name="Recognition">
+        <onentry>
+          <script>
+              if(logger.isi()) logger.info('entered Speech.Recognition with '+ JSON.stringify(speech_data));
+              mmir.speechioManager.raise('speech-recognition', speech_data);
+          </script>
+        </onentry>
+      </state>
+
+      <state id="Understanding" name="Understanding">
+        <onentry>
+          <script>
+              if(logger.isi()) logger.info('entrered Speech.Understanding with '+ JSON.stringify(speech_data));
+              mmir.speechioManager.raise('speech-understanding', speech_data);
+          </script>
+        </onentry>
+      </state>
+
+    </state><!-- END OF: <state id="Speech"> -->
+
+  </state><!-- END OF: <state id="Main"> -->
+
+</scxml>

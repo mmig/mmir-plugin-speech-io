@@ -1,0 +1,43 @@
+{
+  "name": "mmir-plugin-speech-io",
+  "version": "1.0.0",
+  "description": "Plugin for the MMIR framework that adds a state-machine for managing speech input/output states",
+  "main": "./lib/index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "build": "npm run build-ts && npm run build-metadata",
+    "build-ts": "tsc",
+    "build-metadata": "createplugincompat ./ && pluginexport --ignore-deps ./"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mmig/mmir-plugin-speech-io.git"
+  },
+  "keywords": [
+    "speech",
+    "scion",
+    "state machine",
+    "asr",
+    "tts",
+    "mmir",
+    "plugin"
+  ],
+  "author": "russa",
+  "license": "MIT",
+  "dependencies": {
+    "rxjs": "^6.5.3"
+  },
+  "devDependencies": {
+    "@types/node": "^12.11.6",
+    "mmir-lib": "git+https://gitlab-cos.b.dfki.de/mmir/dev_mmir-lib.git",
+    "mmir-plugin-exports": "^1.2.2",
+    "typescript": "^3.6.4"
+  },
+  "cordova": {
+    "id": "mmir-plugin-speech-io",
+    "platforms": []
+  },
+  "engines": {
+    "cordovaDependencies": {}
+  }
+}
