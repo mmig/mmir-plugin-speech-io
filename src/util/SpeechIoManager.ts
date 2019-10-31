@@ -1,5 +1,4 @@
 import { Subject } from 'rxjs';
-import * as mmirLib from 'mmir-lib';
 import { MmirModule, DialogManager } from 'mmir-lib';
 import { StateManager, ManagerFactory } from '../typings/mmir-ext.d';
 import { ExtMmirModule , SpeechIoManager } from '../typings/mmir-ext-dialog.d';
@@ -11,7 +10,7 @@ var managerFactory: Promise<ManagerFactory>;
 var speechIoUri: string;
 var speechIoInputUri: string;
 
-function getGeneratedStateModelUrl(id: string): string {
+function getGeneratedStateModelUrl(mmirLib: MmirModule, id: string): string {
   //extract ID of state-model ~> "mmirf/state/<id>":
   const name = id.replace(/^.*\//, "");
   const path = (mmirLib.res as any).getGeneratedStateModelsPath();
@@ -24,7 +23,7 @@ function getGeneratedStateModelUrl(id: string): string {
   );
 }
 
-function init(){
+function init(mmirLib: MmirModule){
   if(!managerFactory){
     managerFactory = new Promise<ManagerFactory>((resolve, reject) => {
       mmirLib.require(['mmirf/managerFactory'], (factory: ManagerFactory) => resolve(factory), (err: Error) => reject(err));
@@ -33,14 +32,14 @@ function init(){
       speechIoUri = SPEECH_IO_STATES_ID;
       speechIoInputUri = SPEECH_IO_INPUT_STATES_ID;
     } else {
-      speechIoUri = getGeneratedStateModelUrl(SPEECH_IO_STATES_ID);
-      speechIoInputUri = getGeneratedStateModelUrl(SPEECH_IO_INPUT_STATES_ID);
+      speechIoUri = getGeneratedStateModelUrl(mmirLib, SPEECH_IO_STATES_ID);
+      speechIoInputUri = getGeneratedStateModelUrl(mmirLib, SPEECH_IO_INPUT_STATES_ID);
     }
   }
 }
 
-async function createInstance(): Promise<StateManager> {
-  init();
+async function createInstance(mmirLib: MmirModule): Promise<StateManager> {
+  init(mmirLib);
   return managerFactory.then(factory => factory());
 }
 
@@ -63,17 +62,17 @@ function upgrade(mng: DialogManager) : SpeechIoManager<any> {
   return speechMng;
 }
 
-export function createSpeechioManager(logLevel: string | number): Promise<any>{
+export function createSpeechioManager(mmirLib: MmirModule, logLevel: string | number): Promise<any>{
 
   const mmir = mmirLib as MmirModule as ExtMmirModule<any>;
 
   return Promise.all([
-    createInstance().then(stateManager => stateManager._init(SPEECH_IO_MANAGER_ID, {modelUri: speechIoUri, engineId: SPEECH_IO_ENGINE_ID, logLevel: logLevel}, true).then(res => {
+    createInstance(mmirLib).then(stateManager => stateManager._init(SPEECH_IO_MANAGER_ID, {modelUri: speechIoUri, engineId: SPEECH_IO_ENGINE_ID, logLevel: logLevel}, true).then(res => {
       mmir.speechioManager = upgrade(res.manager);
       mmir.speechioEngine = res.engine;
       return res;
     })),
-    createInstance().then(stateManager => stateManager._init(SPEECH_IO_INPUT_ID, {modelUri: speechIoInputUri, engineId: SPEECH_IO_INPUT_ENGINE_ID, logLevel: logLevel}, true).then(res => {
+    createInstance(mmirLib).then(stateManager => stateManager._init(SPEECH_IO_INPUT_ID, {modelUri: speechIoInputUri, engineId: SPEECH_IO_INPUT_ENGINE_ID, logLevel: logLevel}, true).then(res => {
       mmir.speechioInput = res.manager;
       mmir.speechioInputEngine = res.engine;
       return res;
