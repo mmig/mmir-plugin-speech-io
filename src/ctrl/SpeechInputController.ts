@@ -17,7 +17,7 @@ import { SpeechEventName , ExtMmirModule , SpeechIoManager } from '../typings/mm
 import { MmirService } from '../mmir-service';
 import { PLUGIN_ID } from '../consts';
 
-
+declare var require: Function;
 
 
 export type RecognitionTypeExt = RecognitionType | 'RECOGNITION_ERROR';
