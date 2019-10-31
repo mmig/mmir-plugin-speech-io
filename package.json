@@ -31,13 +31,8 @@
     "@types/node": "^12.11.6",
     "mmir-lib": "git+https://gitlab-cos.b.dfki.de/mmir/dev_mmir-lib.git",
     "mmir-plugin-exports": "^1.2.2",
+    "mmir-tooling": "git+http://gitlab-cos.b.dfki.de/mmir/dev_mmir-tooling.git",
+    "mmir-webpack": "git+http://gitlab-cos.b.dfki.de/mmir/dev_mmir-webpack.git",
     "typescript": "^3.6.4"
-  },
-  "cordova": {
-    "id": "mmir-plugin-speech-io",
-    "platforms": []
-  },
-  "engines": {
-    "cordovaDependencies": {}
   }
 }
