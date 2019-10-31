@@ -171,7 +171,7 @@ export class MmirService<CmdImpl extends Cmd> {
           this.appConfig = createConfigSettingsImpl(this._mmir.conf);
         }
 
-        createSpeechioManager(this.isDebugVui? 'debug' : void(0)).then(() => {
+        createSpeechioManager(this._mmir, this.isDebugVui? 'debug' : void(0)).then(() => {
 
           // this.platform.setLang(this.mmir.lang.getLanguage(), true); FIXME set HTML language attribute!?!
 
