@@ -1,1 +1,2 @@
-export declare function createSpeechioManager(logLevel: string | number): Promise<any>;
+import { MmirModule } from 'mmir-lib';
+export declare function createSpeechioManager(mmirLib: MmirModule, logLevel: string | number): Promise<any>;

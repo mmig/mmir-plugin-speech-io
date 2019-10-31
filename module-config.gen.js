@@ -8,31 +8,36 @@ module.exports = {
   pluginName: "speechio",
   config: [
     /**
-     * the require path / URI to (native wrapper) module `./lib/index.js`
-     *
-     * NOTE by default this is set to the relative path (w.r.t. to the plugin main module)
-     *      may need to be changed, if relative resolution is changed
-     *
-     * Common Values:
-     * * package internal (relative): "./lib"
-     * * package-relative (exernal): "mmir-plugin-speech-io"
-     *
-     * @default "./lib"
-     * @see [[ModuleLocation]]
-     */
-    "moduleLocation",
-    /**
      * the module/plugin name for the MediaManager plugins configuration
      * @default "mmir-plugin-speech-io"
      */
     "mod"
   ],
   defaultValues: {
-    moduleLocation: "./lib",
     mod: "mmir-plugin-speech-io"
   },
-  moduleLocation: {
-    external: "mmir-plugin-speech-io",
-    internal: "./lib"
-  }
+  buildConfigs: [
+    {
+      states: {
+        models: {
+          speechio: {
+            moduleId: 'mmirf/speechioManager',
+            mode: 'extended',
+            file: __dirname + '/src/states/dialog.xml'
+          }
+        }
+      }
+    },
+    {
+      states: {
+        models: {
+          speechioInput: {
+            moduleId: 'mmirf/speechioInput',
+            mode: 'extended',
+            file: __dirname + '/src/states/input.xml'
+          }
+        }
+      }
+    }
+  ]
 };
