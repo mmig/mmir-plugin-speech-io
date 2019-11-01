@@ -189,9 +189,9 @@ export type SpeechInputMode = '' | 'guided';// '' (DEFAULT) | 'guided' //TODO sh
 
 export interface ShowSpeechStateOptions {
   state: boolean;// is active/inactive
-	mode: SpeechMode;
-	inputMode: SpeechInputMode;	// '' (default) | 'guided'
-	targetId?: any;//target-id for GUI widget (which should show/update its Speech State feedback)
+  mode: SpeechMode;
+  inputMode: SpeechInputMode;	// '' (default) | 'guided'
+  targetId?: any;//target-id for GUI widget (which should show/update its Speech State feedback)
 }
 
 export interface SpeechFeedbackOptions extends ShowSpeechStateOptions {
@@ -321,7 +321,7 @@ export interface SpeechRecognitionResult {
     confidence: number;
     type: RecognitionType;
     text: string;
-		unstable?: string;
+    unstable?: string;
 }
 
 export interface UnderstandingFunc<CmdImpl extends Cmd> extends Func {
@@ -339,19 +339,19 @@ export interface Gesture {
 
 export interface GestureSource {
   type: string;//HTML tag name, e.g. a or div
-	id?: string;//ID attribute if present
-	name?: string;//ID attribute if present
-	classes?: Array<string>;//list of classes if present
-	data?: string;//attached data if present
+  id?: string;//ID attribute if present
+  name?: string;//ID attribute if present
+  classes?: Array<string>;//list of classes if present
+  data?: string;//attached data if present
 }
 
 ////////////////////////////////////// Speech Commands /////////////////////////////
 
 export interface UnderstandigResult<CmdImpl extends Cmd> {
   id: number;		//INT "server-wide" ID
-	start: number;	//INT UNIX timestamp (incl. milli-seconds)
-	sourceId: number;		//INT interpretation-ID from the request (i.e. req.interpretation.id)
-	nlu: Array<CmdImpl>;
+  start: number;	//INT UNIX timestamp (incl. milli-seconds)
+  sourceId: number;		//INT interpretation-ID from the request (i.e. req.interpretation.id)
+  nlu: Array<CmdImpl>;
 }
 
 export interface Cmd {
