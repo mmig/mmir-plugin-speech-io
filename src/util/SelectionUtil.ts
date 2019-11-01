@@ -4,8 +4,8 @@ import * as LengthModule from '../lib/length.d';
 import { CaretOptions } from '../lib/caretPosition.d';
 
 interface CaretOptionsExt extends CaretOptions {
-	_container?: any;
-	_fieldName?: string;
+  _container?: any;
+  _fieldName?: string;
 }
 
 const PREV_FONT_SIZE 		= 'tsp_pfontsize';//previous value for font-size of selection-marker target (String)
@@ -14,20 +14,20 @@ const PREV_LINE_HEIGHT	= 'tsp_plineheight';//previous value for line-height in p
 //try to minimize calculation effort for selection marker:
 //reuse shadow DIV & try to avoid (re-) styling the shadow DIV
 var _selOpt: CaretOptionsExt = {
-	//for faster execution, this can be set to TRUE (tries to avoid unnecessary re-styling when calculating caret-coordinates):
-	//    if TRUE, styling of the DIV (for calculating the the caret-position) is only re-set
-	//    when the targeted TAG (i.e. <input> vs. <textarea>) changes
-	// -> should only be set to TRUE, if all speech-enabled <input>-tags are styled the same, and all speech-enabled <textarea>-tags are styled the same
-	guessIfUpdateStyle: false,
-	//overwrite/clear any global styles for <span> so that the faux-span for calculating the seletction-position works correctly
-	 forceClearFauxStyle: true,
-	//if TRUE, the DIV for calculating the the caret-position is re-used
-	reuse: true,
+  //for faster execution, this can be set to TRUE (tries to avoid unnecessary re-styling when calculating caret-coordinates):
+  //    if TRUE, styling of the DIV (for calculating the the caret-position) is only re-set
+  //    when the targeted TAG (i.e. <input> vs. <textarea>) changes
+  // -> should only be set to TRUE, if all speech-enabled <input>-tags are styled the same, and all speech-enabled <textarea>-tags are styled the same
+  guessIfUpdateStyle: false,
+  //overwrite/clear any global styles for <span> so that the faux-span for calculating the seletction-position works correctly
+  forceClearFauxStyle: true,
+  //if TRUE, the DIV for calculating the the caret-position is re-used
+  reuse: true,
 
-	//apply zoom factor to font-size when measuring position:
-	// necessary for getting exact position, when font-zoom (e.g. accessibility functions) is active
-	// -> set true so that fontZoom will be calculation upon first invocation
-	fontZoom: true
+  //apply zoom factor to font-size when measuring position:
+  // necessary for getting exact position, when font-zoom (e.g. accessibility functions) is active
+  // -> set true so that fontZoom will be calculation upon first invocation
+  fontZoom: true
 };
 
 var _selectionColor = '#0094FF';
@@ -39,12 +39,12 @@ var _cursorBlinkClass = 'text-selection-cursor-blink';
 var _cursorStyle = 'background-color: black !important; opacity:1 !important;';//TODO make this settable?//TODO use target's font-color as background-color
 //CSS animation style for cursor (blinking)
 var _blinkAnimation = '@keyframes ' + _cursorBlinkClass +
-						' { 50% { opacity: 0.0; } }\n@-webkit-keyframes ' + _cursorBlinkClass +
-						' { 50% { opacity: 0.0; } }\n.' + _cursorBlinkClass +
-						' { animation: ' + _cursorBlinkClass +
-						' 1s steps(15, start) infinite; -webkit-animation: ' + _cursorBlinkClass +
-						' 1s steps(15, start) infinite; ' + _cursorStyle +
-						'}';
+            ' { 50% { opacity: 0.0; } }\n@-webkit-keyframes ' + _cursorBlinkClass +
+            ' { 50% { opacity: 0.0; } }\n.' + _cursorBlinkClass +
+            ' { animation: ' + _cursorBlinkClass +
+            ' 1s steps(15, start) infinite; -webkit-animation: ' + _cursorBlinkClass +
+            ' 1s steps(15, start) infinite; ' + _cursorStyle +
+            '}';
 
 //CSS class name for selection marker DIV
 var _selectionMarkerClass = 'text-selection-marker-div';
@@ -58,30 +58,30 @@ var _selectionMarkerClass = 'text-selection-marker-div';
  */
 function createSelectionMarker(parentElement: Element | boolean, isCreateBlinkStyle?: boolean){
 
-	var isAttach = parentElement !== false;
-	parentElement = !parentElement || parentElement === true? document.body : parentElement;
+  var isAttach = parentElement !== false;
+  parentElement = !parentElement || parentElement === true? document.body : parentElement;
 
-	var rect = document.createElement('div');
-	rect.classList.add(_selectionMarkerClass);
+  var rect = document.createElement('div');
+  rect.classList.add(_selectionMarkerClass);
 
-	rect.style.display = 'none';//<- hide on initialization
-	rect.style.position = 'absolute';
-	rect.style.pointerEvents = 'none';//<- let click/touch-events etc. through to the underlying element(s)
-	rect.style.width = '1px';//<- set initial size to simulate the "cursor"
+  rect.style.display = 'none';//<- hide on initialization
+  rect.style.position = 'absolute';
+  rect.style.pointerEvents = 'none';//<- let click/touch-events etc. through to the underlying element(s)
+  rect.style.width = '1px';//<- set initial size to simulate the "cursor"
 
-	rect.style.backgroundColor = _selectionColor;
-	rect.style.opacity = '0.2';//FIXME TEST for single block-marker
+  rect.style.backgroundColor = _selectionColor;
+  rect.style.opacity = '0.2';//FIXME TEST for single block-marker
 
-	if(isCreateBlinkStyle){
-		var blink = document.createElement('style');
-		blink.textContent = _blinkAnimation;
-		rect.appendChild(blink);
-	}
+  if(isCreateBlinkStyle){
+    var blink = document.createElement('style');
+    blink.textContent = _blinkAnimation;
+    rect.appendChild(blink);
+  }
 
-	if(isAttach)
-		parentElement.appendChild(rect);
+  if(isAttach)
+    parentElement.appendChild(rect);
 
-	return rect;
+  return rect;
 }
 
 export class SelectionUtil {
@@ -127,28 +127,28 @@ setSelectionMarker(elem: HTMLInputElement | HTMLTextAreaElement | null, start: n
     target = void(0);
   }
 
-	//only show marker:
-	// * if elem is defined (if not: clear marker)
-	// * for selection *ranges* (i.e. do not show caret)
-	// * if elem is not focused (if focused, the build-in functionality of textarea/input will show the selection)
-	if(!forceDisplay && this._selMarkerStart && (!elem || /*length === 0 ||*/ document.activeElement === elem)){
+  //only show marker:
+  // * if elem is defined (if not: clear marker)
+  // * for selection *ranges* (i.e. do not show caret)
+  // * if elem is not focused (if focused, the build-in functionality of textarea/input will show the selection)
+  if(!forceDisplay && this._selMarkerStart && (!elem || /*length === 0 ||*/ document.activeElement === elem)){
 
     if(this._debug) console.log('clearSelectionMarker()');
 
-		this._selMarkerStart.style.display = 'none';
+    this._selMarkerStart.style.display = 'none';
 
-		if(this._selMarkerEnd)
-			this._selMarkerEnd.style.display = 'none';
+    if(this._selMarkerEnd)
+      this._selMarkerEnd.style.display = 'none';
 
-		if(this._selMarkerBlock)
-			this._selMarkerBlock.style.display = 'none';
+    if(this._selMarkerBlock)
+      this._selMarkerBlock.style.display = 'none';
 
-		return;/////////////EARLY EXIT/////////////////////
-	}
+    return;/////////////EARLY EXIT/////////////////////
+  }
 
-	if(!elem){
-		return;/////////////EARLY EXIT/////////////////////
-	}
+  if(!elem){
+    return;/////////////EARLY EXIT/////////////////////
+  }
 
   if(target){
     if(typeof target === 'string'){
@@ -164,120 +164,120 @@ setSelectionMarker(elem: HTMLInputElement | HTMLTextAreaElement | null, start: n
 
   if(this._debug) console.log('setSelectionMarker -> ['+start+', '+(start + length)+']');
 
-	var pos1 = this.caretPos.getCoordinates(elem, start, _selOpt);
-	var pos2 = this.caretPos.getCoordinates(elem, start + length, _selOpt);
+  var pos1 = this.caretPos.getCoordinates(elem, start, _selOpt);
+  var pos2 = this.caretPos.getCoordinates(elem, start + length, _selOpt);
 
-	var offsetTop = elem.offsetTop - elem.scrollTop;
-	var offsetLeft = elem.offsetLeft - elem.scrollLeft;
+  var offsetTop = elem.offsetTop - elem.scrollTop;
+  var offsetLeft = elem.offsetLeft - elem.scrollLeft;
 
-	var offsetParent = elem.offsetParent;
+  var offsetParent = elem.offsetParent;
 
-	if(!this._selMarkerStart){
-		this._selMarkerStart = createSelectionMarker(offsetParent, true);
-	}
+  if(!this._selMarkerStart){
+    this._selMarkerStart = createSelectionMarker(offsetParent, true);
+  }
 
-	var parent: Element;//TODO need to detect, if the marker was removed (e.g. due to page change etc)
-	if(offsetParent){//HACK: insert marker into relative-parent of target-element => will be moved correctly on scrolling etc.
-		if(offsetParent && offsetParent !== this._selMarkerStart.parentElement){
-			this._selMarkerStart.parentElement.removeChild(this._selMarkerStart);
-			if(this._selMarkerEnd) this._selMarkerEnd.parentElement.removeChild(this._selMarkerEnd);//TODO do this only if it will be displayed
-			if(this._selMarkerBlock) this._selMarkerBlock.parentElement.removeChild(this._selMarkerBlock);//TODO do this only if it will be displayed
-			parent = offsetParent;
-		}
-	} else {
-		if(this._selMarkerStart.parentElement !== document.body){
-			this._selMarkerStart.parentElement.removeChild(this._selMarkerStart);
-			if(this._selMarkerEnd) this._selMarkerEnd.parentElement.removeChild(this._selMarkerEnd);//TODO do this only if it will be displayed
-			if(this._selMarkerBlock) this._selMarkerBlock.parentElement.removeChild(this._selMarkerBlock);//TODO do this only if it will be displayed
-			parent = document.body;
-		}
-	}
+  var parent: Element;//TODO need to detect, if the marker was removed (e.g. due to page change etc)
+  if(offsetParent){//HACK: insert marker into relative-parent of target-element => will be moved correctly on scrolling etc.
+    if(offsetParent && offsetParent !== this._selMarkerStart.parentElement){
+      this._selMarkerStart.parentElement.removeChild(this._selMarkerStart);
+      if(this._selMarkerEnd) this._selMarkerEnd.parentElement.removeChild(this._selMarkerEnd);//TODO do this only if it will be displayed
+      if(this._selMarkerBlock) this._selMarkerBlock.parentElement.removeChild(this._selMarkerBlock);//TODO do this only if it will be displayed
+      parent = offsetParent;
+    }
+  } else {
+    if(this._selMarkerStart.parentElement !== document.body){
+      this._selMarkerStart.parentElement.removeChild(this._selMarkerStart);
+      if(this._selMarkerEnd) this._selMarkerEnd.parentElement.removeChild(this._selMarkerEnd);//TODO do this only if it will be displayed
+      if(this._selMarkerBlock) this._selMarkerBlock.parentElement.removeChild(this._selMarkerBlock);//TODO do this only if it will be displayed
+      parent = document.body;
+    }
+  }
 
-	var lineFirstTop = offsetTop + pos1.top;
+  var lineFirstTop = offsetTop + pos1.top;
 
-	this._selMarkerStart.style.display = '';
-	this._selMarkerStart.style.top = lineFirstTop + 'px';
-	this._selMarkerStart.style.left = offsetLeft + pos1.left + 'px';
+  this._selMarkerStart.style.display = '';
+  this._selMarkerStart.style.top = lineFirstTop + 'px';
+  this._selMarkerStart.style.left = offsetLeft + pos1.left + 'px';
 
-	//if length is 0 -> "cursor" representation: add blink-animation
-	if(length === 0){
-		this._selMarkerStart.classList.add(_cursorBlinkClass);
-	} else {
-		this._selMarkerStart.classList.remove(_cursorBlinkClass);
-	}
+  //if length is 0 -> "cursor" representation: add blink-animation
+  if(length === 0){
+    this._selMarkerStart.classList.add(_cursorBlinkClass);
+  } else {
+    this._selMarkerStart.classList.remove(_cursorBlinkClass);
+  }
 
-	var selHeight = this.setHeightFromFont(elem, this._selMarkerStart);
-	if(typeof selHeight === 'undefined'){
-		selHeight = getDataInt(this._selMarkerStart, PREV_LINE_HEIGHT);
-	} else {
-		setData(this._selMarkerStart, PREV_LINE_HEIGHT, selHeight);
-	}
+  var selHeight = this.setHeightFromFont(elem, this._selMarkerStart);
+  if(typeof selHeight === 'undefined'){
+    selHeight = getDataInt(this._selMarkerStart, PREV_LINE_HEIGHT);
+  } else {
+    setData(this._selMarkerStart, PREV_LINE_HEIGHT, selHeight);
+  }
 
-	var lines = Math.round(Math.abs(pos1.top - pos2.top) / selHeight) + 1;
-	if(lines > 1){
+  var lines = Math.round(Math.abs(pos1.top - pos2.top) / selHeight) + 1;
+  if(lines > 1){
 
-		if(this._debug) console.debug('multiline selections: '+lines);
+    if(this._debug) console.debug('multiline selections: '+lines);
 
-		//if we have more than 1 line, we can calculate the exact line-height:
-		selHeight = Math.abs(pos1.top - pos2.top) / (lines - 1);
+    //if we have more than 1 line, we can calculate the exact line-height:
+    selHeight = Math.abs(pos1.top - pos2.top) / (lines - 1);
 
-		//set marker for first line: from selection-start to line-end
-		var lineFirstWidth = elem.clientWidth - pos1.left;//<- NOTE: this marks the complete line (normally only the text would be marked)
+    //set marker for first line: from selection-start to line-end
+    var lineFirstWidth = elem.clientWidth - pos1.left;//<- NOTE: this marks the complete line (normally only the text would be marked)
 
-		this._selMarkerStart.style.display = '';
-		this._selMarkerStart.style.width = lineFirstWidth + 'px';
-		this._selMarkerStart.style.height = selHeight + 'px';
+    this._selMarkerStart.style.display = '';
+    this._selMarkerStart.style.width = lineFirstWidth + 'px';
+    this._selMarkerStart.style.height = selHeight + 'px';
 
-		//if there are more than 2 lines, we need an additional block that extends over the complete width
-		// and which starts from the lower edge of the first line to the upper edge of the last line
-		var lineBlockHeight = (lines - 2) * selHeight;
-		if(lineBlockHeight > 0){
+    //if there are more than 2 lines, we need an additional block that extends over the complete width
+    // and which starts from the lower edge of the first line to the upper edge of the last line
+    var lineBlockHeight = (lines - 2) * selHeight;
+    if(lineBlockHeight > 0){
 
-			if(!this._selMarkerBlock){
-				this._selMarkerBlock = createSelectionMarker(parent? false : offsetParent);
-			}
+      if(!this._selMarkerBlock){
+        this._selMarkerBlock = createSelectionMarker(parent? false : offsetParent);
+      }
 
-			var lineBlockWidth = elem.clientWidth;
+      var lineBlockWidth = elem.clientWidth;
 
-			this._selMarkerBlock.style.display = '';
-			this._selMarkerBlock.style.top = lineFirstTop + selHeight + 'px';
-			this._selMarkerBlock.style.left = offsetLeft + 'px';
-			this._selMarkerBlock.style.width = lineBlockWidth + 'px';
-			this._selMarkerBlock.style.height = lineBlockHeight + 'px';
-		} else if(this._selMarkerBlock) {
-			this._selMarkerBlock.style.display = 'none';
-		}
+      this._selMarkerBlock.style.display = '';
+      this._selMarkerBlock.style.top = lineFirstTop + selHeight + 'px';
+      this._selMarkerBlock.style.left = offsetLeft + 'px';
+      this._selMarkerBlock.style.width = lineBlockWidth + 'px';
+      this._selMarkerBlock.style.height = lineBlockHeight + 'px';
+    } else if(this._selMarkerBlock) {
+      this._selMarkerBlock.style.display = 'none';
+    }
 
-		if(!this._selMarkerEnd){
-			this._selMarkerEnd = createSelectionMarker(parent? false : offsetParent);
-		}
+    if(!this._selMarkerEnd){
+      this._selMarkerEnd = createSelectionMarker(parent? false : offsetParent);
+    }
 
-		//set the marker for the last line: from line-start to the selection-end
-		var lineLastWidth = pos2.left;
+    //set the marker for the last line: from line-start to the selection-end
+    var lineLastWidth = pos2.left;
 
-		this._selMarkerEnd.style.display = '';
-		this._selMarkerEnd.style.top = lineFirstTop + selHeight + lineBlockHeight + 'px';
-		this._selMarkerEnd.style.left = offsetLeft + 'px';
-		this._selMarkerEnd.style.width = lineLastWidth + 'px';
-		this._selMarkerEnd.style.height = selHeight + 'px';
+    this._selMarkerEnd.style.display = '';
+    this._selMarkerEnd.style.top = lineFirstTop + selHeight + lineBlockHeight + 'px';
+    this._selMarkerEnd.style.left = offsetLeft + 'px';
+    this._selMarkerEnd.style.width = lineLastWidth + 'px';
+    this._selMarkerEnd.style.height = selHeight + 'px';
 
-	} else {
+  } else {
 
-		//single line selection:
+    //single line selection:
 
-		if(this._selMarkerBlock) this._selMarkerBlock.style.display = 'none';
-		if(this._selMarkerEnd) this._selMarkerEnd.style.display = 'none';
+    if(this._selMarkerBlock) this._selMarkerBlock.style.display = 'none';
+    if(this._selMarkerEnd) this._selMarkerEnd.style.display = 'none';
 
-		var width = Math.max(1, pos2.left - pos1.left);
-		this._selMarkerStart.style.width = width + 'px';
+    var width = Math.max(1, pos2.left - pos1.left);
+    this._selMarkerStart.style.width = width + 'px';
 
-	}
+  }
 
-	if(parent){//<- only (re-)insert, if necessary
-		parent.appendChild(this._selMarkerStart);
-		if(this._selMarkerBlock) parent.appendChild(this._selMarkerBlock);
-		if(this._selMarkerEnd) parent.appendChild(this._selMarkerEnd);
-	}
+  if(parent){//<- only (re-)insert, if necessary
+    parent.appendChild(this._selMarkerStart);
+    if(this._selMarkerBlock) parent.appendChild(this._selMarkerBlock);
+    if(this._selMarkerEnd) parent.appendChild(this._selMarkerEnd);
+  }
 
   if(target){
     (_selOpt as any)._container = null;
@@ -289,26 +289,26 @@ setSelectionMarker(elem: HTMLInputElement | HTMLTextAreaElement | null, start: n
 
 setSelectionColor(color: string){
 
-	if(color !== _selectionColor){
+  if(color !== _selectionColor){
 
-		_selectionColor = color;
+    _selectionColor = color;
 
-		if(this._selMarkerStart){
-			this._selMarkerStart.style.backgroundColor = color;
-		}
+    if(this._selMarkerStart){
+      this._selMarkerStart.style.backgroundColor = color;
+    }
 
-		if(this._selMarkerEnd){
-			this._selMarkerEnd.style.backgroundColor = color;
-		}
+    if(this._selMarkerEnd){
+      this._selMarkerEnd.style.backgroundColor = color;
+    }
 
-		if(this._selMarkerBlock){
-			this._selMarkerBlock.style.backgroundColor = color;
-		}
-	}
+    if(this._selMarkerBlock){
+      this._selMarkerBlock.style.backgroundColor = color;
+    }
+  }
 }
 
 getSelectionColor(){
-	return _selectionColor;
+  return _selectionColor;
 }
 
 /**
@@ -334,11 +334,11 @@ getSelectionColor(){
  * 				options.id					STRING: the id attribute for the shadow DIV (DEFAULT: "input-textarea-caret-position-mirror-div")
  */
 setSelectionOptions(options: CaretOptions){
-	_selOpt = options;
+  _selOpt = options;
 }
 
 getSelectionOptions(): CaretOptions {
-	return _selOpt;
+  return _selOpt;
 }
 
 /**
@@ -351,35 +351,35 @@ getSelectionOptions(): CaretOptions {
  * i.e. no resetting necessary.
  */
 resetSelectionCalc(){
-	this.caretPos.resetStyleDiv();
+  this.caretPos.resetStyleDiv();
 }
 
 
 setHeightFromFont(elem: HTMLElement, marker: HTMLElement){
 
-	var fontSize = getComputedStyle(elem).getPropertyValue('font-size');
+  var fontSize = getComputedStyle(elem).getPropertyValue('font-size');
 
-	//check if (re-)calculation of font-size is necessary:
-	var prevFontSize = getData(marker, PREV_FONT_SIZE);
-	if(fontSize === prevFontSize){
-		return void(0);///////// EARLY EXIT ////////////////
-	}
+  //check if (re-)calculation of font-size is necessary:
+  var prevFontSize = getData(marker, PREV_FONT_SIZE);
+  if(fontSize === prevFontSize){
+    return void(0);///////// EARLY EXIT ////////////////
+  }
 
-	var pxSize = this.unitUtil.toPx(elem, fontSize);
+  var pxSize = this.unitUtil.toPx(elem, fontSize);
 
-	var lineHeight = getComputedStyle(elem).getPropertyValue('line-height');
-	if(lineHeight === 'normal'){
-		//FIXME: the 'normal' line-height is slightly greater than the font-size
-		//       ... this approximates the increase in webkit-based engine ... is there a formula for this?
-		pxSize += Math.round(pxSize * 0.17);
-	} else {
-		pxSize = this.unitUtil.toPx(elem, lineHeight, 'line-height');
-	}
+  var lineHeight = getComputedStyle(elem).getPropertyValue('line-height');
+  if(lineHeight === 'normal'){
+    //FIXME: the 'normal' line-height is slightly greater than the font-size
+    //       ... this approximates the increase in webkit-based engine ... is there a formula for this?
+    pxSize += Math.round(pxSize * 0.17);
+  } else {
+    pxSize = this.unitUtil.toPx(elem, lineHeight, 'line-height');
+  }
 
-	marker.style.height = pxSize + 'px';
-	setData(marker, PREV_FONT_SIZE, fontSize);//<- store un-modified fontSize
+  marker.style.height = pxSize + 'px';
+  setData(marker, PREV_FONT_SIZE, fontSize);//<- store un-modified fontSize
 
-	return pxSize;
+  return pxSize;
 }
 
 }
@@ -395,7 +395,7 @@ setHeightFromFont(elem: HTMLElement, marker: HTMLElement){
  *
  */
 function setData(el: HTMLElement, name: string, value: number | boolean | string){
-	el.dataset[name] = value !== null? value.toString() : value + '';
+  el.dataset[name] = value !== null? value.toString() : value + '';
 }
 
 /**
@@ -407,7 +407,7 @@ function setData(el: HTMLElement, name: string, value: number | boolean | string
  * @returns the data-value
  */
 function getData(el: HTMLElement, name: string): string {
-	return el.dataset[name];
+  return el.dataset[name];
 }
 
 /**
@@ -419,7 +419,7 @@ function getData(el: HTMLElement, name: string): string {
  * @returns the data as integer. If conversion fails, NaN will be returned (e.g. check with isFinite()).
  */
 function getDataInt(el: HTMLElement, name: string): number {
-	return parseInt(el.dataset[name], 10);
+  return parseInt(el.dataset[name], 10);
 }
 
 // /**

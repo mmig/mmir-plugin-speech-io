@@ -114,13 +114,13 @@ export class MmirService<CmdImpl extends Cmd> {
     //   setting is not really important for how the class functions, we just
     //   continue anyway)
     this.isDebugVui = true;
-  	this.appConfig.get('showVuiDebugOutput').then(isEnabled => {
-  		this.isDebugVui = isEnabled;
+    this.appConfig.get('showVuiDebugOutput').then(isEnabled => {
+      this.isDebugVui = isEnabled;
       if(this.mmir && this.mmir.speechioManager){
         let dlg = this.mmir.speechioManager;
         dlg._isDebugVui = isEnabled;
       }
-  	});
+    });
 
     if(!this._initialize){
       this._initialize = this.mmirInit();
@@ -200,7 +200,7 @@ export class MmirService<CmdImpl extends Cmd> {
           //circumvent message-queue for init-event:
           // (this allows to pass non-stringified and non-stringifyable object instances)
           let dlgEngine: ExtStateEngine = this.mmir.speechioEngine;
-      		dlgEngine.worker._engineGen.call(dlgEngine.worker._engineInstance, 'init', {
+          dlgEngine.worker._engineGen.call(dlgEngine.worker._engineInstance, 'init', {
             appConfig: this.appConfig,
             mmir: this._mmir,
             emma: dlg.emma,

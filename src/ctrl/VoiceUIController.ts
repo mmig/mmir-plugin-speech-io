@@ -276,8 +276,8 @@ export class VoiceUIController<CmdImpl extends Cmd> {
 
     this.triggerTouchFeedback(event);
 
-		// this.inp.raise('touch_input_event');
-		// this.inp.raise('click_on_' + name, data);
+    // this.inp.raise('touch_input_event');
+    // this.inp.raise('click_on_' + name, data);
     let emmaEvt = this.mmir.emma.toEmma(event, data);
     this.mmir.emma._setEmmaFuncData(emmaEvt, 'understanding', {
       name: name,
@@ -346,7 +346,7 @@ export class VoiceUIController<CmdImpl extends Cmd> {
     this.triggerTouchFeedback(event, feedbackOptions);
 
     this.speech.raise('toggleSpeechInputState', {mode: 'command', targetId: btnId});
-	  this.speech.raise('showSpeechState');
+    this.speech.raise('showSpeechState');
   }
 
   /**
@@ -377,7 +377,7 @@ export class VoiceUIController<CmdImpl extends Cmd> {
     this.initDictationTarget(targetId, feedbackStyle);
 
     this.speech.raise('toggleSpeechInputState', {mode: 'dictation', targetId: targetId});
-	  this.speech.raise('showSpeechState');
+    this.speech.raise('showSpeechState');
   }
 
   public initDictationTarget(targetId: string | DictationTarget, feedbackStyle?: SelectionMode) : DictationHandler {

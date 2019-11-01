@@ -67,12 +67,12 @@ export class DictationHandler {
   private _selectionListener: (event: Event) => void;
 
   //MIGRATE start
-	// input: textEl, -> textfield
+  // input: textEl, -> textfield
   isBrowserEnv: boolean;//ctrl._env.isBrowserEnv,
-	_isNeedFixFocus: boolean;//isRequireFocusFix,
-	isPlainText: boolean;//isPlainTextEl,
-	isTextInputEl: boolean;//isTextInputEl,
-	isIntegerInput: boolean;//isIntegerInput,
+  _isNeedFixFocus: boolean;//isRequireFocusFix,
+  isPlainText: boolean;//isPlainTextEl,
+  isTextInputEl: boolean;//isTextInputEl,
+  isIntegerInput: boolean;//isIntegerInput,
   _isAutocomplete?: boolean;
   _inputData: CurrentInputData;
   //MIGRATE end
@@ -102,13 +102,13 @@ export class DictationHandler {
     const textEl: HTMLElement = getHtmlElement(textfield);
     this.nativeInput = textEl;
 
-	  const tagType = textEl.tagName;
-  	this.isPlainText = tagType === 'TEXTAREA' || tagType === 'INPUT'? true : false;
-  	this.isTextInputEl = tagType === 'INPUT'? true : false;
-  	this.isIntegerInput = this.getData('accept') === 'integer' || this.getData('accepts') === 'integer';//FIXME should really be only "accept", but current on regisration-pages (PLZ field) "accepts" is used ...
+    const tagType = textEl.tagName;
+    this.isPlainText = tagType === 'TEXTAREA' || tagType === 'INPUT'? true : false;
+    this.isTextInputEl = tagType === 'INPUT'? true : false;
+    this.isIntegerInput = this.getData('accept') === 'integer' || this.getData('accepts') === 'integer';//FIXME should really be only "accept", but current on regisration-pages (PLZ field) "accepts" is used ...
 
-  	//FIXME need more elaborate detection: this should be true for Android (are there version where it is not needed? is it needed on iOS?
-  	this._isNeedFixFocus = this.isPlainText && false;//TODO: this._env.isCordovaEnv && !wik.tools.isAutoCompleteEl(textEl);//<- if Cordova-env, text-input element (but not for autocomplete widgets!)
+    //FIXME need more elaborate detection: this should be true for Android (are there version where it is not needed? is it needed on iOS?
+    this._isNeedFixFocus = this.isPlainText && false;//TODO: this._env.isCordovaEnv && !wik.tools.isAutoCompleteEl(textEl);//<- if Cordova-env, text-input element (but not for autocomplete widgets!)
 
 
     const sel: InputSelection = this.getInputSelection();
@@ -240,8 +240,8 @@ export class DictationHandler {
     }
     if(this.nativeInput && this._selectionListener){
       this.nativeInput.removeEventListener('select', this._selectionListener, false);
-			this.nativeInput.removeEventListener('keyup', this._selectionListener, false);
-			this.nativeInput.removeEventListener('click', this._selectionListener, false);
+      this.nativeInput.removeEventListener('keyup', this._selectionListener, false);
+      this.nativeInput.removeEventListener('click', this._selectionListener, false);
       this._selectionListener = null;
     }
     this.textfield = null;
@@ -315,41 +315,41 @@ export class DictationHandler {
   /////////////////////////////////// MIGRATE /////////////////////////////////
   setText(str: string | DisplayText, isCommitAutoComplete?: boolean){
 
-			let text: string;
-			let unstable: string;
+      let text: string;
+      let unstable: string;
       let rest: string;
-			let _isAutoCompl: boolean = true;
+      let _isAutoCompl: boolean = true;
 
-			//normalize arguments
-			if(typeof str !== 'string'){
+      //normalize arguments
+      if(typeof str !== 'string'){
 
-				text = str.text;
-				unstable = str.unstable;
+        text = str.text;
+        unstable = str.unstable;
         rest = str.rest;
-				if(typeof str.isAutoComplete !== 'undefined'){
-					// (and if present in 1st options-style argument)
-					_isAutoCompl = str.isAutoComplete;
-				}
+        if(typeof str.isAutoComplete !== 'undefined'){
+          // (and if present in 1st options-style argument)
+          _isAutoCompl = str.isAutoComplete;
+        }
 
-				//append space, if there is an unstable part
-				if( unstable && (! /\s$/igm.test(text)) ){
-					unstable = ' ' + unstable;
-				}
+        //append space, if there is an unstable part
+        if( unstable && (! /\s$/igm.test(text)) ){
+          unstable = ' ' + unstable;
+        }
 
-				if(unstable){
-					text += unstable;
-				}
+        if(unstable){
+          text += unstable;
+        }
 
         if(rest){
           text += rest;
         }
-			}
-			else {
-				text = str;
-			}
+      }
+      else {
+        text = str;
+      }
 
-			//the explicit 2nd argument overwrites options for isCommitAutoComplete, if it is present:
-			_isAutoCompl = typeof isCommitAutoComplete !== 'undefined'? isCommitAutoComplete : _isAutoCompl;
+      //the explicit 2nd argument overwrites options for isCommitAutoComplete, if it is present:
+      _isAutoCompl = typeof isCommitAutoComplete !== 'undefined'? isCommitAutoComplete : _isAutoCompl;
       if(_isAutoCompl && this.isAutocomplete()){
         //trigger autocomplete FIXME this is still the old jQuery implementation:
         (this.textfield as any).autocomplete('search',text);
@@ -378,14 +378,14 @@ export class DictationHandler {
       } else if(this.nativeInput){
 
         if(this.isPlainText){
-  				(this.nativeInput as HTMLInputElement).value = text;
-  			}
-  			else {
-  				if(unstable){
-  					text += UNSTABLE_RESULT_HTML_PREFIX + unstable + UNSTABLE_RESULT_HTML_SUFFIX;
-  				}
-  				this.nativeInput.innerHTML = text;
-  			}
+          (this.nativeInput as HTMLInputElement).value = text;
+        }
+        else {
+          if(unstable){
+            text += UNSTABLE_RESULT_HTML_PREFIX + unstable + UNSTABLE_RESULT_HTML_SUFFIX;
+          }
+          this.nativeInput.innerHTML = text;
+        }
       }
 
       if(this.nativeInput && this.isPlainText){
@@ -419,9 +419,9 @@ export class DictationHandler {
         }
       }
 
-		}
+    }
 
-		getText() : string {
+    getText() : string {
       if(this.target){
         if(this.target.form){
           return this.target.form.value;
@@ -429,58 +429,58 @@ export class DictationHandler {
         return this.target.container[this.target.fieldName];
       }
       else if(this.isPlainText){
-				return (this.nativeInput as HTMLInputElement).value;
-			}
-			else {
-				return this.nativeInput.textContent;
-			}
-		}
+        return (this.nativeInput as HTMLInputElement).value;
+      }
+      else {
+        return this.nativeInput.textContent;
+      }
+    }
 
-		isAutocomplete(): boolean {//is jQuery.UI autocomplete?
-			if(typeof this._isAutocomplete === 'undefined'){
-				this._isAutocomplete = this.isPlainText && false;//TODO: wik.tools.isAutoCompleteEl(this.textfield);
-			}
-			return this._isAutocomplete;
-		}
+    isAutocomplete(): boolean {//is jQuery.UI autocomplete?
+      if(typeof this._isAutocomplete === 'undefined'){
+        this._isAutocomplete = this.isPlainText && false;//TODO: wik.tools.isAutoCompleteEl(this.textfield);
+      }
+      return this._isAutocomplete;
+    }
 
-		getAutocompleteMenu(): any {//would return: jQuery-wrapped element
+    getAutocompleteMenu(): any {//would return: jQuery-wrapped element
       //FIXME impl.:
-			// if(this.isAutocomplete()){
-			// 	return this.textfield.autocomplete('widget').find('.ui-menu-item:visible').filter(function(index){
-			// 		if(jQuery(this).find('.'+wik.NO_AUTOCOMPLETE_RESULTS_CLASS).length === 0){
-			// 			return true;
-			// 		}
-			// 		return false;
-			// 	});
-			// }
-			// return jQuery();//return empty jQuery collection otherwise
-		}
+      // if(this.isAutocomplete()){
+      // 	return this.textfield.autocomplete('widget').find('.ui-menu-item:visible').filter(function(index){
+      // 		if(jQuery(this).find('.'+wik.NO_AUTOCOMPLETE_RESULTS_CLASS).length === 0){
+      // 			return true;
+      // 		}
+      // 		return false;
+      // 	});
+      // }
+      // return jQuery();//return empty jQuery collection otherwise
+    }
 
-		isAutocompleteNoResult(): boolean {
+    isAutocompleteNoResult(): boolean {
       //FIXME impl.:
-			// if(this.isAutocomplete()){
-			// 	return this.textfield.autocomplete('widget').find('.ui-menu-item:visible .'+wik.NO_AUTOCOMPLETE_RESULTS_CLASS).length > 0;
-			// }
-			return false;
-		}
+      // if(this.isAutocomplete()){
+      // 	return this.textfield.autocomplete('widget').find('.ui-menu-item:visible .'+wik.NO_AUTOCOMPLETE_RESULTS_CLASS).length > 0;
+      // }
+      return false;
+    }
 
-		/**
-		 * HELPER: set state "system-initiated selection in progress"
-		 *
-		 * NOTE: some browsers fire a FOCUS event when text is selected, some do not
-		 * 		-> this HELPER sets a marker to the text-element, so that:
-		 *
-		 * isActive === true => $(text-element).data('isSystemSelection') === true
-		 * isActive === false => $(text-element).data('isSystemSelection') === FALSY
-		 */
-		setSysSel(isActive: boolean) {
-			this.setData('isSystemSelection', !!isActive);
-		}
+    /**
+     * HELPER: set state "system-initiated selection in progress"
+     *
+     * NOTE: some browsers fire a FOCUS event when text is selected, some do not
+     * 		-> this HELPER sets a marker to the text-element, so that:
+     *
+     * isActive === true => $(text-element).data('isSystemSelection') === true
+     * isActive === false => $(text-element).data('isSystemSelection') === FALSY
+     */
+    setSysSel(isActive: boolean) {
+      this.setData('isSystemSelection', !!isActive);
+    }
 
     isSysSel(): boolean {
-			const isActive: string = this.getData('isSystemSelection');
+      const isActive: string = this.getData('isSystemSelection');
       return isActive? JSON.parse(isActive) : false;
-		}
+    }
 
     getData(field: string): string {
       return this.nativeInput? this.nativeInput.dataset[field] : void(0);
@@ -499,41 +499,41 @@ export class DictationHandler {
       }
     }
 
-		/**
-		 * HELPER for fixing the issue, that some Android devices will "pull" focus to the input-element
-		 * 			when text is entered / a selection is made
-		 * @param isForce
-		 * @returns
-		 */
-		doSetUnfocused(isForce?: boolean){
+    /**
+     * HELPER for fixing the issue, that some Android devices will "pull" focus to the input-element
+     * 			when text is entered / a selection is made
+     * @param isForce
+     * @returns
+     */
+    doSetUnfocused(isForce?: boolean){
 
-			if(this.textfield && this.isPlainText && (this._isNeedFixFocus || isForce)){
+      if(this.textfield && this.isPlainText && (this._isNeedFixFocus || isForce)){
 
-				if(document.activeElement === this.nativeInput || !document.activeElement){
+        if(document.activeElement === this.nativeInput || !document.activeElement){
           const evt = new Event('blur', {bubbles: false});
-	        this.nativeInput.dispatchEvent(evt);
-				}
+          this.nativeInput.dispatchEvent(evt);
+        }
 
-			}
-		}
-		/**
-		 * HELPER: set "system initiated" selection (see #setSysSel)
-		 *
-		 * IF arguments start and end are omitted -> select ALL
-		 *
-		 * setSelection()
-		 * setSelection(null)
-		 * setSelection(start: number, end: number, text?: string)
-		 */
-		setSelection(start?: number | null, end?: number, text?: string): void {
+      }
+    }
+    /**
+     * HELPER: set "system initiated" selection (see #setSysSel)
+     *
+     * IF arguments start and end are omitted -> select ALL
+     *
+     * setSelection()
+     * setSelection(null)
+     * setSelection(start: number, end: number, text?: string)
+     */
+    setSelection(start?: number | null, end?: number, text?: string): void {
 
       if(!this.nativeInput){
         return;
       }
 
-			text = text || this.getText();//<- get text without HTML tags/formatting (for text-field/area: the text is always plain)
+      text = text || this.getText();//<- get text without HTML tags/formatting (for text-field/area: the text is always plain)
 
-			if(this.isPlainText){
+      if(this.isPlainText){
 
         if(start === null && this.selectUtil){
           //clear visual selection (visible when text-element is not focused):
@@ -541,13 +541,13 @@ export class DictationHandler {
           return;
         }
 
-				if(typeof start !== 'number'){
-					start = 0;
-				}
+        if(typeof start !== 'number'){
+          start = 0;
+        }
 
-				if(typeof end !== 'number'){
-					end = text.length;
-				}
+        if(typeof end !== 'number'){
+          end = text.length;
+        }
 
 // 				//FIX: avoid strange "select-all" behavior in Chrome: do not select ending linebreak
 // 				//     ... although this may leave a linebreak(s) (e.g. in case it ends with "\n\n" -> "\n")
@@ -574,27 +574,27 @@ export class DictationHandler {
         const input = this.nativeInput as HTMLInputElement;//NOTE may also be a HTMLTextAreaElement, but in this instance it does not matter
 
         let omitNativeSel: boolean = false;
-				if(end <= start){
-					omitNativeSel = true;
-				} else {
+        if(end <= start){
+          omitNativeSel = true;
+        } else {
 
-					//check if the this range is already selected
-					var currStart = input.selectionStart;
-					if(isFinite(currStart)){
-						var currEnd = input.selectionEnd;
-						if(currEnd === end && currStart === start){
-							if(this._debug)  console.info('already selected: ['+start+','+end+']');
-							omitNativeSel = true;
-						}
-					}
+          //check if the this range is already selected
+          var currStart = input.selectionStart;
+          if(isFinite(currStart)){
+            var currEnd = input.selectionEnd;
+            if(currEnd === end && currStart === start){
+              if(this._debug)  console.info('already selected: ['+start+','+end+']');
+              omitNativeSel = true;
+            }
+          }
 
-				}
+        }
 
-				this.setSysSel(true);
-				if(this._isNeedFixFocus){
-					input.disabled = true;
-				}
-				try{
+        this.setSysSel(true);
+        if(this._isNeedFixFocus){
+          input.disabled = true;
+        }
+        try{
 
           if(!omitNativeSel){
             if(this._debug)  console.info('setSelection('+start+', '+end+')');
@@ -603,7 +603,7 @@ export class DictationHandler {
             input.dataset['MMMIR_PREV_SEL_START'] = ''+start;
             input.dataset['MMMIR_PREV_SEL_END'] = ''+end;
 
-  		      input.setSelectionRange(start, end);
+            input.setSelectionRange(start, end);
           }
 
           //set visual selection, even when text-element is not focused:
@@ -611,36 +611,36 @@ export class DictationHandler {
             this.selectUtil.setSelectionMarker(input, start, end - start, text? text : this.target as {container: any, fieldName: string});
           }
 
-				} catch(err){
-					//setSelectionRange is not available for all <input> types!
-					console.error('InputElement(id='+(input?input.id:'NIL')+'): could not set selection ['+start+','+end+']: '+err);
-				}
-				if(this._isNeedFixFocus){
-					input.disabled = false;
-				}
-				this.setSysSel(false);
+        } catch(err){
+          //setSelectionRange is not available for all <input> types!
+          console.error('InputElement(id='+(input?input.id:'NIL')+'): could not set selection ['+start+','+end+']: '+err);
+        }
+        if(this._isNeedFixFocus){
+          input.disabled = false;
+        }
+        this.setSysSel(false);
 
-			} else {
+      } else {
 
-				var len = text.length;
-				if(typeof start !== 'number' && typeof start !== 'number'){
-					start = 0;
-					end = len;
-				}
+        var len = text.length;
+        if(typeof start !== 'number' && typeof start !== 'number'){
+          start = 0;
+          end = len;
+        }
 
-				if(end <= start){
-					return;
-				}
+        if(end <= start){
+          return;
+        }
 
-				text =  (start > 0?       text.substring(0, start)   : '') + UNSTABLE_RESULT_HTML_PREFIX +
-						(start + 1 > end? text.substring(start + 1, end) : '') + UNSTABLE_RESULT_HTML_SUFFIX +
-						(end   + 1 > len? text.substring(end + 1)        : '');
+        text =  (start > 0?       text.substring(0, start)   : '') + UNSTABLE_RESULT_HTML_PREFIX +
+            (start + 1 > end? text.substring(start + 1, end) : '') + UNSTABLE_RESULT_HTML_SUFFIX +
+            (end   + 1 > len? text.substring(end + 1)        : '');
 
         const input = this.nativeInput;
-				input.innerHTML = text;
+        input.innerHTML = text;
 
-			}
-		}//END setSelection(){...}
+      }
+    }//END setSelection(){...}
 }
 
 export type SelectionMode = 'none' | 'unstable' | 'interim';
@@ -651,36 +651,36 @@ export class CurrentInputData {
 
       _debug: boolean;
 
-			result: Array<string> = [];
-			interim: string = '';
-			unstable: string = '';
+      result: Array<string> = [];
+      interim: string = '';
+      unstable: string = '';
 
       selection: InputSelection | null = null;
 
-			reset(): void {
-				this.interim = '';
-				this.unstable = '';
-				this.result.splice(0, this.result.length);
-			}
+      reset(): void {
+        this.interim = '';
+        this.unstable = '';
+        this.result.splice(0, this.result.length);
+      }
 
-			/**
-			 * sets current input to 1 single, stable result (and removes unstable & interim parts)
-			 *
-			 * @param {string} text
-			 *                     the (stable) text
-			 * @param {Boolean} [isPreprocessText]
-			 *                     indicates, if text is already prepocessed: if not, preprocessing is applied
-			 *                     (transform punctuation-words, captialize at beginning of sentence etc)
-			 *                     DEFAULT: true
-			 */
-			set(text: string, isPreprocessText?: boolean){//text STRING, isPreprocessText BOOLEAN OPTIONAL (default: true)
-				this.interim = '';
-				this.unstable = '';
-				if(isPreprocessText !== false){
-					text = this._processPunctuation(text);
-				}
-				this.result.splice(0, this.result.length, text);
-			}
+      /**
+       * sets current input to 1 single, stable result (and removes unstable & interim parts)
+       *
+       * @param {string} text
+       *                     the (stable) text
+       * @param {Boolean} [isPreprocessText]
+       *                     indicates, if text is already prepocessed: if not, preprocessing is applied
+       *                     (transform punctuation-words, captialize at beginning of sentence etc)
+       *                     DEFAULT: true
+       */
+      set(text: string, isPreprocessText?: boolean){//text STRING, isPreprocessText BOOLEAN OPTIONAL (default: true)
+        this.interim = '';
+        this.unstable = '';
+        if(isPreprocessText !== false){
+          text = this._processPunctuation(text);
+        }
+        this.result.splice(0, this.result.length, text);
+      }
 
       getCurrentText(): string {
         // const len = this.result.length;
@@ -716,61 +716,61 @@ export class CurrentInputData {
         return '';
       }
 
-			/**
-			 * add an additional stable part to the current input
-			 *
-			 * @param {String} result
-			 * 			the (paritial but stable) result to add/append
-			 */
-			add(result: string): void {
+      /**
+       * add an additional stable part to the current input
+       *
+       * @param {String} result
+       * 			the (paritial but stable) result to add/append
+       */
+      add(result: string): void {
 
         if(this._debug) console.log('add "'+result+'" -> ', this.result, ' ', this.selection);
 
-				result = this._processPunctuation(result);
+        result = this._processPunctuation(result);
 
-				const insertIndex: number = this._getTargetIndex();
-				const beginsWithWhitespace: boolean = /^\s/ig.test(result);
-				let prev: string;
-				let isAddSpace: boolean = false, isToUpperCase: boolean = false;
+        const insertIndex: number = this._getTargetIndex();
+        const beginsWithWhitespace: boolean = /^\s/ig.test(result);
+        let prev: string;
+        let isAddSpace: boolean = false, isToUpperCase: boolean = false;
 
-				if(insertIndex > 0){
+        if(insertIndex > 0){
 
-					prev = this.result[insertIndex-1];
+          prev = this.result[insertIndex-1];
 
-					if(prev.length > 0){
+          if(prev.length > 0){
 
-						//add space if previous String does not end with one
-						// (and if the result itself does not begin with punctuation)
-						if(!beginsWithWhitespace  && !/\s$/ig.test(prev) && ! /^[.,;?!:]/ig.test(result) ){
-							isAddSpace = true;
-						}
+            //add space if previous String does not end with one
+            // (and if the result itself does not begin with punctuation)
+            if(!beginsWithWhitespace  && !/\s$/ig.test(prev) && ! /^[.,;?!:]/ig.test(result) ){
+              isAddSpace = true;
+            }
 
-						//make first Char to upper case, if previous ends with
-						// new line or with a "sentence ending punctuation"
-						if(/(^|[.?!])\s*$/ig.test(prev)){
-							isToUpperCase = true;
-						}
-					}
-				}
-				else {
-					//if it is the very first result:
-					//  make first Char upper case
-					isToUpperCase = /^/ig.test(result);
-				}
+            //make first Char to upper case, if previous ends with
+            // new line or with a "sentence ending punctuation"
+            if(/(^|[.?!])\s*$/ig.test(prev)){
+              isToUpperCase = true;
+            }
+          }
+        }
+        else {
+          //if it is the very first result:
+          //  make first Char upper case
+          isToUpperCase = /^/ig.test(result);
+        }
 
-				if(isToUpperCase){
-					result = result.replace(/^(\s*)(\w)(\w+)/ig, function(_m, s, ch, word){
-						return (s? s : '') + ch.toUpperCase() + word;
-					});
-				}
+        if(isToUpperCase){
+          result = result.replace(/^(\s*)(\w)(\w+)/ig, function(_m, s, ch, word){
+            return (s? s : '') + ch.toUpperCase() + word;
+          });
+        }
 
-				if(isAddSpace){
-					result = ' ' + result;
-				}
+        if(isAddSpace){
+          result = ' ' + result;
+        }
 
-				this._add(result);
+        this._add(result);
 
-			}//END: add(result)
+      }//END: add(result)
 
 
       private _add(result: string): void {
@@ -836,24 +836,24 @@ export class CurrentInputData {
         }
       }
 
-			_processPunctuation(text: string): string {//TODO move this function to an separate text-processing module
+      _processPunctuation(text: string): string {//TODO move this function to an separate text-processing module
 
-      	var str = text.replace(/\s?\bKomma\b/ig, ',')
-      				.replace(/\s?\bFrage ?zeichen\b/ig, '?')
-      				.replace(/\s?\bAusrufe ?zeichen\b/ig, '!')
-      				.replace(/\s?\bDoppelpunkt\b/ig, ':')
-      				.replace(/\s?\bSemikolon\b/ig, ';')
-      				.replace(/\s?\bAnführungs ?(zeichen|striche)\b/ig, '"')
-      				.replace(/\b(Binde|Gedanken) ?strich\b/ig, '-')
-      				.replace(/(\s|^)?\.(\s|\r?\n)/g, function(_matchStr, spaceBefore, spaceAfter, _offset, _origStr){//<- "revert" dots that were converted by the recognizer back to the word (and process them uniformly with "rule" below)
-      					spaceBefore = spaceBefore || ' ';//may need to insert a space
-      					return spaceBefore + 'Punkt' + spaceAfter;
-      				});
+        var str = text.replace(/\s?\bKomma\b/ig, ',')
+              .replace(/\s?\bFrage ?zeichen\b/ig, '?')
+              .replace(/\s?\bAusrufe ?zeichen\b/ig, '!')
+              .replace(/\s?\bDoppelpunkt\b/ig, ':')
+              .replace(/\s?\bSemikolon\b/ig, ';')
+              .replace(/\s?\bAnführungs ?(zeichen|striche)\b/ig, '"')
+              .replace(/\b(Binde|Gedanken) ?strich\b/ig, '-')
+              .replace(/(\s|^)?\.(\s|\r?\n)/g, function(_matchStr, spaceBefore, spaceAfter, _offset, _origStr){//<- "revert" dots that were converted by the recognizer back to the word (and process them uniformly with "rule" below)
+                spaceBefore = spaceBefore || ' ';//may need to insert a space
+                return spaceBefore + 'Punkt' + spaceAfter;
+              });
 
-      	//if "Punkt" is last word, then replace it too
-      	str = str.replace(/\s?\bPunkt\b(\s|\r|\n)*$/igm, '.');
+        //if "Punkt" is last word, then replace it too
+        str = str.replace(/\s?\bPunkt\b(\s|\r|\n)*$/igm, '.');
 
-      	return str;
+        return str;
     }
 
     /**
@@ -871,7 +871,7 @@ export class CurrentInputData {
       if(text[start-1] === ' ' && newStr[0] === ' '){
         newStr = newStr.substring(1);
       }
-  		const end = selection.end;
+      const end = selection.end;
       let newText: string = (start > 0? text.substring(0, start) : '') + newStr;
       const rest = (tlen > end? text.substring(end) : '');
 
@@ -883,7 +883,7 @@ export class CurrentInputData {
       if(this._debug) console.log('_inserted ',[newStr, rest], ''+(!newStr? new Error().stack.replace(/Error\*/i, '') : ''));
 
       return [newText, rest];
-  	}
+    }
 
     _getTargetIndex(): number {
       if(this.selection && this.selection.index > -1){
