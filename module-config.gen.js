@@ -8,12 +8,18 @@ module.exports = {
   pluginName: "speechio",
   config: [
     /**
+     * the plugin type
+     * @default "custom"
+     */
+    "type",
+    /**
      * the module/plugin name for the MediaManager plugins configuration
      * @default "mmir-plugin-speech-io"
      */
     "mod"
   ],
   defaultValues: {
+    type: "custom",
     mod: "mmir-plugin-speech-io"
   },
   buildConfigs: [
