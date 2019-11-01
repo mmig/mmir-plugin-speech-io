@@ -1,5 +1,5 @@
 <scxml xmlns="http://www.w3.org/2005/07/scxml" version="1.0"
-       profile="ecmascript" name="speechio" initial="InitialSpeechIo">
+      profile="ecmascript" name="speechio" initial="InitialSpeechIo">
 
 
   <!-- State Machine for MMIR Speech IO -->
@@ -234,39 +234,39 @@
 
       <datamodel>
         <!-- mode for speech input:
-                 "command" | "dictation"
+                "command" | "dictation"
 
             DEFAULT: 'command'
-         -->
+        -->
         <data id="speech_mode" expr="'command'"/>
 
         <!-- input mode for speech input:
                 FLASY (default) | "guided" | "extended"
-         -->
+        -->
         <data id="input_mode" expr="''"/>
 
         <!-- ID attribute for DOM element that triggered speech input
 
             DEFAULT: 'speech-cmd' (the speech command button)
-         -->
+        -->
         <data id="target_id" expr="'speech-cmd'"/>
 
         <!-- temporary ID:
                 if this is set, then speech-input should be re-started
                 next for this DOM element
-         -->
+        -->
         <data id="temp_restart_speech_with_id" expr="''"/>
 
         <!-- temporary ID:
                 if this is set, then speech-input should be re-started
                 again, after reading has finished
-         -->
+        -->
         <data id="temp_resume_speech_with_id" expr="''"/>
 
         <!-- temporary ID:
                 if this is set, then speech-input should be re-started
                 again, after reading has finished with the prompt
-         -->
+        -->
         <data id="temp_prompt_data" expr="''"/>
 
         <!--  the ID / context-name for the ASR engine, DEFAULT: void i.e. use default context/engine -->
@@ -276,7 +276,7 @@
             flag for starting guidance of guided-input (instead of continuing it)
             if this is set, the first call to continueGuidance will be "converted"
             to start-guidance (instead of continue-guidance), and then be reset
-         -->
+        -->
         <data id="start_guidance" expr="false"/>
 
       </datamodel>
@@ -284,7 +284,7 @@
       <!--
           set the ASR engine: either "nuance" or "android"
           NOTE: you should cancel / stop speech-input before setting a new ASR context
-       -->
+      -->
       <transition event="setAsrEngine" name="setAsrEngine">
         <script>
             if(_util.env.isCordovaEnv){
@@ -704,9 +704,9 @@
           </transition>
 
           <!--
-               stop speech-input only for now, but set "marker" in order to restart it again
-               (will be evaluated, e.g. when reading stops, see reading-stopped)
-           -->
+              stop speech-input only for now, but set "marker" in order to restart it again
+              (will be evaluated, e.g. when reading stops, see reading-stopped)
+          -->
           <transition event="pause-speech-input" name="pause-speech-input" target="AsrInactive">
             <assign location="temp_resume_speech_with_id" expr="target_id"/>
           </transition>
@@ -743,7 +743,7 @@
 
           <transition event="cancel-non-guided-dictation" name="cancel-non-guided-dictation" cond="speech_mode === 'dictation'">
             <script>
-               if(_util.isDebugVui) console.debug('active cancel-non-guided-dictation -> state: '+JSON.stringify(_util.createVuiOptions()));
+              if(_util.isDebugVui) console.debug('active cancel-non-guided-dictation -> state: '+JSON.stringify(_util.createVuiOptions()));
             </script>
             <if cond="input_mode !== 'guided'">
               <!-- if not in guided-input mode: trigger "normal" cancel that stops current input and all suspended restarts too: -->
@@ -777,7 +777,7 @@
 
           <transition event="cancel-non-guided-dictation" name="cancel-non-guided-dictation" cond="speech_mode === 'command'">
             <script>
-               if(_util.isDebugVui) console.debug('active cancel-non-guided-dictation -> state: '+JSON.stringify(_util.createVuiOptions()));
+              if(_util.isDebugVui) console.debug('active cancel-non-guided-dictation -> state: '+JSON.stringify(_util.createVuiOptions()));
             </script>
             <assign location="temp_restart_speech_with_id" expr="''" />
             <!-- need to update GUI before resetting to default values: -->
@@ -944,7 +944,7 @@
           <transition event="cancel-non-guided-dictation" name="cancel-non-guided-dictation">
 
             <script>
-               if(_util.isDebugVui) console.debug('INactive cancel-non-guided-dictation -> state: '+JSON.stringify(_util.createVuiOptions()));
+              if(_util.isDebugVui) console.debug('INactive cancel-non-guided-dictation -> state: '+JSON.stringify(_util.createVuiOptions()));
             </script>
 
             <assign location="speech_mode" expr="_util.defaultSpeechMode" />
@@ -1037,10 +1037,10 @@
       <transition event="read-prompt" name="read-prompt-active" cond="reading_status">
 
         <!-- if the active reading is not for the same target,
-             re-start for it after the current one has stopped.
+            re-start for it after the current one has stopped.
 
-             (but also not restart, if reading has been explicitly stopped)
-         -->
+            (but also not restart, if reading has been explicitly stopped)
+        -->
         <if cond="_event.data.readingId !== reading_id &amp;&amp; !_event.data.stopReading">
           <assign location="temp_reading_data" expr="_event.data" />
         <else/>

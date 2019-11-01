@@ -245,25 +245,25 @@ export class SpeechInputController {
 
   protected doHandleDictationResult(asrEmmaEvent: RecognitionEmma, inputElem: DictationHandler){
 
-  	const asr = this._emma._extractAsrData(asrEmmaEvent) as ASRResult;
-  	// var targetId = this._extractTargetElementId(asrEmmaEvent);
+    const asr = this._emma._extractAsrData(asrEmmaEvent) as ASRResult;
+    // var targetId = this._extractTargetElementId(asrEmmaEvent);
 
-  	const currentInputData: CurrentInputData = inputElem._inputData;// this._getCurrentInput(targetId);
-  	// const inputElem = this._getCurrentInputElement(targetId);
+    const currentInputData: CurrentInputData = inputElem._inputData;// this._getCurrentInput(targetId);
+    // const inputElem = this._getCurrentInputElement(targetId);
 
-  	let result: string = asr.text;
-  	const	//score: number = asr.confidence,
-  		type: RecognitionTypeExt = asr.type as RecognitionTypeExt,
+    let result: string = asr.text;
+    const	//score: number = asr.confidence,
+      type: RecognitionTypeExt = asr.type as RecognitionTypeExt,
   //		alternatives = asr.alternatives,
-  		unstable: string = asr.unstable,
-  		isAutoComplete: boolean = asr.isAutoComplete;//<- flag: if omitted or TRUE: do "commit" result to autocomplete (if the targeted DOM-element is an autocomplete widget)
+      unstable: string = asr.unstable,
+      isAutoComplete: boolean = asr.isAutoComplete;//<- flag: if omitted or TRUE: do "commit" result to autocomplete (if the targeted DOM-element is an autocomplete widget)
 
-  	let isStopped: boolean = false;
+    let isStopped: boolean = false;
 
-  	//process non-guided "selection mode" for autocomplete
-  	const isGuided: boolean = false;//TODO: asrEmmaEvent && asrEmmaEvent.interpretation && asrEmmaEvent.interpretation.isGuided;
-  	let isConsumed: boolean = false;
-  	if(! isGuided){
+    //process non-guided "selection mode" for autocomplete
+    const isGuided: boolean = false;//TODO: asrEmmaEvent && asrEmmaEvent.interpretation && asrEmmaEvent.interpretation.isGuided;
+    let isConsumed: boolean = false;
+    if(! isGuided){
 
       //TODO: impl.:  autocomplete-widget handling
   // 		if(inputElem && inputElem.isAutocomplete()){//} && inputElem.input.attr('disamb') == 'true'){
@@ -361,80 +361,80 @@ export class SpeechInputController {
   //
   // 		}//END: if(isAutocomplete)
 
-  	}//END: if(!isGuided)
+    }//END: if(!isGuided)
 
-  	let isCanceled: boolean = false;
-  	if(!isStopped && type !== 'INTERIM'){
+    let isCanceled: boolean = false;
+    if(!isStopped && type !== 'INTERIM'){
 
-  		const isEvalStopWord: boolean = this._isEvalDictStopWord(asrEmmaEvent);
-  		if(isEvalStopWord && this._stopDictExpr.test(result)){
+      const isEvalStopWord: boolean = this._isEvalDictStopWord(asrEmmaEvent);
+      if(isEvalStopWord && this._stopDictExpr.test(result)){
 
-  			if(this._cancelDictExpr.test(result)){
-  				isCanceled = true;
-  			}
+        if(this._cancelDictExpr.test(result)){
+          isCanceled = true;
+        }
 
-  			result = result.replace(this._stopDictExpr, '');
+        result = result.replace(this._stopDictExpr, '');
 
         //remove trainling whithespace, if there is one:
         if(/\s$/.test(result)){
           result = result.substring(0, result.length - 1);
         }
 
-  			isStopped = true;
+        isStopped = true;
 
-  			//isStopped due to stop-word, but already consumed:
-  			// need to update input-text -> "un-consume"!
-  			if(isConsumed){
-  				isConsumed = false;
-  			}
-  		}
+        //isStopped due to stop-word, but already consumed:
+        // need to update input-text -> "un-consume"!
+        if(isConsumed){
+          isConsumed = false;
+        }
+      }
 
-  	}
+    }
 
-  	let isUpdateControl: boolean = false;
-  	if(!isConsumed){
+    let isUpdateControl: boolean = false;
+    if(!isConsumed){
 
-  		if(type == 'INTERIM'){
-  			currentInputData.interim = result;
-  			currentInputData.unstable = unstable;
-  		}
-  		else if(result || isStopped) {
+      if(type == 'INTERIM'){
+        currentInputData.interim = result;
+        currentInputData.unstable = unstable;
+      }
+      else if(result || isStopped) {
 
-  			currentInputData.interim = '';
-  			currentInputData.unstable = '';
-  	//		currentInputData.result.push(result.replace(/  /gm, ' '));
-  			if(result){
-  				currentInputData.add(result);
-  			}
+        currentInputData.interim = '';
+        currentInputData.unstable = '';
+    //		currentInputData.result.push(result.replace(/  /gm, ' '));
+        if(result){
+          currentInputData.add(result);
+        }
 
-  	//		currentInputData.score.push(score);
-  	//		currentInputData.result.alternatives.push(alternatives);
-  		}
+    //		currentInputData.score.push(score);
+    //		currentInputData.result.alternatives.push(alternatives);
+      }
 
-  		if(type !== 'RECOGNITION_ERROR'){
+      if(type !== 'RECOGNITION_ERROR'){
 
-  			//FIXME only should do this when neccessary (-> "focus fix for selecting text on Android": do blur() if non-stable results are contained, so that text-input loses focus)
-  			isUpdateControl = isUpdateControl || type !== 'INTERIM';
+        //FIXME only should do this when neccessary (-> "focus fix for selecting text on Android": do blur() if non-stable results are contained, so that text-input loses focus)
+        isUpdateControl = isUpdateControl || type !== 'INTERIM';
 
-  			this._printCurrentInput(inputElem.id, isAutoComplete, inputElem);//TODO currentInputData);
-  		}
-  	}
+        this._printCurrentInput(inputElem.id, isAutoComplete, inputElem);//TODO currentInputData);
+      }
+    }
 
-  	if(isStopped){
+    if(isStopped){
 
-  		if(isCanceled || !inputElem.getText().trim()){
+      if(isCanceled || !inputElem.getText().trim()){
 
-  			//input-text is empty due to stop-word-removal, or dict was canceled
-  			// -> restore original-text (if there is one)
+        //input-text is empty due to stop-word-removal, or dict was canceled
+        // -> restore original-text (if there is one)
 
-  			const originalText: string = inputElem.getData('original-text');
-  			if(originalText){
-  				currentInputData.set(originalText);
-  				inputElem.setText(originalText);
-  			}
-  		}
+        const originalText: string = inputElem.getData('original-text');
+        if(originalText){
+          currentInputData.set(originalText);
+          inputElem.setText(originalText);
+        }
+      }
 
-  		let isActivateCommandInput: boolean = false;
+      let isActivateCommandInput: boolean = false;
 
   //		if(inputElem && inputElem.isAutocomplete()){
   //
@@ -458,7 +458,7 @@ export class SpeechInputController {
   //		}
 
         //TODO impl. auto-proceed, i.e. go-to-next
-  		// if(this.isDictAutoProceed()){
+      // if(this.isDictAutoProceed()){
   // 			var dicts = $('.wik-speech.speech-dict');
   // 			var currIndex = -1;
   // 			var size = dicts.length;
@@ -480,52 +480,52 @@ export class SpeechInputController {
   // 		}
   // 		else {
 
-  			if(inputElem.getData('speech') === 'restart-command'){
-  				inputElem.removeData('speech');//reset element
+        if(inputElem.getData('speech') === 'restart-command'){
+          inputElem.removeData('speech');//reset element
   //				$('#mc-speech-command').trigger('click');//restart command-mode
-  				isActivateCommandInput = true;
-  			}
-  			else if(!isActivateCommandInput) {
-  				//close dictation
+          isActivateCommandInput = true;
+        }
+        else if(!isActivateCommandInput) {
+          //close dictation
           this._manager.raise('cancel-dictation');
-  				isUpdateControl = true;
-  			}
-  		// }//END: if(this.isDictAutoProceed()){...
+          isUpdateControl = true;
+        }
+      // }//END: if(this.isDictAutoProceed()){...
 
-  		if(isActivateCommandInput){
-  			triggerClickFeedback();//FIXME should we use impl. from VoiceUIController here instead?
-  			this._manager.raise('toggleSpeechInputState', {mode: 'command', targetId: 'mc-speech-command'});
-  			this._manager.raise('showSpeechState');
-  			isUpdateControl = true;
-  		}
+      if(isActivateCommandInput){
+        triggerClickFeedback();//FIXME should we use impl. from VoiceUIController here instead?
+        this._manager.raise('toggleSpeechInputState', {mode: 'command', targetId: 'mc-speech-command'});
+        this._manager.raise('showSpeechState');
+        isUpdateControl = true;
+      }
 
   //		if(isUpdateControl){
   //			inputElem.doSetUnfocused();
   //		}
 
-  	}//END: if(isStopped)
+    }//END: if(isStopped)
 
-  	//FIXME must/should this be done for asr-engines with interim-results (i.e. Google ASR), so that on Android tablets focus is freed after selection (would only be needed, if unstable was present!)
-  	if(isUpdateControl){// !isUpdateControl && unstable){
-  		inputElem.doSetUnfocused();
-  	}
+    //FIXME must/should this be done for asr-engines with interim-results (i.e. Google ASR), so that on Android tablets focus is freed after selection (would only be needed, if unstable was present!)
+    if(isUpdateControl){// !isUpdateControl && unstable){
+      inputElem.doSetUnfocused();
+    }
   }
 
   protected _printCurrentInput(targetId: string, isCommitAutoComplete: boolean, inputElem: DictationHandler){
 
-  	inputElem = inputElem || this.dictTargetHandler.get(targetId);
+    inputElem = inputElem || this.dictTargetHandler.get(targetId);
 
-  	const output = this._getCurrentInputText(targetId, inputElem.isPlainText, inputElem.isIntegerInput, true, inputElem._inputData);
+    const output = this._getCurrentInputText(targetId, inputElem.isPlainText, inputElem.isIntegerInput, true, inputElem._inputData);
 
-  	if(output){
+    if(output){
 
-  		if(typeof output === 'object'){
-  			output.isAutoComplete = isCommitAutoComplete;
-  			isCommitAutoComplete = void(0);
-  		}
+      if(typeof output === 'object'){
+        output.isAutoComplete = isCommitAutoComplete;
+        isCommitAutoComplete = void(0);
+      }
 
-  		inputElem.setText(output, isCommitAutoComplete);
-  	}
+      inputElem.setText(output, isCommitAutoComplete);
+    }
   }
 
 
@@ -568,99 +568,99 @@ export class SpeechInputController {
  */
 protected _getCurrentInputText(targetId: string, isPlainText: boolean, isRemoveAllWhitespaces: boolean, isWithExtraUnstable: boolean, inputData?: CurrentInputData): DisplayText | string {
 
-	let output: string;
+  let output: string;
   let rest: string;
-	let unstable: string;
+  let unstable: string;
   let interimIndex: number;
-	let currentInputData: CurrentInputData = inputData || this.dictTargetHandler.get(targetId)._inputData;
-	if(isPlainText){
+  let currentInputData: CurrentInputData = inputData || this.dictTargetHandler.get(targetId)._inputData;
+  if(isPlainText){
 
-		output = currentInputData.getCurrentText();
+    output = currentInputData.getCurrentText();
     rest = currentInputData.getRestText();
 
-		if(isRemoveAllWhitespaces === true){
-			output = output.replace(/\s+/gm, '');
-		}
+    if(isRemoveAllWhitespaces === true){
+      output = output.replace(/\s+/gm, '');
+    }
 
-		if(currentInputData.interim){
+    if(currentInputData.interim){
       interimIndex = output.length;
-			output = output + ' ' + currentInputData.interim;
-		}
+      output = output + ' ' + currentInputData.interim;
+    }
 
-		if(currentInputData.unstable){
+    if(currentInputData.unstable){
 
-			if(!isWithExtraUnstable){
-				output = output + ' ' + currentInputData.unstable;
-			}
-			else {
-				unstable = currentInputData.unstable;
-			}
-		}
+      if(!isWithExtraUnstable){
+        output = output + ' ' + currentInputData.unstable;
+      }
+      else {
+        unstable = currentInputData.unstable;
+      }
+    }
 
 
 
-		output = output.replace(/  /gm, ' ');
-	}
-	else {
+    output = output.replace(/  /gm, ' ');
+  }
+  else {
 
-  		output = currentInputData.getCurrentText();
+      output = currentInputData.getCurrentText();
       rest = currentInputData.getRestText();
 
-  		if(currentInputData.interim){
+      if(currentInputData.interim){
         interimIndex = output.length;
-  			if( ! /\s$/igm.test(output)){
-  				output += ' ';
-  			}
-  			output += currentInputData.interim;
-  		}
+        if( ! /\s$/igm.test(output)){
+          output += ' ';
+        }
+        output += currentInputData.interim;
+      }
 
-  		// if(output){
-  		//
-  		// 	//TODO russa: do this on adding the results to the inputData object (and not *every* time when it is printed!)
-  		// 	output = output.
-  		// 		//remove space before puntuation:
-  		// 		replace(/ ([.,;?!:])/igm, '$1').
-  		// 		//force upper case on new line and after "sentence ending punctuation"
-  		// 		replace(/(^|[.?!]\s)\s?(\w)(\w+)/igm, function(m, p1, w1, w2){ return p1 + w1.toUpperCase() + w2; });
-  		//
-  		// }
+      // if(output){
+      //
+      // 	//TODO russa: do this on adding the results to the inputData object (and not *every* time when it is printed!)
+      // 	output = output.
+      // 		//remove space before puntuation:
+      // 		replace(/ ([.,;?!:])/igm, '$1').
+      // 		//force upper case on new line and after "sentence ending punctuation"
+      // 		replace(/(^|[.?!]\s)\s?(\w)(\w+)/igm, function(m, p1, w1, w2){ return p1 + w1.toUpperCase() + w2; });
+      //
+      // }
 
-  		if(currentInputData.unstable){
+      if(currentInputData.unstable){
 
-  			if(!isWithExtraUnstable){
+        if(!isWithExtraUnstable){
 
-  				if( ! /\s$/igm.test(output)){
-  					output += ' ';
-  				}
-  				output += UNSTABLE_RESULT_HTML_PREFIX + currentInputData.unstable + UNSTABLE_RESULT_HTML_SUFFIX;
+          if( ! /\s$/igm.test(output)){
+            output += ' ';
+          }
+          output += UNSTABLE_RESULT_HTML_PREFIX + currentInputData.unstable + UNSTABLE_RESULT_HTML_SUFFIX;
 
-  			} else {
-  				unstable = currentInputData.unstable;
-  			}
-  		}
-  		output = output.replace(/\r?\n/gm, '<br>');
-  	}
+        } else {
+          unstable = currentInputData.unstable;
+        }
+      }
+      output = output.replace(/\r?\n/gm, '<br>');
+    }
 
-  	if(isWithExtraUnstable){
-  		return {
-  			text: output,
+    if(isWithExtraUnstable){
+      return {
+        text: output,
         rest: rest,
         interimIndex: interimIndex,
-  			unstable: unstable
-  		};
-  	}
-  	else {
-  		return output + (rest? ' ' + rest : rest);
-  	}
+        unstable: unstable
+      };
+    }
+    else {
+      return output + (rest? ' ' + rest : rest);
+    }
   }
 
   protected _isEvalDictStopWord(asrEmmaEvent: RecognitionEmma): boolean {
-  	//TODO impl. & "global" setting on SpeechInput, in case emmaEvent has no info set? -> this.isEvalDictStopWord
-  	return !(asrEmmaEvent && asrEmmaEvent.interpretation && asrEmmaEvent.interpretation.inputMode === 'guided');
+    //TODO impl. & "global" setting on SpeechInput, in case emmaEvent has no info set? -> this.isEvalDictStopWord
+    return !(asrEmmaEvent && asrEmmaEvent.interpretation && asrEmmaEvent.interpretation.inputMode === 'guided');
   }
 
   protected isDictAutoProceed(): boolean {
-  	return false;//TODO (move to more appropriate place?): mmir.User.isDictAutoProceed();
+    return false;//TODO (move to more appropriate place?): mmir.User.isDictAutoProceed();
   };
 
 }
