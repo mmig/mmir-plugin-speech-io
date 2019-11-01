@@ -11,5 +11,3 @@ export { DictationTarget } from './io/SpeechDictation';
 export { PromptReader } from './io/PromptReader';
 export { EmmaUtil } from './util/EmmaUtil';
 export { SubscriptionUtil } from './util/SubscriptionUtil';
-
-export function initialize(cb: Function){ cb({});};//FIXME change mmir-plugin to allow other than media-plugins!!!
