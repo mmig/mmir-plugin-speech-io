@@ -1,5 +1,7 @@
+import { MmirModule } from 'mmir-lib';
+import { PLUGIN_ID } from '../consts';
 
-declare var mmir;//FIXME
+declare var mmir: MmirModule;
 
 export var IS_SOUND_FEEDBACK : boolean  = true;
 export var IS_HAPTIC_FEEDBACK: boolean = true;
@@ -17,7 +19,7 @@ export function enableHapticFeedback(enable: boolean): void {
 }
 
 export function isSoundFeedbackEnabled() {
-  var isSound = mmir.conf.get('soundFeedbackEnabled');
+  var isSound = mmir.conf.get([PLUGIN_ID, 'soundFeedbackEnabled']);
   if(typeof isSound === 'undefined'){
     isSound = IS_SOUND_FEEDBACK;
   }
@@ -25,7 +27,7 @@ export function isSoundFeedbackEnabled() {
 }
 
 export function isHapticFeedbackEnabled() {
-  var isHaptic = mmir.conf.get('hapticFeedbackEnabled');
+  var isHaptic = mmir.conf.get([PLUGIN_ID, 'hapticFeedbackEnabled']);
   if(typeof isHaptic === 'undefined'){
     isHaptic = IS_HAPTIC_FEEDBACK;
   }
