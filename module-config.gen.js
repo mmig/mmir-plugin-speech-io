@@ -11,16 +11,10 @@ module.exports = {
      * the plugin type
      * @default "custom"
      */
-    "type",
-    /**
-     * the module/plugin name for the MediaManager plugins configuration
-     * @default "mmir-plugin-speech-io"
-     */
-    "mod"
+    "type"
   ],
   defaultValues: {
-    type: "custom",
-    mod: "mmir-plugin-speech-io"
+    type: "custom"
   },
   buildConfigs: [
     {
