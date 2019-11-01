@@ -18,4 +18,10 @@ export interface PluginConfigEntry {//extends PluginEntry {
   * @default "mmir-plugin-speech-io"
   */
   mod: 'mmir-plugin-speech-io';
+
+  /**
+   * the plugin type
+   * @default "custom"
+   */
+  type: 'custom';
 }
