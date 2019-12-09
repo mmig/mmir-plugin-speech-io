@@ -668,12 +668,16 @@ export class CurrentInputData {
        *
        * @param {string} text
        *                     the (stable) text
-       * @param {Boolean} [isPreprocessText]
+       * @param {boolean} [isPreprocessText]
        *                     indicates, if text is already prepocessed: if not, preprocessing is applied
        *                     (transform punctuation-words, captialize at beginning of sentence etc)
        *                     DEFAULT: true
        */
       set(text: string, isPreprocessText?: boolean){//text STRING, isPreprocessText BOOLEAN OPTIONAL (default: true)
+        if(text === null || typeof text === 'undefined'){
+          this.reset();
+          return;
+        }
         this.interim = '';
         this.unstable = '';
         if(isPreprocessText !== false){
