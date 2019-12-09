@@ -212,19 +212,27 @@ export interface ReadingOptions {
   readingData?: ReadingData;
 
   /**
-   * if set to FALSE (or omitted) and encountering an active prompt with different readingId:
-   * will stop current prompt and continue with this prompt
+   * if TRUE, will stop reading prompts:
+   *  * if no prompt is currently active, nothing will be done
+   *  * if a prompt is active, the active prompt will be stopped
    *
-   * DEFAULT behavior if encountering an active prompt with different readingId:
-   * stop reading and cancel/do not start reading this prompt.
+   * DEFAULT behavior:
+   *   * if no prompt is active, the new one will start
+   *   * if a prompt is active:
+   *     * if prompt with same ID, prompt will be stopped
+   *     * if prompt with different ID, active prompt will be stopped, and new one will be started
+   *
+   * @default false
    */
   stopReading?: boolean;
   /**
    * if set to TRUE and encountering an active prompt with the same readingId:
-   * will stop current prompt and continue with this prompt
+   * will stop current prompt and continue with new prompt (i.e. "restart" prompt with same ID)
    *
    * DEFAULT behavior if encountering an active prompt with same readingId:
-   * stop reading and cancel/do not start reading this prompt.
+   * stop reading and cancel/do not start reading new prompt.
+   *
+   * @default false
    */
   cancelActivePrompts?: boolean;
 }
