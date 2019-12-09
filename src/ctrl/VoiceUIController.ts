@@ -374,9 +374,9 @@ export class VoiceUIController<CmdImpl extends Cmd> {
     // if(!isSyntheticClick(event))//TODO detect programatically triggered invocations of this function?
     this.triggerTouchFeedback(event, touchFeedback);
 
-    this.initDictationTarget(targetId, feedbackStyle);
+    const handler = this.initDictationTarget(targetId, feedbackStyle);
 
-    this.speech.raise('toggleSpeechInputState', {mode: 'dictation', targetId: targetId});
+    this.speech.raise('toggleSpeechInputState', {mode: 'dictation', targetId: handler? handler.id : targetId});
     this.speech.raise('showSpeechState');
   }
 
