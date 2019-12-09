@@ -1044,7 +1044,7 @@
         <if cond="_event.data.readingId !== reading_id &amp;&amp; !_event.data.stopReading">
           <assign location="temp_reading_data" expr="_event.data" />
         <else/>
-          <if cond="_event.data.readingId === reading_id &amp;&amp; _event.data.cancelActivePrompts">
+          <if cond="_event.data.readingId === reading_id &amp;&amp; _event.data.cancelActivePrompts &amp;&amp; !_event.data.stopReading">
             <assign location="temp_reading_data" expr="_event.data" />
           </if>
         </if>
