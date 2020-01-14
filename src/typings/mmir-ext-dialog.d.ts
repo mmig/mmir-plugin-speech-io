@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { IAudio , MmirModule , DialogManager, InputManager , DialogEngine , PlayError } from 'mmir-lib';
 import { Cmd , ShowSpeechStateOptions , SpeechFeedbackOptions , RecognitionEmma , UnderstandingEmma , ReadingOptions , StopReadingOptions , ReadingShowOptions } from './mmir-base-dialog.d';
 import { EmmaUtil } from '../util/EmmaUtil';
+import { FeedbackOption } from '../io/HapticFeedback';
 
 export interface WrappedElement {
   nativeElement: any;
@@ -71,4 +72,15 @@ export interface ExtMmirModule<CmdImpl extends Cmd> extends MmirModule, EmmaModu
   speechioEngine: ExtStateEngine;
   speechioInput: InputManager;
   speechioInputEngine: ExtStateEngine;
+}
+
+export interface InputOutputOption extends FeedbackOption {
+  // /**
+  //  * if explicitly set to FALSE, active ASR will not be canceled
+  //  */
+  // asrCancel?: boolean;
+  /**
+   * if explicitly set to FALSE, active TTS will not be canceled
+   */
+  ttsCancel?: boolean
 }
