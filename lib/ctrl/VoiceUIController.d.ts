@@ -8,7 +8,7 @@ import { DictationTargetHandler, DictationHandler, DictationTarget, SelectionMod
 import { ReadTargetHandler } from '../io/SpeechReading';
 import { EventLike } from '../typings/emma.d';
 import { ISpeechInputIndicator, ISpeechOutputIndicator } from '../typings/speech-io-indicator.d';
-import { ExtMmirModule, SpeechEventName, GuiElement, SpeechIoManager } from '../typings/mmir-ext-dialog.d';
+import { ExtMmirModule, SpeechEventName, GuiElement, SpeechIoManager, InputOutputOption } from '../typings/mmir-ext-dialog.d';
 import { MmirService } from '../mmir-service';
 export declare class VoiceUIController<CmdImpl extends Cmd> {
     protected _mmirProvider: MmirService<CmdImpl>;
@@ -85,7 +85,7 @@ export declare class VoiceUIController<CmdImpl extends Cmd> {
     localize(res: string): string;
     evalSemantics(asr_result: string): void;
     triggerTouchFeedback(_event: MouseEvent | TouchEvent | RecognitionEmma | UnderstandingEmma<CmdImpl> | EventLike, feedbackOptions?: FeedbackOption): void;
-    commandClicked(event: MouseEvent | TouchEvent | RecognitionEmma | UnderstandingEmma<CmdImpl> | EventLike, btnId: string, feedbackOptions?: FeedbackOption): void;
+    commandClicked(event: MouseEvent | TouchEvent | RecognitionEmma | UnderstandingEmma<CmdImpl> | EventLike, btnId: string, feedbackOptions?: InputOutputOption): void;
     /**
      *
      * dictationClicked(event: Event, target: DictationTarget, feedbackMode?: SelectionMode)
@@ -98,7 +98,7 @@ export declare class VoiceUIController<CmdImpl extends Cmd> {
      *                          style for visualizing unstable/interim part of dictation result/text
      *                          DEFAULT: uses #_defaultDictationFeedbackStyle
      */
-    dictationClicked(event: Event, targetId: string | DictationTarget, feedbackStyle?: SelectionMode, touchFeedback?: FeedbackOption): void;
+    dictationClicked(event: Event, targetId: string | DictationTarget, feedbackStyle?: SelectionMode, touchFeedback?: InputOutputOption): void;
     initDictationTarget(targetId: string | DictationTarget, feedbackStyle?: SelectionMode): DictationHandler;
     private updateCurrentDictationTarget;
     /**
