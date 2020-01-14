@@ -5,6 +5,7 @@ import { VoiceUIController } from './ctrl/VoiceUIController';
 import { ReadingOptions , Cmd } from './typings/mmir-base-dialog.d';
 import { ExtMmirModule } from './typings/mmir-ext-dialog.d';
 import { MmirService } from './mmir-service';
+import { raiseInternal } from './util/SpeechIoManager';
 
 export class VoiceUIService<CmdImpl extends Cmd> {
 
@@ -40,7 +41,14 @@ export class VoiceUIService<CmdImpl extends Cmd> {
 
   constructor(mmirProvider: MmirService<CmdImpl>) {
     this.mmirProvider = mmirProvider;
-    this.vuiCtrl = new VoiceUIController(mmirProvider);
+    this.init();
+  }
+
+  private init(): void {
+    this.vuiCtrl = new VoiceUIController(this.mmirProvider);
+    this.mmirProvider.ready().then(service => {
+      raiseInternal(service.mmir.speechioEngine, 'set-vui-service', {vui: this});
+    });
   }
 
   public async ready(): Promise<VoiceUIController<CmdImpl>> {
