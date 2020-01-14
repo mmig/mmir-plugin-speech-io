@@ -81,7 +81,7 @@ export class SpeechOutputController {
 
       isTest = data.test;
 
-      if(!this.prompt.handler || this.prompt.handler.willReadPrompt(data.contextId, data.readingId)){
+      if(!this.prompt.handler || this.prompt.handler.willReadPrompt(data.contextId, data.readingId, void(0))){
 
         if(isTest){
           return true;/////////////////// EARYL EXIT ///////////////////
