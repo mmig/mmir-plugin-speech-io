@@ -100,7 +100,7 @@ export declare class CurrentInputData {
      *
      * @param {string} text
      *                     the (stable) text
-     * @param {Boolean} [isPreprocessText]
+     * @param {boolean} [isPreprocessText]
      *                     indicates, if text is already prepocessed: if not, preprocessing is applied
      *                     (transform punctuation-words, captialize at beginning of sentence etc)
      *                     DEFAULT: true

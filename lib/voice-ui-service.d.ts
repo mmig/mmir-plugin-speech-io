@@ -15,6 +15,7 @@ export declare class VoiceUIService<CmdImpl extends Cmd> {
     readonly ttsActive: boolean;
     debug: boolean;
     constructor(mmirProvider: MmirService<CmdImpl>);
+    private init;
     ready(): Promise<VoiceUIController<CmdImpl>>;
     asrCancel(): void;
     ttsCancel(): void;

@@ -47,8 +47,9 @@ export interface SpeechEventEmitter<CmdImpl extends Cmd> {
 }
 
 export interface IPromptHandler {
-  willReadPrompt(contextId: number | string, readingId: number | string): boolean;
+  willReadPrompt(contextId: number | string, readingId: number | string, willPauseAsr?: boolean): boolean;
   preparePrompt(readingData: ReadingOptions): string | Array<string>;
+  isCommandPrompt?: (readingId: number | string) => boolean;
 }
 
 export interface EmmaModule<CmdImpl extends Cmd> {

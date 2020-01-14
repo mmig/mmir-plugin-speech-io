@@ -65,6 +65,7 @@ export declare class VoiceUIController<CmdImpl extends Cmd> {
     ttsCancel(options?: StopReadingOptions): void;
     asrEngine(engine: string | null): void;
     ttsEngine(engine: string | null): void;
+    enableBargeIn(enable: boolean): void;
     enterView(asrActiveHandler: ((asrActive: boolean) => void) | null, ttsActiveHandler: ((ttsActive: boolean) => void) | null): void;
     /**
      * Remembers the subscription for the current/active view, and
@@ -76,6 +77,7 @@ export declare class VoiceUIController<CmdImpl extends Cmd> {
     leaveView(): void;
     protected _asrEngine(engine: string | null): void;
     _ttsEngine(engine: string | null): void;
+    protected _enableBargeIn(enable: boolean): void;
     protected doUnsubscribeCurrentPage(): void;
     protected releasePageResources(): void;
     protected releaseUiResources(force: boolean): void;
