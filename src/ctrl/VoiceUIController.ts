@@ -185,6 +185,18 @@ export class VoiceUIController<CmdImpl extends Cmd> {
     }
   }
 
+  public enableBargeIn(enable: boolean): void {
+    if(this.mmir.speechioManager){
+      this._enableBargeIn(enable);
+    } else if(this.initializing) {
+      this.initializing.then(() => {
+          this._enableBargeIn(enable);
+      });
+    } else {
+      console.error('VoiceUIController.enableBargeIn: cannot set enableBargeIn to '+enable+', because mmir.speechioManager is not availabe!');
+    }
+  }
+
   public enterView(asrActiveHandler: ((asrActive: boolean) => void) | null, ttsActiveHandler: ((ttsActive: boolean) => void) | null) : void {
 
     //cancel any previous subscriptions:
@@ -242,6 +254,10 @@ export class VoiceUIController<CmdImpl extends Cmd> {
       this.ttsCancel();
     }
     this.prompt.ttsCtx = engine;
+  }
+
+  protected _enableBargeIn(enable: boolean): void {
+    this.mmir.speechioManager.raise('enableBargeIn', enable);
   }
 
   protected doUnsubscribeCurrentPage(){
