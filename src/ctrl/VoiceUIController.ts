@@ -13,7 +13,7 @@ import { ReadTargetHandler , ReadHandler } from '../io/SpeechReading';
 import { EventLike } from '../typings/emma.d';
 import { ISpeechInputIndicator , ISpeechOutputIndicator } from '../typings/speech-io-indicator.d';
 
-import { ExtMmirModule , SpeechEventName , GuiElement , SpeechIoManager } from '../typings/mmir-ext-dialog.d';
+import { ExtMmirModule , SpeechEventName , GuiElement , SpeechIoManager , InputOutputOption } from '../typings/mmir-ext-dialog.d';
 
 // import { ReadOverlay } from '../../../components/speech-overlay/dialogs/read-overlay';
 import { MmirService } from '../mmir-service';
@@ -346,7 +346,7 @@ export class VoiceUIController<CmdImpl extends Cmd> {
 
   ////////////////////////////////////////// Speech IO ////////////////////////
 
-  public commandClicked(event: MouseEvent | TouchEvent | RecognitionEmma | UnderstandingEmma<CmdImpl> | EventLike, btnId: string, feedbackOptions?: FeedbackOption){
+  public commandClicked(event: MouseEvent | TouchEvent | RecognitionEmma | UnderstandingEmma<CmdImpl> | EventLike, btnId: string, feedbackOptions?: InputOutputOption){
 
     if(event && (event as any).preventDefault){
       (event as any).preventDefault();
@@ -354,7 +354,7 @@ export class VoiceUIController<CmdImpl extends Cmd> {
 
     //if(this._debugMsg) console.log('commandClicked');
 
-    if(this.ttsActive){
+    if(this.ttsActive && (!feedbackOptions || (feedbackOptions && feedbackOptions.ttsCancel !== false))){
       this.ttsCancel();
     }
 
@@ -377,13 +377,13 @@ export class VoiceUIController<CmdImpl extends Cmd> {
    *                          style for visualizing unstable/interim part of dictation result/text
    *                          DEFAULT: uses #_defaultDictationFeedbackStyle
    */
-  public dictationClicked(event: Event, targetId: string | DictationTarget, feedbackStyle?: SelectionMode, touchFeedback?: FeedbackOption): void {
+  public dictationClicked(event: Event, targetId: string | DictationTarget, feedbackStyle?: SelectionMode, touchFeedback?: InputOutputOption): void {
 
     event.preventDefault();
 
     //if(this._debugMsg) console.log('dictationClicked');
 
-    if(this.ttsActive){
+    if(this.ttsActive && (!touchFeedback || (touchFeedback && touchFeedback.ttsCancel !== false))){
       this.ttsCancel();
     }
 
