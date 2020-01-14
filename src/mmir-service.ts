@@ -2,14 +2,14 @@
 import { Subject , BehaviorSubject } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 
-import { MediaManager, PlayError , LogLevel , LogLevelNum } from 'mmir-lib';
+import { MediaManager, PlayError , LogLevel , LogLevelNum, IAudio } from 'mmir-lib';
 import { ShowSpeechStateOptions, SpeechFeedbackOptions, RecognitionEmma, UnderstandingEmma , ReadingOptions , StopReadingOptions, ReadingShowOptions , Cmd } from './typings/mmir-base-dialog.d';
 import { IAppSettings } from './typings/app-settings';
 
 import { EmmaUtil } from './util/EmmaUtil';
 
 import { SpeechEventEmitter , WaitReadyOptions , SpeechIoManager , ExtStateEngine , ExtMmirModule } from './typings/mmir-ext-dialog.d';
-import { createSpeechioManager } from './util/SpeechIoManager';
+import { createSpeechioManager , raiseInternal } from './util/SpeechIoManager';
 import { SPEECH_IO_MANAGER_ID , SPEECH_IO_INPUT_ID , SPEECH_IO_INPUT_ENGINE_ID , SPEECH_IO_ENGINE_ID , PLUGIN_ID } from './consts';
 import { createConfigSettingsImpl } from './util/SettingsUtils';
 
@@ -175,7 +175,7 @@ export class MmirService<CmdImpl extends Cmd> {
 
           // this.platform.setLang(this.mmir.lang.getLanguage(), true); FIXME set HTML language attribute!?!
 
-          this.mmir.media.on('errorplay', (audio, error) => {
+          this.mmir.media.on('errorplay', (audio: IAudio, error: any) => {
             this.evt.playError.next({audio: audio, error: error});
           });
 
@@ -200,7 +200,7 @@ export class MmirService<CmdImpl extends Cmd> {
           //circumvent message-queue for init-event:
           // (this allows to pass non-stringified and non-stringifyable object instances)
           let dlgEngine: ExtStateEngine = this.mmir.speechioEngine;
-          dlgEngine.worker._engineGen.call(dlgEngine.worker._engineInstance, 'init', {
+          raiseInternal(dlgEngine, 'init', {
             appConfig: this.appConfig,
             mmir: this._mmir,
             emma: dlg.emma,
