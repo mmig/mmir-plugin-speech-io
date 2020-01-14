@@ -74,6 +74,7 @@
                 }
                 return input_mode;
             },
+            /** HELPER: get ASR configuration value depending on speech-mode, fallback etc. */
             getAsrConfig: function(configName, defaultValue, speechMode){
               speechMode = speechMode || speech_mode;
               var val = this.conf.get([_pluginId, speechMode, configName]);
@@ -84,6 +85,28 @@
                 return defaultValue;
               }
               return val;
+            },
+            /** HELPER: get PromptHandler of PromptReader from VoiceUIService (may be undefined if none is set) */
+            getPromptHandler: function(){
+              if(this.vui && this.vui.prompt){
+                return this.vui.prompt.handler;
+              }
+            },
+            /** HELPER: check if prompt is allowed to interrupt active ASR via PromptHandler (if one is set), DEFAULT false*/
+            isCommandInterruptionPrompt: function(contextId, promptId){
+              var handler = this.getPromptHandler();
+              if(handler){
+                return handler.willReadPrompt(contextId, promptId, false);
+              }
+              return false;
+            },
+            /** HELPER: check if interrupting prompt should change ASR mode to 'command' via PromptHandler (if one is set), DEFAULT false*/
+            isCommandPrompt: function(promptId){
+              var handler = this.getPromptHandler();
+              if(handler && handler.isCommandPrompt){
+                return handler.isCommandPrompt(promptId);
+              }
+              return false;
             },
             speechCtrlName: 'SpeechInput',
             readCtrlName: 'SpeechOutput',
@@ -97,6 +120,8 @@
             dlg: mmir.speechioManager,
             input: mmir.speechioInput,
             conf: mmir.conf,
+
+            vui: void(0), //<- will be set via set-vui-service event (see below)
 
             isDebugVui: false
         };
@@ -228,6 +253,14 @@
         </script>
       </transition>
 
+
+      <transition event="set-vui-service" name="set-vui-service">
+        <script>
+            if(_util.isDebugVui) console.info('set-vui-service with data ', _event.data);
+            _util.vui = _event.data? _event.data.vui : void(0);
+        </script>
+      </transition>
+
     </state><!-- END OF: <state id="Gui">  -->
 
     <state id="Vui" name="Vui" initial="AsrInactive">
@@ -273,6 +306,18 @@
         <data id="asr_ctx" expr="void(0)"/>
 
         <!--
+            flag that indicates if "barge-in" is allowed:
+            will allow microphone (-> AsrActive) to stay open during reading of prompts / TTS
+
+            NOTE: this should only be enabled, if the TTS/reading cannot intefere
+                  with open microphone/active ASR.
+                  Usually this means:
+                  * either TTS output is via headphones
+                  * or an echo-cancellation mechanism (for the ASR) is in effect
+        -->
+        <data id="allow_barge_in" expr="false"/>
+
+        <!--
             flag for starting guidance of guided-input (instead of continuing it)
             if this is set, the first call to continueGuidance will be "converted"
             to start-guidance (instead of continue-guidance), and then be reset
@@ -281,17 +326,19 @@
 
       </datamodel>
 
-      <!--
-          set the ASR engine: either "nuance" or "android"
-          NOTE: you should cancel / stop speech-input before setting a new ASR context
-      -->
       <transition event="setAsrEngine" name="setAsrEngine">
         <script>
-            if(_util.env.isCordovaEnv){
-                var engine = _event.data;
-                asr_ctx = engine;
-                _util.appConfig.set('speechEngine', engine);
-            }
+            var engine = _event.data;
+            asr_ctx = engine;
+            _util.appConfig.set('speechEngine', engine);
+            if(_util.isDebugVui) console.warn('asr_ctx -> ', asr_ctx);
+        </script>
+      </transition>
+
+      <transition event="enableBargeIn" name="enableBargeIn">
+        <script>
+            allow_barge_in = !!_event.data;
+            if(_util.isDebugVui) console.warn('allow_barge_in -> ', allow_barge_in);
         </script>
       </transition>
 
@@ -300,17 +347,13 @@
             <script>//<![CDATA[
 
                 if(_event.data){
-
                     if(_event.data.mode){
                         speech_mode = _event.data.mode;
                     }
-
                     if(_event.data.targetId){
                         target_id = _event.data.targetId;
                     }
-
                 }
-
 
                 var speechTargetElem = target_id;
                 var speechInputMode = speech_mode;
@@ -642,7 +685,7 @@
 
                 _util.applyInputMode(_event);
 
-                if(wik.tools.isCommandInterruptionPrompt(_event.data.promptId)){
+                if(_util.isCommandInterruptionPrompt(_event.data.contextId, _event.data.promptId)){
 
                     if(_util.isDebugVui) console.debug('start reading prompt, toggleSpeechInputState to INACTIVE, data -> ',_event.data);
 
@@ -916,7 +959,7 @@
 
                 if(_util.isDebugVui) console.debug('start command-prompt, then speech-command mode for '+JSON.stringify(_event.data));
 
-                if(_event.data &amp;&amp; (_event.data.mode === 'command' || wik.tools.isCommandPrompt(_event.data.promptId))){
+                if(_event.data &amp;&amp; (_event.data.mode === 'command' || _util.isCommandPrompt(_event.data.promptId))){
                     speech_mode = 'command';
                 }
 
@@ -1009,7 +1052,6 @@
         <data id="temp_reading_data" expr="''"/>
       </datamodel>
 
-
       <transition event="readAll" name="readAll">
         <script>
             _util.dlg.raise('read', {readingId: 'all'});
@@ -1065,7 +1107,9 @@
             reading_status = true;
 
             //cancel any speech-input, if active:
-            _util.dlg.raise('pause-speech-input');//'cancel-speech-input');
+            if(!allow_barge_in){
+              _util.dlg.raise('pause-speech-input');//'cancel-speech-input');
+            }
 
             var options = {contextId: dialog_id || page_id, readingId: reading_id};
             if(_event.data.readingData){
