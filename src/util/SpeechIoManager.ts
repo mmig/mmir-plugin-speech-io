@@ -1,7 +1,7 @@
 import { Subject } from 'rxjs';
 import { MmirModule, DialogManager } from 'mmir-lib';
 import { StateManager, ManagerFactory } from '../typings/mmir-ext.d';
-import { ExtMmirModule , SpeechIoManager } from '../typings/mmir-ext-dialog.d';
+import { ExtMmirModule , SpeechIoManager , ExtStateEngine } from '../typings/mmir-ext-dialog.d';
 import { SPEECH_IO_INPUT_STATES_ID , SPEECH_IO_INPUT_ID , SPEECH_IO_STATES_ID , SPEECH_IO_MANAGER_ID , SPEECH_IO_ENGINE_ID , SPEECH_IO_INPUT_ENGINE_ID } from '../consts';
 
 declare var WEBPACK_BUILD: boolean;
@@ -78,4 +78,18 @@ export function createSpeechioManager(mmirLib: MmirModule, logLevel: string | nu
       return res;
     })),
   ]);
+}
+
+/**
+ * HELPER for using a state-machine's internal raise function:
+ *        this allows to pass-in "behavioral objects", that is objects with functions etc.
+ *        and not only "mere" data/JSON-like objects as with the normal raise-function
+ *
+ * @param  dlgEngine the DialogManager with WebWorker-engine, i.e. must have <code>dlgEngine.worker._engineGen</code>
+ * @param  eventName the event-name to be raised
+ * @param  eventData the event data
+ * @return the engine configuration/state
+ */
+export function raiseInternal(dlgEngine: ExtStateEngine, eventName: string, eventData?: {[field: string]: any}): any {
+  return dlgEngine.worker._engineGen.call(dlgEngine.worker._engineInstance, eventName, eventData);
 }
