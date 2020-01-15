@@ -74,6 +74,13 @@ export interface SpeechIoPluginConfigurationEntry {
    * @default speechInputMode === 'command'
    */
   disableImprovedFeedback?: boolean;
+
+  /**
+   * enable/disable receiving interim ASR results depending on speech mode
+   *
+   * @default speechInputMode === 'dictation'
+   */
+  enableInterimResults?: boolean
 }
 
 export interface SpeechIoPluginConfigurationBaseEntry {

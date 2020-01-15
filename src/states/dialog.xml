@@ -381,6 +381,8 @@
                 //  if(_util.isDebugVui) console.info('start dictation in guided-input mode: using long-pause detection...');//FIXME DEBUG
                 //}
 
+                var allowInterim = _util.getAsrConfig('enableInterimResults', speechInputMode === 'dictation', speechInputMode);
+
                 _util.media.perform(asr_ctx, 'startRecord', [{
                     success: function(result, score, type, alt, unstable){
 
@@ -390,7 +392,7 @@
                         //FIXME filter empty/non-final etc results, or should all results fire an event?
                         var isNotEmpty  = result || (alt && alt.length);
                         var isFinal     = type === 'FINAL';
-                        var isFireEvent = isNotEmpty || isFinal || (speechInputMode === 'dictation' &&  (isNotEmpty || unstable) );
+                        var isFireEvent = isNotEmpty || isFinal || (allowInterim &&  unstable);
 
                         if(isFireEvent){
                             var emmaEvt = _util.emma.toEmma({type: 'speech', mode: speechInputMode, target: speechTargetElem}, [result, score, type, alt, unstable]);

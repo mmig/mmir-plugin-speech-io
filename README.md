@@ -75,6 +75,13 @@ Configuration values:
    * @default speechInputMode === 'command'
    */
   disableImprovedFeedback?: boolean;
+  
+  /**
+   * enable/disable receiving interim ASR results depending on speech mode
+   *
+   * @default speechInputMode === 'dictation'
+   */
+  enableInterimResults?: boolean
 
   /**
    * specific configration values for active speech-mode ('dictation' or 'command'):
