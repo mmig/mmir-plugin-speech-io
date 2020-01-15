@@ -361,7 +361,7 @@
                 //if(_util.isDebugVui) console.debug('Speech input activated (mode: '+speechInputMode+'; event: '+JSON.stringify(_event)+')');
 
                 //cancel TTS (has no effect, if TTS is not active)
-                if(!_util.getAsrConfig('disableCancelPrompt', false, speechInputMode)){
+                if(!allow_barge_in && !_util.getAsrConfig('disableCancelPrompt', false, speechInputMode)){
                   _util.dlg.raise('stop-reading');
                 }
 
