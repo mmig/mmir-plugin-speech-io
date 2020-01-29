@@ -1,6 +1,10 @@
-# mmir-plugin-speech-io
+# [mmir-plugin-speech-io][0]
 
-Plugin for the MMIR framework that adds a state-machines for managing speech input/output states
+[![MIT license](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![GitHub package.json version](https://img.shields.io/github/package-json/v/mmig/mmir-plugin-speech-io/master)](https://github.com/mmig/mmir-plugin-speech-io)
+[![npm](https://img.shields.io/npm/v/mmir-plugin-speech-io)](https://www.npmjs.com/package/mmir-plugin-speech-io)
+
+Plugin for the [MMIR framework][3] that adds a state-machines for managing speech input/output states
 
 __NOTE__ currently this plugin requires a [webpack][1] build process (see [mmir-webpack][2]).
 
@@ -164,6 +168,7 @@ Configuration values:
 
 ```
 
-
+[0]: https://github.com/mmig/mmir-plugin-speech-io
 [1]: https://www.npmjs.com/package/webpack
 [2]: https://www.npmjs.com/package/mmir-webpack
+[3]: https://github.com/mmig/mmir
