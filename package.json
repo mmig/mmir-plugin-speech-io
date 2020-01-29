@@ -4,11 +4,19 @@
   "description": "Plugin for the MMIR framework that adds a state-machine for managing speech input/output states",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
+  "typesVersions": {
+    ">=3.6": {
+      "lib/*": [
+        "lib/ts3.6/*"
+      ]
+    }
+  },
   "scripts": {
-    "build": "npm run build-ts && npm run copy-dts && npm run copy-js && npm run build-metadata",
+    "build": "npm run build-ts && npm run copy-dts && npm run copy-js && npm run downlevel-dts && npm run build-metadata",
     "build-ts": "tsc",
     "copy-dts": "copyfiles -u 1 \"src/**/*.d.ts\" lib",
     "copy-js": "copyfiles -u 1 \"src/**/*.js\" lib",
+    "downlevel-dts": "dtsdownlevel lib",
     "build-metadata": "createplugincompat ./ && pluginexport --ignore-deps ./"
   },
   "repository": {
@@ -32,7 +40,7 @@
   "devDependencies": {
     "copyfiles": "^2.2.0",
     "mmir-lib": "^6.0.0",
-    "mmir-plugin-exports": "^1.3.0",
+    "mmir-plugin-exports": "^1.4.1",
     "mmir-tooling": "^6.0.0",
     "typescript": "^3.7.5"
   }

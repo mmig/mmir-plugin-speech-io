@@ -1,0 +1,11 @@
+export declare const PLUGIN_ID: string;
+export declare const SPEECH_ACTIVE: string;
+export declare const READ_ACTIVE: string;
+export declare const DICTATION_CONTROL: string;
+export declare const READ_CONTROL: string;
+export declare const SPEECH_IO_MANAGER_ID = "mmirf/speechioManager";
+export declare const SPEECH_IO_ENGINE_ID = "mmirf/speechioEngine";
+export declare const SPEECH_IO_STATES_ID = "mmirf/state/speechio";
+export declare const SPEECH_IO_INPUT_ID = "mmirf/speechioInput";
+export declare const SPEECH_IO_INPUT_ENGINE_ID = "mmirf/speechioInput";
+export declare const SPEECH_IO_INPUT_STATES_ID = "mmirf/state/speechioInput";

@@ -31,7 +31,8 @@ export declare class SpeechInputController {
     protected _stopDictExpr: RegExp;
     protected _cancelDictWord: string;
     protected _cancelDictExpr: RegExp;
-    debug: boolean;
+    get debug(): boolean;
+    set debug(value: boolean);
     constructor(mmirProvider: MmirService<any>, dictTargetHandler: DictationTargetHandler);
     destroy(): void;
     createDictationTarget(target: DictationTarget, id: string, feedbackStyle?: SelectionMode): DictationHandler;
