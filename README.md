@@ -1,6 +1,6 @@
 # mmir-plugin-speech-io
 
-Plugin for the MMIR framework that adds a state-machine for managing speech input/output states
+Plugin for the MMIR framework that adds a state-machines for managing speech input/output states
 
 __NOTE__ currently this plugin requires a [webpack][1] build process (see [mmir-webpack][2]).
 
@@ -13,6 +13,7 @@ for including plugin in mmir webpack build
 const mmirAppConfig = {
   includePlugins: [
     {id: 'mmir-plugin-speech-io', config: {
+      //optional configuration for the plugin:
       alternativeResults: 5,
       longPause: true,
       command: {
@@ -75,7 +76,7 @@ Configuration values:
    * @default speechInputMode === 'command'
    */
   disableImprovedFeedback?: boolean;
-  
+
   /**
    * enable/disable receiving interim ASR results depending on speech mode
    *
