@@ -7,7 +7,8 @@ export declare class SpeechOutputController {
     protected prompt: PromptReader;
     protected _debugMsg: boolean;
     protected _speechEventSubscriptions: Map<SpeechEventName, Subscription>;
-    debug: boolean;
+    get debug(): boolean;
+    set debug(value: boolean);
     constructor(prompt: PromptReader, mmirProvider: MmirService<any>);
     destroy(): void;
     /**
