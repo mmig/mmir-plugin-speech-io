@@ -27,13 +27,13 @@
   "author": "russa",
   "license": "MIT",
   "dependencies": {
-    "rxjs": "^6.0.0"
+    "rxjs": "^6.5.4"
   },
   "devDependencies": {
-    "copyfiles": "^2.1.1",
-    "mmir-lib": "git+https://gitlab-cos.b.dfki.de/mmir/dev_mmir-lib.git",
+    "copyfiles": "^2.2.0",
+    "mmir-lib": "^6.0.0",
     "mmir-plugin-exports": "^1.3.0",
-    "mmir-tooling": "^5.2.0",
-    "typescript": "^3.6.4"
+    "mmir-tooling": "^6.0.0",
+    "typescript": "^3.7.5"
   }
 }
