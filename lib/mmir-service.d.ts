@@ -31,6 +31,7 @@ export declare class MmirService<CmdImpl extends Cmd> {
     readonly speechEvents: SpeechEventEmitterImpl<CmdImpl>;
     constructor(mmir: ExtMmirModule<CmdImpl>);
     init(appConfig: IAppSettings, ..._args: any[]): Promise<MmirService<CmdImpl>>;
+    private initDebugVui;
     ready(): Promise<MmirService<CmdImpl>>;
     protected mmirInit(): Promise<MmirService<CmdImpl>>;
     setSpeechIoDebugLevel(logLevel: LogLevel | LogLevelNum): void;
