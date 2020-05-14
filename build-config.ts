@@ -5,6 +5,7 @@
  */
 
 import { AppConfig } from 'mmir-tooling';
+import { WebpackAppConfig } from 'mmir-webpack';
 
 declare var __dirname: string;
 
@@ -36,4 +37,11 @@ export const buildConfigSpeechInput: AppConfig = {
       }
     }
   }
+};
+
+/**
+ * additional build dependencies from mmir-lib core library
+ */
+export const buildConfigLibDependencies: WebpackAppConfig = {
+  includeModules: ['mmirf/util/extendDeep']
 };
