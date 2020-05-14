@@ -38,6 +38,9 @@ module.exports = {
           }
         }
       }
+    },
+    {
+      includeModules: ['mmirf/util/extendDeep']
     }
   ]
 };
