@@ -114,6 +114,31 @@ export class MmirService<CmdImpl extends Cmd> {
     //   setting is not really important for how the class functions, we just
     //   continue anyway)
     this.isDebugVui = true;
+    if(this._isCreateAppConfigImpl === true && !this.appConfig){
+
+      //... if no AppConfig implementation is available, we need to wait for
+      //    mmir to initialize to create the default implementation
+      this._mmir.ready(() => {
+
+        if(this._isCreateAppConfigImpl === true && !this.appConfig){
+          this.appConfig = createConfigSettingsImpl(this._mmir.conf);
+        }
+
+        //... and actually initialize the VUI debug settings:
+        this.initDebugVui();
+      });
+    } else {
+      this.initDebugVui();
+    }
+
+    if(!this._initialize){
+      this._initialize = this.mmirInit();
+    }
+
+    return this._initialize;
+  }
+
+  private initDebugVui(): void {
     this.appConfig.get('showVuiDebugOutput').then(isEnabled => {
       this.isDebugVui = isEnabled;
       if(this.mmir && this.mmir.speechioManager){
@@ -121,12 +146,6 @@ export class MmirService<CmdImpl extends Cmd> {
         dlg._isDebugVui = isEnabled;
       }
     });
-
-    if(!this._initialize){
-      this._initialize = this.mmirInit();
-    }
-
-    return this._initialize;
   }
 
   public ready(): Promise<MmirService<CmdImpl>> {
@@ -167,9 +186,10 @@ export class MmirService<CmdImpl extends Cmd> {
     return new Promise<MmirService<CmdImpl>>((resolve) => {
       this._mmir.ready(() => {
 
-        if(this._isCreateAppConfigImpl === true && !this.appConfig){
-          this.appConfig = createConfigSettingsImpl(this._mmir.conf);
-        }
+        //DISABLED now done in init() -> when initializing VUI debug settings
+        // if(this._isCreateAppConfigImpl === true && !this.appConfig){
+        //   this.appConfig = createConfigSettingsImpl(this._mmir.conf);
+        // }
 
         createSpeechioManager(this._mmir, this.isDebugVui? 'debug' : void(0)).then(() => {
 
