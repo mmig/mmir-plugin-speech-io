@@ -26,22 +26,27 @@
   "keywords": [
     "speech",
     "scion",
-    "state machine",
+    "scxml",
     "asr",
     "tts",
     "mmir",
-    "plugin"
+    "plugin",
+    "mmir plugin"
   ],
   "author": "russa",
   "license": "MIT",
   "dependencies": {
-    "rxjs": "^6.5.4"
+    "rxjs": "^6.5.5"
   },
   "devDependencies": {
     "copyfiles": "^2.2.0",
-    "mmir-lib": "^6.0.0",
-    "mmir-plugin-exports": "^1.4.2",
-    "mmir-tooling": "^6.0.0",
-    "typescript": "^3.7.5"
+    "mmir-lib": "^6.1.0",
+    "mmir-plugin-exports": "^1.5.0",
+    "mmir-tooling": "^6.1.0",
+    "mmir-webpack": "^6.1.0",
+    "typescript": "^3.9.2"
+  },
+  "peerDependencies": {
+    "mmir-lib": "^6.0.0"
   }
 }
