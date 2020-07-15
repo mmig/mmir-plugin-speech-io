@@ -1,10 +1,10 @@
+import type { Cmd , ShowSpeechStateOptions , SpeechFeedbackOptions , RecognitionEmma , UnderstandingEmma , ReadingOptions , StopReadingOptions , ReadingShowOptions } from './';
 
-import { Observable } from 'rxjs';
+import type { Observable } from 'rxjs';
 
-import { IAudio , MmirModule , DialogManager, InputManager , DialogEngine , PlayError } from 'mmir-lib';
-import { Cmd , ShowSpeechStateOptions , SpeechFeedbackOptions , RecognitionEmma , UnderstandingEmma , ReadingOptions , StopReadingOptions , ReadingShowOptions } from './mmir-base-dialog.d';
-import { EmmaUtil } from '../util/EmmaUtil';
-import { FeedbackOption } from '../io/HapticFeedback';
+import type { MmirModule , DialogManager, InputManager , DialogEngine , PlayError } from 'mmir-lib';
+import type { EmmaUtil } from '../util/EmmaUtil';
+import type { FeedbackOption } from '../io/HapticFeedback';
 
 export interface WrappedElement {
   nativeElement: any;

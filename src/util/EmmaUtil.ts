@@ -1,7 +1,7 @@
 
-import { Emma , RecognitionEmma , UnderstandingEmma , TactileEmma, SpeechRecognitionResult , Cmd , Interpretation } from '../typings/mmir-base-dialog.d';
-import { EventLike , AnyEmma , RecognitionData , UnderstandingData , EmmaFunctionType } from '../typings/emma.d';
-import { ExtMmirModule } from '../typings/mmir-ext-dialog.d';
+import { Emma , RecognitionEmma , UnderstandingEmma , TactileEmma, SpeechRecognitionResult , Cmd , Interpretation } from '../typings/';
+import { EventLike , AnyEmma , RecognitionData , UnderstandingData , EmmaFunctionType } from '../typings/';
+import { ExtMmirModule } from '../typings/';
 
 
   var extend: Function;

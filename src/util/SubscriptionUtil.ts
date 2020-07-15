@@ -1,6 +1,6 @@
 
 import { Subscription } from 'rxjs';
-import { SpeechEventName , SpeechEventEmitter } from '../typings/mmir-ext-dialog.d';
+import { SpeechEventName , SpeechEventEmitter } from '../typings/';
 
 export class SubscriptionUtil {
 

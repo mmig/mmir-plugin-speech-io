@@ -3,12 +3,12 @@ import { Subject , BehaviorSubject } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 
 import { MediaManager, PlayError , LogLevel , LogLevelNum, IAudio } from 'mmir-lib';
-import { ShowSpeechStateOptions, SpeechFeedbackOptions, RecognitionEmma, UnderstandingEmma , ReadingOptions , StopReadingOptions, ReadingShowOptions , Cmd } from './typings/mmir-base-dialog.d';
-import { IAppSettings } from './typings/app-settings';
+import { ShowSpeechStateOptions, SpeechFeedbackOptions, RecognitionEmma, UnderstandingEmma , ReadingOptions , StopReadingOptions, ReadingShowOptions , Cmd } from './typings/';
+import { IAppSettings } from './typings/';
 
 import { EmmaUtil } from './util/EmmaUtil';
 
-import { SpeechEventEmitter , WaitReadyOptions , SpeechIoManager , ExtStateEngine , ExtMmirModule } from './typings/mmir-ext-dialog.d';
+import { SpeechEventEmitter , WaitReadyOptions , SpeechIoManager , ExtStateEngine , ExtMmirModule } from './typings/';
 import { createSpeechioManager , raiseInternal } from './util/SpeechIoManager';
 import { SPEECH_IO_MANAGER_ID , SPEECH_IO_INPUT_ID , SPEECH_IO_INPUT_ENGINE_ID , SPEECH_IO_ENGINE_ID , PLUGIN_ID } from './consts';
 import { createConfigSettingsImpl } from './util/SettingsUtils';

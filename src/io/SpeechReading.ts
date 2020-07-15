@@ -1,7 +1,7 @@
 
 import { getHtmlElement } from '../util/Utils';
 import { READ_CONTROL } from '../consts';
-import { GuiElement } from '../typings/mmir-ext-dialog.d';
+import { GuiElement } from '../typings/mmir-ext-dialog';
 
 export class ReadTargetHandler {
 

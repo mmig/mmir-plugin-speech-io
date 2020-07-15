@@ -16,6 +16,9 @@
   "include": [
     "src/**/*.ts"
   ],
+  "exclude": [
+    "src/typings/*.ts"
+  ],
   "compileOnSave": false,
   "atom": {
     "rewriteTsconfig": false

@@ -1,6 +1,6 @@
 
 import { ConfigurationManager } from 'mmir-lib';
-import { IAppSettings } from '../typings/app-settings.d';
+import { IAppSettings } from '../typings/';
 import { PLUGIN_ID } from '../consts';
 
 export interface AppSettingsConfigImpl extends IAppSettings {

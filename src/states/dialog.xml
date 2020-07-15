@@ -1046,6 +1046,8 @@
       <datamodel>
         <!-- flag that indicates if TTS is currently active  -->
         <data id="reading_status" expr="false"/>
+        <!-- the context ID for the reading-target -->
+        <data id="page_id" expr="''"/>
         <!-- the (command) ID for the reading-target (i.e. what should be read) -->
         <data id="reading_id" expr="''"/>
         <!-- the ID for the reading-context (if empty/unset, the pageId is used) -->
