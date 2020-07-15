@@ -1,4 +1,4 @@
-import { WrappedElement, ContainedElement } from '../typings/mmir-ext-dialog.d';
+import { WrappedElement, ContainedElement } from '../typings/';
 /**
  * HELPER get/extract a "target" element
  *

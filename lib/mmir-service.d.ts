@@ -1,8 +1,8 @@
 import { Subject, BehaviorSubject } from 'rxjs';
 import { PlayError, LogLevel, LogLevelNum } from 'mmir-lib';
-import { ShowSpeechStateOptions, SpeechFeedbackOptions, RecognitionEmma, UnderstandingEmma, ReadingOptions, StopReadingOptions, ReadingShowOptions, Cmd } from './typings/mmir-base-dialog.d';
-import { IAppSettings } from './typings/app-settings';
-import { SpeechEventEmitter, WaitReadyOptions, ExtMmirModule } from './typings/mmir-ext-dialog.d';
+import { ShowSpeechStateOptions, SpeechFeedbackOptions, RecognitionEmma, UnderstandingEmma, ReadingOptions, StopReadingOptions, ReadingShowOptions, Cmd } from './typings/';
+import { IAppSettings } from './typings/';
+import { SpeechEventEmitter, WaitReadyOptions, ExtMmirModule } from './typings/';
 interface SpeechEventEmitterImpl<CmdImpl extends Cmd> extends SpeechEventEmitter<CmdImpl> {
     showSpeechInputState: BehaviorSubject<ShowSpeechStateOptions>;
     changeMicLevels: BehaviorSubject<SpeechFeedbackOptions>;

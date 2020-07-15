@@ -1,5 +1,5 @@
 import { MmirModule } from 'mmir-lib';
-import { ExtStateEngine } from '../typings/mmir-ext-dialog.d';
+import { ExtStateEngine } from '../typings/';
 export declare function createSpeechioManager(mmirLib: MmirModule, logLevel: string | number): Promise<any>;
 /**
  * HELPER for using a state-machine's internal raise function:
