@@ -1,7 +1,7 @@
 import { Subject } from 'rxjs';
 import { MmirModule, DialogManager } from 'mmir-lib';
-import { StateManager, ManagerFactory } from '../typings/mmir-ext.d';
-import { ExtMmirModule , SpeechIoManager , ExtStateEngine } from '../typings/mmir-ext-dialog.d';
+import { StateManager, ManagerFactory } from '../typings/';
+import { ExtMmirModule , SpeechIoManager , ExtStateEngine } from '../typings/';
 import { SPEECH_IO_INPUT_STATES_ID , SPEECH_IO_INPUT_ID , SPEECH_IO_STATES_ID , SPEECH_IO_MANAGER_ID , SPEECH_IO_ENGINE_ID , SPEECH_IO_INPUT_ENGINE_ID } from '../consts';
 
 declare var WEBPACK_BUILD: boolean;

@@ -3,8 +3,8 @@ export interface ISpeechInputIndicator {
 
   initialized: boolean;
 
-  show(event, target?: HTMLElement): void;
-  toggle(event, target?: HTMLElement): void;
+  show(event: any, target?: HTMLElement): void;
+  toggle(event: any, target?: HTMLElement): void;
   hide(): void;
   ready(overlayTarget?: OverlayTarget) : Promise<void>;
 }
@@ -13,7 +13,7 @@ export interface ISpeechOutputIndicator {
 
   initialized: boolean;
 
-  startReading(e, target?: HTMLElement): void;
+  startReading(event: any, target?: HTMLElement): void;
   stopReading(isLeaveOpen?: boolean): void;
 
   ready(overlayTarget?: OverlayTarget) : Promise<void>;

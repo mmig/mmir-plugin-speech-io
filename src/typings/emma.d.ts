@@ -1,6 +1,5 @@
 
-import { Emma , RecognitionEmma , UnderstandingEmma , TactileEmma, SpeechRecognitionResult , Cmd } from './mmir-base-dialog.d';
-import { MmirModule } from 'mmir-lib';
+import type { Emma , RecognitionEmma , UnderstandingEmma , TactileEmma , Cmd } from './';
 
 export type EmmaFunctionType = 'recognition' | 'understanding';
 export type AnyEmma<CmdImpl extends Cmd> = Emma | RecognitionEmma | UnderstandingEmma<CmdImpl> | TactileEmma;

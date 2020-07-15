@@ -7,7 +7,7 @@ import { DisplayText } from '../ctrl/SpeechInputController';
 import { SelectionUtil } from '../util/SelectionUtil';
 import { DICTATION_CONTROL } from '../consts';
 import { getHtmlElement } from '../util/Utils';
-import { GuiElement } from '../typings/mmir-ext-dialog.d';
+import { GuiElement } from '../typings/mmir-ext-dialog';
 
 
 export const UNSTABLE_RESULT_HTML_PREFIX = '<span class="unstable">';

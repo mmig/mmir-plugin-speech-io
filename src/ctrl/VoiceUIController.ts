@@ -1,7 +1,7 @@
 
 import { Subscription , BehaviorSubject } from 'rxjs';
 
-import { RecognitionEmma , UnderstandingEmma , ShowSpeechStateOptions, ReadingShowOptions , StopReadingOptions, SpeechFeedbackOptions , Cmd } from '../typings/mmir-base-dialog.d';
+import { RecognitionEmma , UnderstandingEmma , ShowSpeechStateOptions, ReadingShowOptions , StopReadingOptions, SpeechFeedbackOptions , Cmd } from '../typings/';
 import { SPEECH_ACTIVE , READ_ACTIVE } from '../consts';
 import { triggerClickFeedback , FeedbackOption } from '../io/HapticFeedback';
 import { PromptReader } from '../io/PromptReader';
@@ -10,10 +10,10 @@ import { SpeechOutputController } from '../ctrl/SpeechOutputController';
 import { SubscriptionUtil } from '../util/SubscriptionUtil';
 import { DictationTargetHandler , DictationHandler, DictationTarget , SelectionMode } from '../io/SpeechDictation';
 import { ReadTargetHandler , ReadHandler } from '../io/SpeechReading';
-import { EventLike } from '../typings/emma.d';
-import { ISpeechInputIndicator , ISpeechOutputIndicator } from '../typings/speech-io-indicator.d';
+import { EventLike } from '../typings/';
+import { ISpeechInputIndicator , ISpeechOutputIndicator } from '../typings/';
 
-import { ExtMmirModule , SpeechEventName , GuiElement , SpeechIoManager , InputOutputOption } from '../typings/mmir-ext-dialog.d';
+import { ExtMmirModule , SpeechEventName , GuiElement , SpeechIoManager , InputOutputOption } from '../typings/';
 
 // import { ReadOverlay } from '../../../components/speech-overlay/dialogs/read-overlay';
 import { MmirService } from '../mmir-service';

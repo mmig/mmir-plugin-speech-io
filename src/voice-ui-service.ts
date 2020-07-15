@@ -2,8 +2,8 @@
 import { PromptReader } from './io/PromptReader';
 import { VoiceUIController } from './ctrl/VoiceUIController';
 
-import { ReadingOptions , Cmd } from './typings/mmir-base-dialog.d';
-import { ExtMmirModule } from './typings/mmir-ext-dialog.d';
+import { ReadingOptions , Cmd } from './typings/';
+import { ExtMmirModule } from './typings/';
 import { MmirService } from './mmir-service';
 import { raiseInternal } from './util/SpeechIoManager';
 

@@ -12,12 +12,13 @@
     }
   },
   "scripts": {
-    "build": "npm run build-ts && npm run copy-dts && npm run copy-js && npm run downlevel-dts && npm run build-metadata",
+    "build": "npm run build-ts && npm run build-typings && npm run copy-libs && npm run downlevel-dts && npm run build-metadata",
     "build-ts": "tsc",
-    "copy-dts": "copyfiles -u 1 \"src/**/*.d.ts\" lib",
-    "copy-js": "copyfiles -u 1 \"src/**/*.js\" lib",
+    "build-typings": "node scripts/update-typings.js",
+    "copy-libs": "copyfiles -u 1 \"src/lib/**/*.*\" lib",
     "downlevel-dts": "dtsdownlevel lib",
-    "build-metadata": "createplugincompat ./ && pluginexport --ignore-deps ./"
+    "build-metadata": "createplugincompat ./ && pluginexport --ignore-deps ./",
+    "install": "npm run update-libs"
   },
   "repository": {
     "type": "git",
@@ -36,15 +37,19 @@
   "author": "russa",
   "license": "MIT",
   "dependencies": {
-    "rxjs": "^6.5.5"
+    "rxjs": "^6.6.0"
   },
   "devDependencies": {
-    "copyfiles": "^2.2.0",
+    "@types/fs-extra": "^9.0.1",
+    "copyfiles": "^2.3.0",
+    "fs-extra": "^9.0.1",
     "mmir-lib": "^6.1.0",
     "mmir-plugin-exports": "^1.5.0",
-    "mmir-tooling": "^6.1.0",
-    "mmir-webpack": "^6.1.0",
-    "typescript": "^3.9.2"
+    "mmir-tooling": "^6.1.1",
+    "mmir-webpack": "^6.1.1",
+    "text-caret-pos": "^1.0.1",
+    "typescript": "^3.9.6",
+    "web-units": "^1.0.0"
   },
   "peerDependencies": {
     "mmir-lib": "^6.0.0"

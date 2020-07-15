@@ -4,8 +4,8 @@ import { Subscription } from 'rxjs';
 import { PromptReader } from '../io/PromptReader';
 
 import { SubscriptionUtil } from '../util/SubscriptionUtil';
-import { ReadingOptions , StopReadingOptions } from '../typings/mmir-base-dialog.d';
-import { SpeechEventName } from '../typings/mmir-ext-dialog.d';
+import { ReadingOptions , StopReadingOptions } from '../typings/';
+import { SpeechEventName } from '../typings/';
 import { MmirService } from '../mmir-service';
 
 export class SpeechOutputController {

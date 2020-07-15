@@ -2,7 +2,7 @@
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { RecognitionEmma , UnderstandingEmma , RecognitionType , SpeechRecognitionResult } from '../typings/mmir-base-dialog.d';
+import { RecognitionEmma , UnderstandingEmma , RecognitionType , SpeechRecognitionResult } from '../typings/';
 import { EmmaUtil } from '../util/EmmaUtil';
 
 import { SubscriptionUtil } from '../util/SubscriptionUtil';
@@ -13,7 +13,7 @@ import * as CaretPositionModule from '../lib/caretPosition.d';
 import * as LengthModule from '../lib/length.d';
 import { SelectionUtil } from '../util/SelectionUtil';
 
-import { SpeechEventName , ExtMmirModule , SpeechIoManager } from '../typings/mmir-ext-dialog.d';
+import { SpeechEventName , ExtMmirModule , SpeechIoManager } from '../typings/';
 import { MmirService } from '../mmir-service';
 import { PLUGIN_ID } from '../consts';
 

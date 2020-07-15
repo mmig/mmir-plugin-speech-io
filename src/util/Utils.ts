@@ -1,5 +1,5 @@
 
-import { WrappedElement , ContainedElement } from '../typings/mmir-ext-dialog.d';
+import { WrappedElement , ContainedElement } from '../typings/';
 
 
 /**

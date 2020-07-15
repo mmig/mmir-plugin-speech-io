@@ -171,14 +171,14 @@ export interface ISpeechOutput {
 export interface IGuidedSpeechInput {
 
   // _util.ctrlGuided.perform('resetGuidedInputForCurrentControl');
-  resetGuidedInputForCurrentControl();
+  resetGuidedInputForCurrentControl(): void;
   // _util.ctrlGuided.perform('startGuidedInput');
-  startGuidedInput();
+  startGuidedInput(): void;
   // _util.ctrlGuided.perform('resetGuidedInput');
-  resetGuidedInput();
+  resetGuidedInput(): void;
 
   // _util.ctrlSpeechIn.perform('isDictAutoProceed')
-  isDictAutoProceed();
+  isDictAutoProceed(): boolean;
 }
 
 
