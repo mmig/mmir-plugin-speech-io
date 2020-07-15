@@ -1,6 +1,6 @@
 import { MediaManager } from 'mmir-lib';
-import { StopReadingOptions } from '../typings/mmir-base-dialog';
-import { IPromptHandler, SpeechIoManager } from '../typings/mmir-ext-dialog';
+import { StopReadingOptions } from '../typings/';
+import { IPromptHandler, SpeechIoManager } from '../typings/';
 export declare class PromptReader {
     private dlg;
     private media;

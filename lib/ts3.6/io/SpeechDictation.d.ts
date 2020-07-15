@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 import { DisplayText } from '../ctrl/SpeechInputController';
 import { SelectionUtil } from '../util/SelectionUtil';
-import { GuiElement } from '../typings/mmir-ext-dialog';
+import { GuiElement } from '../typings/';
 export declare const UNSTABLE_RESULT_HTML_PREFIX = "<span class=\"unstable\">";
 export declare const UNSTABLE_RESULT_HTML_SUFFIX = "</span>";
 export declare class DictationTargetHandler {
