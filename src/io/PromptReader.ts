@@ -1,7 +1,7 @@
 
 import { MediaManager, TTSOptions } from 'mmir-lib';
-import { StopReadingOptions } from '../typings/mmir-base-dialog';
-import { IPromptHandler , SpeechIoManager } from '../typings/mmir-ext-dialog';
+import { StopReadingOptions } from '../typings/';
+import { IPromptHandler , SpeechIoManager } from '../typings/';
 
 export class PromptReader {
 
