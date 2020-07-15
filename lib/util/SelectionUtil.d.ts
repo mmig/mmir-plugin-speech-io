@@ -1,6 +1,6 @@
-import * as CaretPositionModule from '../lib/caretPosition.d';
-import * as LengthModule from '../lib/length.d';
-import { CaretOptions } from '../lib/caretPosition.d';
+import * as CaretPositionModule from '../lib/caretPosition';
+import * as LengthModule from '../lib/length';
+import { CaretOptions } from '../lib/caretPosition';
 export declare class SelectionUtil {
     private unitUtil;
     private caretPos;

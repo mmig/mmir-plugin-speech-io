@@ -1,4 +1,4 @@
-import { GuiElement } from '../typings/mmir-ext-dialog.d';
+import { GuiElement } from '../typings/mmir-ext-dialog';
 export declare class ReadTargetHandler {
     activeHandler: ReadHandler;
     private targets;

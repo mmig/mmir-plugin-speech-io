@@ -1,14 +1,14 @@
 import { Subscription, BehaviorSubject } from 'rxjs';
-import { RecognitionEmma, UnderstandingEmma, ShowSpeechStateOptions, ReadingShowOptions, StopReadingOptions, SpeechFeedbackOptions, Cmd } from '../typings/mmir-base-dialog.d';
+import { RecognitionEmma, UnderstandingEmma, ShowSpeechStateOptions, ReadingShowOptions, StopReadingOptions, SpeechFeedbackOptions, Cmd } from '../typings/';
 import { FeedbackOption } from '../io/HapticFeedback';
 import { PromptReader } from '../io/PromptReader';
 import { SpeechInputController } from '../ctrl/SpeechInputController';
 import { SpeechOutputController } from '../ctrl/SpeechOutputController';
 import { DictationTargetHandler, DictationHandler, DictationTarget, SelectionMode } from '../io/SpeechDictation';
 import { ReadTargetHandler } from '../io/SpeechReading';
-import { EventLike } from '../typings/emma.d';
-import { ISpeechInputIndicator, ISpeechOutputIndicator } from '../typings/speech-io-indicator.d';
-import { ExtMmirModule, SpeechEventName, GuiElement, SpeechIoManager, InputOutputOption } from '../typings/mmir-ext-dialog.d';
+import { EventLike } from '../typings/';
+import { ISpeechInputIndicator, ISpeechOutputIndicator } from '../typings/';
+import { ExtMmirModule, SpeechEventName, GuiElement, SpeechIoManager, InputOutputOption } from '../typings/';
 import { MmirService } from '../mmir-service';
 export declare class VoiceUIController<CmdImpl extends Cmd> {
     protected _mmirProvider: MmirService<CmdImpl>;

@@ -1,8 +1,4 @@
-export * from './typings/mmir-base-dialog.d';
-export * from './typings/mmir-ext-dialog.d';
-export * from './typings/speech-io-indicator.d';
-export * from './typings/emma.d';
-export * from './typings/app-settings.d';
+export * from './typings';
 export { MmirService } from './mmir-service';
 export { VoiceUIService } from './voice-ui-service';
 export { DictationTarget } from './io/SpeechDictation';

@@ -1,7 +1,7 @@
 import { PromptReader } from './io/PromptReader';
 import { VoiceUIController } from './ctrl/VoiceUIController';
-import { ReadingOptions, Cmd } from './typings/mmir-base-dialog.d';
-import { ExtMmirModule } from './typings/mmir-ext-dialog.d';
+import { ReadingOptions, Cmd } from './typings/';
+import { ExtMmirModule } from './typings/';
 import { MmirService } from './mmir-service';
 export declare class VoiceUIService<CmdImpl extends Cmd> {
     protected vuiCtrl: VoiceUIController<CmdImpl>;

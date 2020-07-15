@@ -1,7 +1,7 @@
 import { Subscription } from 'rxjs';
 import { PromptReader } from '../io/PromptReader';
-import { ReadingOptions } from '../typings/mmir-base-dialog.d';
-import { SpeechEventName } from '../typings/mmir-ext-dialog.d';
+import { ReadingOptions } from '../typings/';
+import { SpeechEventName } from '../typings/';
 import { MmirService } from '../mmir-service';
 export declare class SpeechOutputController {
     protected prompt: PromptReader;

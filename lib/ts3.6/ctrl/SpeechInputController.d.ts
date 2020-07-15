@@ -1,9 +1,9 @@
 import { Observable, Subscription } from 'rxjs';
-import { RecognitionEmma, UnderstandingEmma, RecognitionType, SpeechRecognitionResult } from '../typings/mmir-base-dialog.d';
+import { RecognitionEmma, UnderstandingEmma, RecognitionType, SpeechRecognitionResult } from '../typings/';
 import { EmmaUtil } from '../util/EmmaUtil';
 import { DictationTargetHandler, DictationHandler, DictationTarget, CurrentInputData, SelectionMode } from '../io/SpeechDictation';
 import { SelectionUtil } from '../util/SelectionUtil';
-import { SpeechEventName, ExtMmirModule, SpeechIoManager } from '../typings/mmir-ext-dialog.d';
+import { SpeechEventName, ExtMmirModule, SpeechIoManager } from '../typings/';
 import { MmirService } from '../mmir-service';
 export declare type RecognitionTypeExt = RecognitionType | 'RECOGNITION_ERROR';
 export interface ASRResult extends SpeechRecognitionResult {

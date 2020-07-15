@@ -1,5 +1,5 @@
 import { ConfigurationManager } from 'mmir-lib';
-import { IAppSettings } from '../typings/app-settings.d';
+import { IAppSettings } from '../typings/';
 export interface AppSettingsConfigImpl extends IAppSettings {
     _conf: ConfigurationManager;
 }
