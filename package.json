@@ -19,8 +19,7 @@
     "update-libs": "npm update text-caret-pos web-units && npm run update-src-libs",
     "update-src-libs": "node scripts/update-libs.js",
     "downlevel-dts": "dtsdownlevel lib",
-    "build-metadata": "createplugincompat ./ && pluginexport --ignore-deps ./",
-    "install": "npm run update-libs"
+    "build-metadata": "createplugincompat ./ && pluginexport --ignore-deps ./"
   },
   "repository": {
     "type": "git",
