@@ -5,7 +5,7 @@ export declare class PromptReader {
     private dlg;
     private media;
     protected _ttsActive: boolean;
-    get active(): boolean;
+    readonly active: boolean;
     /** context for tts(): set to FALSY for default context
      * @see mmir.media.setDefaultCtx(ctx: string | null)
      */

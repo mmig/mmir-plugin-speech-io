@@ -1,4 +1,3 @@
-
 /**
  * convert/calculate CSS unit-values to pixel-length;
  * @param  elem the HTMLElement which should be measured

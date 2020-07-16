@@ -33,8 +33,9 @@ export declare class DictationHandler {
     _inputData: CurrentInputData;
     selectionMode: SelectionMode;
     private _debug;
-    debug: boolean;
-    readonly activationCtrl: HTMLElement;
+    get debug(): boolean;
+    set debug(value: boolean);
+    get activationCtrl(): HTMLElement;
     constructor(id: string, selectUtil: SelectionUtil);
     protected setInputTarget(textfield: GuiElement): void;
     protected doInitSelectionChange(): void;
