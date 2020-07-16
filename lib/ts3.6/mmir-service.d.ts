@@ -27,8 +27,8 @@ export declare class MmirService<CmdImpl extends Cmd> {
     protected _readyWaitTimer: number;
     protected readonly _readyWaitTimeout: number;
     protected isDebugVui: boolean;
-    get mmir(): ExtMmirModule<CmdImpl>;
-    get speechEvents(): SpeechEventEmitterImpl<CmdImpl>;
+    readonly mmir: ExtMmirModule<CmdImpl>;
+    readonly speechEvents: SpeechEventEmitterImpl<CmdImpl>;
     constructor(mmir: ExtMmirModule<CmdImpl>);
     init(appConfig: IAppSettings, ..._args: any[]): Promise<MmirService<CmdImpl>>;
     private initDebugVui;

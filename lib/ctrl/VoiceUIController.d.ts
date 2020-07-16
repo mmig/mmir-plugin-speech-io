@@ -13,7 +13,7 @@ import { MmirService } from '../mmir-service';
 export declare class VoiceUIController<CmdImpl extends Cmd> {
     protected _mmirProvider: MmirService<CmdImpl>;
     protected mmir: ExtMmirModule<CmdImpl>;
-    protected readonly speech: SpeechIoManager<CmdImpl>;
+    protected get speech(): SpeechIoManager<CmdImpl>;
     protected prompt: PromptReader;
     protected _asrActive: boolean;
     asrActiveChange: BehaviorSubject<boolean>;
@@ -36,8 +36,8 @@ export declare class VoiceUIController<CmdImpl extends Cmd> {
     isReadOverlaySingleton: boolean;
     protected _debugMsg: boolean;
     protected readonly _defaultDictationFeedbackStyle: SelectionMode;
-    readonly asrActive: boolean;
-    readonly ttsActive: boolean;
+    get asrActive(): boolean;
+    get ttsActive(): boolean;
     speechOut: SpeechOutputController;
     speechIn: SpeechInputController;
     protected activePageSubscriptions: Array<Subscription>;
@@ -46,7 +46,8 @@ export declare class VoiceUIController<CmdImpl extends Cmd> {
     protected dictationOverlay: ISpeechInputIndicator;
     protected readOverlay: ISpeechOutputIndicator;
     protected readOverlayClickSubscription: Subscription;
-    debug: boolean;
+    get debug(): boolean;
+    set debug(value: boolean);
     protected _speechEventSubscriptions: Map<SpeechEventName, Subscription>;
     protected initializing: Promise<MmirService<CmdImpl>>;
     constructor(mmirProvider: MmirService<CmdImpl>);
