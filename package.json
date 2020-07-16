@@ -5,7 +5,7 @@
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "typesVersions": {
-    ">=3.6": {
+    "<3.8": {
       "lib/*": [
         "lib/ts3.6/*"
       ]
@@ -18,7 +18,7 @@
     "copy-libs": "copyfiles -u 1 \"src/lib/**/*.*\" lib",
     "update-libs": "npm update text-caret-pos web-units && npm run update-src-libs",
     "update-src-libs": "node scripts/update-libs.js",
-    "downlevel-dts": "dtsdownlevel lib",
+    "downlevel-dts": "dtsdownlevel lib --force",
     "build-metadata": "createplugincompat ./ && pluginexport --ignore-deps ./"
   },
   "repository": {
@@ -45,7 +45,7 @@
     "copyfiles": "^2.3.0",
     "fs-extra": "^9.0.1",
     "mmir-lib": "^6.1.0",
-    "mmir-plugin-exports": "^1.5.0",
+    "mmir-plugin-exports": "^2.0.0-rc.1",
     "mmir-tooling": "^6.1.1",
     "mmir-webpack": "^6.1.1",
     "text-caret-pos": "^1.0.1",
