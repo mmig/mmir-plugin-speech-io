@@ -15,6 +15,8 @@ export class VoiceUIService<CmdImpl extends Cmd> {
   protected _debug: boolean = false;
   protected _initialized = false;
 
+
+  public get mmirService(): MmirService<CmdImpl> { return this.mmirProvider;}
   public get mmir(): ExtMmirModule<CmdImpl> { return this.mmirProvider.mmir;}
   public get prompt(): PromptReader { return this.vuiCtrl.getPromptReader();}
   public get ctrl(): VoiceUIController<CmdImpl> { return this.vuiCtrl;}
