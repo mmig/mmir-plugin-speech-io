@@ -89,6 +89,17 @@ Configuration values:
   enableInterimResults?: boolean
 
   /**
+   * Flag that indicates if end-of-speech (EOS) detection will be used
+   * for speech recognition.
+   *
+   * If enabled, the recognition will be stopped after EOS was detected
+   * (e.g. upon a pause after dictating a sentence).
+   *
+   * @default false
+   */
+  eos?: boolean;
+
+  /**
    * specific configration values for active speech-mode ('dictation' or 'command'):
    * override general configuration values for the plugin (see configuration options above)
    */

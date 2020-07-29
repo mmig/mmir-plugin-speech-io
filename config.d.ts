@@ -81,6 +81,17 @@ export interface SpeechIoPluginConfigurationEntry {
    * @default speechInputMode === 'dictation'
    */
   enableInterimResults?: boolean
+
+  /**
+   * Flag that indicates if end-of-speech (EOS) detection will be used
+   * for speech recognition.
+   *
+   * If enabled, the recognition will be stopped after EOS was detected
+   * (e.g. upon a pause after dictating a sentence).
+   *
+   * @default false
+   */
+  eos?: boolean;
 }
 
 export interface SpeechIoPluginConfigurationBaseEntry {
