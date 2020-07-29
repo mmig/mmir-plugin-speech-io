@@ -45,14 +45,14 @@
     "copyfiles": "^2.3.0",
     "fs-extra": "^9.0.1",
     "mmir-lib": "^6.1.0",
-    "mmir-plugin-exports": "^2.0.0-rc.1",
+    "mmir-plugin-exports": "^2.0.0",
     "mmir-tooling": "^6.1.1",
     "mmir-webpack": "^6.1.1",
     "text-caret-pos": "^1.0.1",
-    "typescript": "^3.9.6",
+    "typescript": "^3.9.7",
     "web-units": "^1.0.0"
   },
   "peerDependencies": {
-    "mmir-lib": "^6.0.0"
+    "mmir-lib": "^6.1.0"
   }
 }
