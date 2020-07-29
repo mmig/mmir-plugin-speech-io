@@ -389,7 +389,7 @@
                 _util.media.perform(asr_ctx, asrFunc, [{
                     success: function(result, score, type, alt, unstable){
 
-                        if(_util.isDebugVui) console.info('mmir.'+asrFunc+'['+speechInputMode+' - current: '+speech_mode+']: '+JSON.stringify(arguments));
+                        if(_util.isDebugVui) console.info('speechioManager.'+asrFunc+'['+speechInputMode+' - current: '+speech_mode+']: '+JSON.stringify(arguments));
 
 
                         //FIXME filter empty/non-final etc results, or should all results fire an event?
@@ -402,17 +402,17 @@
                             _util.input.raise('speech',emmaEvt);
                         }
                         else {
-                            if(_util.isDebugVui) console.debug('mmir.'+asrFunc+'[empty result]: '+JSON.stringify(arguments));
+                            if(_util.isDebugVui) console.debug('speechioManager.'+asrFunc+'[empty result]: '+JSON.stringify(arguments));
                         }
 
                         if(isFinal){
-                            if(_util.isDebugVui) console.debug('mmir.'+asrFunc+'[final result]: stop recording.');
+                            if(_util.isDebugVui) console.debug('speechioManager.'+asrFunc+'[final result]: stop recording.');
                             _util.dlg.raise('speech-input-stopped');
                         }
                     },
                     error: function(error){
 
-                        console.error('[ERROR] mmir.'+asrFunc+': '+JSON.stringify(arguments)+' (prompt: '+temp_prompt_data+', restart: '+temp_restart_speech_with_id+')');
+                        console.error('[ERROR] speechioManager.'+asrFunc+': '+JSON.stringify(arguments)+' (prompt: '+temp_prompt_data+', restart: '+temp_restart_speech_with_id+')');
 
                         _util.dlg.raise('speech-input-stopped');
 
@@ -453,7 +453,7 @@
                 _util.media.perform(asr_ctx, 'stopRecord', [{
                     success: function(result, score, type, alt, unstable){
 
-                        if(_util.isDebugVui) console.info('mmir.stopRecord['+speechInputMode+' - current: '+speech_mode+']: '+JSON.stringify(arguments));
+                        if(_util.isDebugVui) console.info('speechioManager.stopRecord['+speechInputMode+' - current: '+speech_mode+']: '+JSON.stringify(arguments));
 
                         //FIXME filter empty/non-final etc results, or should all results fire an event?
                         var isNotEmpty  = result || (alt && alt.length);
@@ -465,7 +465,7 @@
                             _util.input.raise('speech',emmaEvt);
                         }
                         else {
-                            if(_util.isDebugVui) console.debug('mmir.stopRecord[empty result]: '+JSON.stringify(arguments));
+                            if(_util.isDebugVui) console.debug('speechioManager.stopRecord[empty result]: '+JSON.stringify(arguments));
                         }
 
                         if(temp_prompt_data){
@@ -506,7 +506,7 @@
                     },
                     error: function(error){
 
-                        console.error('[ERROR] mmir.stopRecord: '+JSON.stringify(arguments)+' (prompt: '+temp_prompt_data+', restart: '+temp_restart_speech_with_id+')');
+                        console.error('[ERROR] speechioManager.stopRecord: '+JSON.stringify(arguments)+' (prompt: '+temp_prompt_data+', restart: '+temp_restart_speech_with_id+')');
 
                         if(temp_prompt_data){
 
