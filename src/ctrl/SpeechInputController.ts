@@ -48,11 +48,11 @@ export class SpeechInputController {
 
   protected _selectionUtil: SelectionUtil;
 
-  protected _stopDictWord: string;
+  protected _stopDictWord: string | {[languageId: string]: string};
   /**stop-expression for stopping dictation-input*/
-  protected _stopDictExpr: RegExp;
-  protected _cancelDictWord: string;
-  protected _cancelDictExpr: RegExp;
+  protected _stopDictExpr: RegExp | {[languageId: string]: RegExp};
+  protected _cancelDictWord: string | {[languageId: string]: string};
+  protected _cancelDictExpr: RegExp | {[languageId: string]: RegExp};
 
   public get debug(): boolean { return this._debugMsg; }
   public set debug(value: boolean) {
@@ -81,7 +81,7 @@ export class SpeechInputController {
       this.dictationResults = mmirProvider.speechEvents.showDictationResult.pipe(map(dictation => this._processDictationResult(dictation)));
 
       //FIXME should get configuration from somewhere else?
-      const stopWord = this._mmir.conf.get([PLUGIN_ID, 'dictStopWord'], 'anhalten');
+      const stopWord = this._mmir.conf.get([PLUGIN_ID, 'dictStopWord'], '');
       if(stopWord){
         const cancelWord: string = this._mmir.conf.get([PLUGIN_ID, 'dictAbortWord'], '');
         this.setDictationCommand(stopWord, cancelWord);
@@ -153,14 +153,98 @@ export class SpeechInputController {
   }
 
   protected doUpdateDictationCmd(){
-    let stopWord: string = this._stopDictWord;
-    const cancelStopWord = this._cancelDictWord;
-    if(cancelStopWord){
-      stopWord = '(' + stopWord + '|' + cancelStopWord + ')';
+    const expr = this.doUpdateDictationCmdRegExp(this._stopDictWord, this._cancelDictWord);
+    this._stopDictExpr = expr[0];
+    this._cancelDictExpr = expr[1];
+  }
+
+  protected doUpdateDictationCmdRegExp(stopCmd: string | {[language: string]: string}, cancelCmd: string | {[language: string]: string}): Array<RegExp | {[language: string]: RegExp}> {
+    let stopWord: string = stopCmd as string;
+    let cancelWord: string = cancelCmd && typeof cancelCmd === 'string'? cancelCmd : '';
+    let reStop: RegExp | {[language: string]: RegExp};
+    let count: number = 0;
+    if(stopCmd && typeof stopCmd !== 'string'){
+      reStop = {};
+      for(const s in stopCmd){
+        stopWord = stopCmd[s];
+        if(stopWord){
+          if(cancelWord){
+            //if there is a single cancel word (i.e. no dictionary):
+            // do include it in all stop-expressions
+            stopWord = '('+stopWord+'|'+cancelWord+')';
+          }
+          reStop[s] = new RegExp('^\\s*'+stopWord+'\\s*$', 'i');
+        }
+        ++count;
+      }
+      stopWord = '';//<- signal that we have a dictionary of stop-commands
     }
-    this._cancelDictExpr = new RegExp('\\b'+cancelStopWord+'\\s*$', 'i');
-    //stop-expression for stopping dictation-input
-    this._stopDictExpr = new RegExp('\\b'+stopWord+'\\s*$', 'i');
+
+    if(stopWord){
+      reStop = new RegExp('^\\s*'+stopWord+'\\s*$', 'i');
+    } else if(!stopCmd || count === 0){
+      //if no stop-command or dictionary was empty: reset expression
+      reStop = void(0);
+    }
+
+    let reCancel: RegExp | {[language: string]: RegExp};
+    let isUpdateStopWord: boolean = false;
+    count = 0;
+    if(cancelCmd && typeof cancelCmd !== 'string'){
+      reCancel = {};
+      for(const s in cancelCmd){
+        cancelWord = cancelCmd[s];
+        if(cancelWord){
+          //if there is stopword:
+          // do add the cancel word, so that it detect both cancel & stop words
+          if(stopCmd && stopCmd[s]){
+            reStop[s] = new RegExp('^\\s*('+stopCmd[s]+'|'+cancelWord+')\\s*$', 'i');
+          } else if (stopWord){
+            //add cancel-word to single-stopword (i.e. non-dictionary) expression
+            stopWord += '|' + cancelWord;
+            isUpdateStopWord = true;
+          }
+          reCancel[s] = new RegExp('^\\s*'+cancelWord+'\\s*$', 'i');
+          ++count;
+        }
+      }
+      cancelWord = '';//<- signal that we have a dictionary of cancel-commands
+    }
+
+    if(cancelWord){
+      reCancel = new RegExp('^\\s*'+cancelWord+'\\s*$', 'i');
+      if(stopWord){
+        stopWord += '|' + cancelWord;
+        isUpdateStopWord = true;
+      }
+    } else if(!cancelCmd || count === 0){
+      //if no cancel-command or dictionary was empty: reset expression
+      reCancel = void(0);
+    }
+
+    if(isUpdateStopWord){
+      //we had dictionary of cancel-words, but only single string for stop-words -> include all cancel words in stop-expression test:
+      reStop = new RegExp('^\\s*('+stopWord+')\\s*$', 'i');
+    }
+
+    return [reStop, reCancel];
+  }
+
+  protected doTest(str: string, dictCmdExpr: RegExp | {[language: string]: RegExp}): boolean;
+  protected doTest(str: string, dictCmdExpr: RegExp | {[language: string]: RegExp}, isRemove: true): string;
+  protected doTest(str: string, dictCmdExpr: RegExp | {[language: string]: RegExp}, isRemove?: boolean): boolean | string {
+    if(dictCmdExpr){
+      let re: RegExp;
+      if(dictCmdExpr instanceof RegExp){
+        re = dictCmdExpr;
+      } else {
+        re = dictCmdExpr[this._mmir.lang.getLanguage()];
+      }
+      if(re){
+        return isRemove? (str? str.replace(re, '') : '') : re.test(str);
+      }
+    }
+    return isRemove? '' : false;
   }
 
   ////////////////////////////////////////// Speech Input Event Handler ////////////////////////
@@ -367,13 +451,14 @@ export class SpeechInputController {
     if(!isStopped && type !== 'INTERIM'){
 
       const isEvalStopWord: boolean = this._isEvalDictStopWord(asrEmmaEvent);
-      if(isEvalStopWord && this._stopDictExpr.test(result)){
+      if(isEvalStopWord && this.doTest(result, this._stopDictExpr)){
 
-        if(this._cancelDictExpr.test(result)){
+        if(this.doTest(result, this._cancelDictExpr)){
           isCanceled = true;
+
         }
 
-        result = result.replace(this._stopDictExpr, '');
+        result = this.doTest(result, this._stopDictExpr, true);
 
         //remove trainling whithespace, if there is one:
         if(/\s$/.test(result)){
