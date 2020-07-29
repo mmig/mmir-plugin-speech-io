@@ -382,11 +382,14 @@
                 //}
 
                 var allowInterim = _util.getAsrConfig('enableInterimResults', speechInputMode === 'dictation', speechInputMode);
+                var eosEnabled = _util.getAsrConfig('eos', false, speechInputMode);
 
-                _util.media.perform(asr_ctx, 'startRecord', [{
+                var asrFunc = eosEnabled? 'recognize' : 'startRecord';
+
+                _util.media.perform(asr_ctx, asrFunc, [{
                     success: function(result, score, type, alt, unstable){
 
-                        if(_util.isDebugVui) console.info('mmir.startRecord['+speechInputMode+' - current: '+speech_mode+']: '+JSON.stringify(arguments));
+                        if(_util.isDebugVui) console.info('mmir.'+asrFunc+'['+speechInputMode+' - current: '+speech_mode+']: '+JSON.stringify(arguments));
 
 
                         //FIXME filter empty/non-final etc results, or should all results fire an event?
@@ -399,12 +402,17 @@
                             _util.input.raise('speech',emmaEvt);
                         }
                         else {
-                            if(_util.isDebugVui) console.debug('mmir.startRecord[empty result]: '+JSON.stringify(arguments));
+                            if(_util.isDebugVui) console.debug('mmir.'+asrFunc+'[empty result]: '+JSON.stringify(arguments));
+                        }
+
+                        if(isFinal){
+                            if(_util.isDebugVui) console.debug('mmir.'+asrFunc+'[final result]: stop recording.');
+                            _util.dlg.raise('speech-input-stopped');
                         }
                     },
                     error: function(error){
 
-                        console.error('[ERROR] mmir.startRecord: '+JSON.stringify(arguments)+' (prompt: '+temp_prompt_data+', restart: '+temp_restart_speech_with_id+')');
+                        console.error('[ERROR] mmir.'+asrFunc+': '+JSON.stringify(arguments)+' (prompt: '+temp_prompt_data+', restart: '+temp_restart_speech_with_id+')');
 
                         _util.dlg.raise('speech-input-stopped');
 
