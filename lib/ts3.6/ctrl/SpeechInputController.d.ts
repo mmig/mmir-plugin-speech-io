@@ -26,17 +26,38 @@ export declare class SpeechInputController {
     protected _manager: SpeechIoManager<any>;
     protected _mmir: ExtMmirModule<any>;
     protected _selectionUtil: SelectionUtil;
-    protected _stopDictWord: string;
+    protected _stopDictWord: string | {
+        [languageId: string]: string;
+    };
     /**stop-expression for stopping dictation-input*/
-    protected _stopDictExpr: RegExp;
-    protected _cancelDictWord: string;
-    protected _cancelDictExpr: RegExp;
+    protected _stopDictExpr: RegExp | {
+        [languageId: string]: RegExp;
+    };
+    protected _cancelDictWord: string | {
+        [languageId: string]: string;
+    };
+    protected _cancelDictExpr: RegExp | {
+        [languageId: string]: RegExp;
+    };
     debug: boolean;
     constructor(mmirProvider: MmirService<any>, dictTargetHandler: DictationTargetHandler);
     destroy(): void;
     createDictationTarget(target: DictationTarget, id: string, feedbackStyle?: SelectionMode): DictationHandler;
     setDictationCommand(stopCommandWord: string, cancelCommandWord?: string): void;
     protected doUpdateDictationCmd(): void;
+    protected doUpdateDictationCmdRegExp(stopCmd: string | {
+        [language: string]: string;
+    }, cancelCmd: string | {
+        [language: string]: string;
+    }): Array<RegExp | {
+        [language: string]: RegExp;
+    }>;
+    protected doTest(str: string, dictCmdExpr: RegExp | {
+        [language: string]: RegExp;
+    }): boolean;
+    protected doTest(str: string, dictCmdExpr: RegExp | {
+        [language: string]: RegExp;
+    }, isRemove: true): string;
     /**
      * Called for processing dictated text.
      *
