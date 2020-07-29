@@ -89,29 +89,65 @@ export interface SpeechIoPluginConfigurationBaseEntry {
    * During active speech-input in 'dictation' mode:
    * if detected as single input/sentence, will stop speech-input for the input-control.
    *
+   * The canceling will only be applied, if it matches the whole input/sentence, i.e.:
+   * <pre>
+   * isStopCommand("some sentence <stop word>") -> false
+   * isStopCommand(" <stop word> ") -> true
+   * </pre>
+   *
+   * Can be either set with a string, or an object/dictionary that maps a
+   * language ID to to the stop-command.
+   * <pre>
+   * var stopCmd = {
+   *   de: 'anhalten',
+   *   en: 'stop'
+   * }
+   * </pre>
+   *
    * NOTE can be set during runtime with:
    * <pre>
    * voiceUiService.ctrl.speechIn.setDictationCommand(dictStopWord, dictAbortWord);
    * </pre>
-   * @default "anhalten"
+   * @default ""
    */
-  dictStopWord?: string;
+  dictStopWord?: string | {[languageId: string]: string};
 
   /**
+   * Will only work, if `dictStopWord` is also set!
    *
    * During active speech-input in 'dictation' mode:
-   * if detected as single input/sentence, will cancel speech-input for the
+   * if detected as single input/sentence, will abort speech-input for the
    * input-control and revert its text to its previous state (i.e. before dictation
    * was started for the input-control).
    *
+   * The aborting will only be applied, if it matches the whole input/sentence, i.e.:
+   * <pre>
+   * isCancelCommand("some sentence <abort word>") -> false
+   * isCancelCommand(" <abort word> ") -> true
+   * </pre>
+   *
+   * Can be either set with a string, or an object/dictionary that maps a
+   * language ID to to the cancel-command.
+   * <pre>
+   * var abortCmd = {
+   *   de: 'rückgängig',
+   *   en: 'undo'
+   * }
+   * </pre>
+   *
    * NOTE can be set during runtime with:
    * <pre>
    * voiceUiService.ctrl.speechIn.setDictationCommand(dictStopWord, dictAbortWord);
    * </pre>
    *
+   * NOTE IMPORTANT:
+   * currently this feature requires, that the original text, that will be reverted
+   * to, is set manually to the text-element's `dataset` to key `original-text`
+   * (e.g. when starting dictation)!
+   *
    * @default ""
    */
-  dictAbortWord?: string;
+  dictAbortWord?: string | {[languageId: string]: string};
 
   /**
    * disable visual feedback for unstable dictation input in "pure text" input controls
