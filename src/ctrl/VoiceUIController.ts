@@ -277,15 +277,23 @@ export class VoiceUIController<CmdImpl extends Cmd> {
   }
 
   protected releaseUiResources(force: boolean){
-
+    if(this.dictationOverlay){
+      if(this.dictationOverlay.visible){
+        this.dictationOverlay.hide();
+      }
       if(force || !this.isDictationOverlaySingleton){
         this.dictationOverlay = null;
       }
-
+    }
+    if(this.readOverlay){
+      if(this.readOverlay.visible){
+        this.readOverlay.stopReading();
+      }
       if(force || !this.isReadOverlaySingleton){
         this.clearReadOverlaySubscription();
         this.readOverlay = null;
       }
+    }
   }
 
   public handleClick(event: MouseEvent | TouchEvent | RecognitionEmma | UnderstandingEmma<CmdImpl> | EventLike, name: string, data?: any){

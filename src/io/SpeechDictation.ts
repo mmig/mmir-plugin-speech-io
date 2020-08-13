@@ -5,7 +5,7 @@ import { Observable , Subscription } from 'rxjs';
 // import { SpeechInputController } from '../ctrl/SpeechInputController';
 import { DisplayText } from '../ctrl/SpeechInputController';
 import { SelectionUtil } from '../util/SelectionUtil';
-import { DICTATION_CONTROL } from '../consts';
+import { DICTATION_CONTROL , SPEECH_ACTIVE } from '../consts';
 import { getHtmlElement } from '../util/Utils';
 import { GuiElement } from '../typings/';
 
@@ -35,7 +35,11 @@ export class DictationTargetHandler {
 
   public reset(){
     if(this.targets.size > 0){
-      this.targets.forEach(handler => handler.destroy());
+      this.targets.forEach(handler => {
+        handler.nativeInput?.classList.remove(SPEECH_ACTIVE);
+        handler.nativeCtrl?.classList.remove(SPEECH_ACTIVE);
+        handler.destroy();
+      });
       this.targets.clear();
     }
   }
