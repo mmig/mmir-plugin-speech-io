@@ -433,16 +433,23 @@ export interface StateManagerConfig {
     engineId?: string;
     logLevel?: number | string;
 }
+export interface Targetable {
+    target?: HTMLElement | EventTarget;
+    currentTarget?: HTMLElement | EventTarget;
+    [field: string]: any;
+}
 export interface ISpeechInputIndicator {
     initialized: boolean;
-    show(event: any, target?: HTMLElement): void;
-    toggle(event: any, target?: HTMLElement): void;
+    visible?: boolean;
+    show(event: Targetable | any, target?: HTMLElement): void;
+    toggle(event: Targetable | any, target?: HTMLElement): void;
     hide(): void;
     ready(overlayTarget?: OverlayTarget): Promise<void>;
 }
 export interface ISpeechOutputIndicator {
     initialized: boolean;
-    startReading(event: any, target?: HTMLElement): void;
+    visible?: boolean;
+    startReading(event: Targetable | any, target?: HTMLElement): void;
     stopReading(isLeaveOpen?: boolean): void;
     ready(overlayTarget?: OverlayTarget): Promise<void>;
 }

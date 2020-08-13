@@ -74,13 +74,21 @@ export declare class DictationHandler {
     /**
      * HELPER: set "system initiated" selection (see #setSysSel)
      *
-     * IF arguments start and end are omitted -> select ALL
-     *
-     * setSelection()
-     * setSelection(null)
-     * setSelection(start: number, end: number, text?: string)
+     * select all text
      */
-    setSelection(start?: number | null, end?: number, text?: string): void;
+    setSelection(): void;
+    /**
+     * HELPER: set "system initiated" selection (see #setSysSel)
+     *
+     * clear selection
+     */
+    setSelection(start: null): void;
+    /**
+     * HELPER: set "system initiated" selection (see #setSysSel)
+     *
+     * set selection range
+     */
+    setSelection(start: number, end: number, text?: string): void;
 }
 export declare type SelectionMode = 'none' | 'unstable' | 'interim';
 export declare type InputSelection = {
