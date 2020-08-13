@@ -132,9 +132,18 @@ export class DictationHandler {
     const self = this;
     this._selectionListener = function(this: HTMLInputElement, event: Event): void {
 
-      const sel = self.getInputSelection();
+      let sel: InputSelection = self.getInputSelection();
       if(!sel){
         //do not need to continue, if position is at input-text's end
+
+        if(this.dataset['MMMIR_PREV_SEL_START'] || this.dataset['MMMIR_PREV_SEL_END']){
+          sel = self.getInputSelection(true);
+          if(sel){
+            if(self._debug) console.log('onselection['+event.type+']: selection changed to zero-length range (position) at '+sel.start+', resetting selection markers ');
+            self.setSelection(null);
+          }
+
+        }
 
         //reset markers for previous position/selection
         this.dataset['MMMIR_PREV_SEL_START'] = '';
@@ -269,12 +278,12 @@ export class DictationHandler {
     }
   }
 
-  private getInputSelection(): InputSelection | null {
+  private getInputSelection(includePosition?: boolean): InputSelection | null {
     if(this.isPlainText && this.nativeInput){
       const input: HTMLTextAreaElement = this.nativeInput as HTMLTextAreaElement;
       const len = input.value.length;
       const start = input.selectionStart;
-      if(len !== start){
+      if(len !== start || includePosition){
         const end = input.selectionEnd;
         return {start: start, end: end};
       }
@@ -523,10 +532,28 @@ export class DictationHandler {
     /**
      * HELPER: set "system initiated" selection (see #setSysSel)
      *
+     * select all text
+     */
+    setSelection(): void;
+    /**
+     * HELPER: set "system initiated" selection (see #setSysSel)
+     *
+     * clear selection
+     */
+    setSelection(start: null): void;
+    /**
+     * HELPER: set "system initiated" selection (see #setSysSel)
+     *
+     * set selection range
+     */
+    setSelection(start: number, end: number, text?: string): void;
+    /**
+     * HELPER: set "system initiated" selection (see #setSysSel)
+     *
      * IF arguments start and end are omitted -> select ALL
      *
-     * setSelection()
-     * setSelection(null)
+     * setSelection() -> select all
+     * setSelection(null) -> clear selection
      * setSelection(start: number, end: number, text?: string)
      */
     setSelection(start?: number | null, end?: number, text?: string): void {
@@ -535,8 +562,6 @@ export class DictationHandler {
         return;
       }
 
-      text = text || this.getText();//<- get text without HTML tags/formatting (for text-field/area: the text is always plain)
-
       if(this.isPlainText){
 
         if(start === null && this.selectUtil){
@@ -544,6 +569,8 @@ export class DictationHandler {
           this.selectUtil.clearSelectionMarker();
           return;
         }
+
+        text = text || this.getText();//<- get text without HTML tags/formatting (for text-field/area: the text is always plain)
 
         if(typeof start !== 'number'){
           start = 0;
@@ -625,6 +652,9 @@ export class DictationHandler {
         this.setSysSel(false);
 
       } else {
+        //else: if(this.isPlainText)
+
+        text = text || this.getText();//<- get text without HTML tags/formatting (for text-field/area: the text is always plain)
 
         var len = text.length;
         if(typeof start !== 'number' && typeof start !== 'number'){
