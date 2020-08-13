@@ -4,3 +4,4 @@ export * from './speech-io-indicator';
 export * from './emma';
 export * from './app-settings';
 export * from './mmir-ext';
+export * from './angular-form';
