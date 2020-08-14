@@ -87,6 +87,12 @@ export declare class DictationHandler {
     /**
      * HELPER: set "system initiated" selection (see #setSysSel)
      *
+     * set selection from start to end of text
+     */
+    setSelection(start: number): void;
+    /**
+     * HELPER: set "system initiated" selection (see #setSysSel)
+     *
      * set selection range
      */
     setSelection(start: number, end: number, text?: string): void;
