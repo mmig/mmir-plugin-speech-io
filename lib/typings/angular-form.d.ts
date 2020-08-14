@@ -1,4 +1,4 @@
-import type { Observable } from 'rxjs';
+import type { Observable as RxObservable } from 'rxjs';
 export interface FormControl extends AbstractControl {
     /**
      * Sets a new value for the form control.
@@ -193,7 +193,7 @@ export interface AbstractControl {
      * A multicasting observable that emits an event every time the value of the control changes, in
      * the UI or programmatically.
      */
-    readonly valueChanges: Observable<any>;
+    readonly valueChanges: RxObservable<any>;
     /**
      * A multicasting observable that emits an event every time the validation `status` of the control
      * recalculates.
@@ -201,7 +201,7 @@ export interface AbstractControl {
      * @see {@link AbstractControl.status}
      *
      */
-    readonly statusChanges: Observable<any>;
+    readonly statusChanges: RxObservable<any>;
     /**
      * Marks the control as `touched`. A control is touched by focus and
      * blur events that do not change the value.

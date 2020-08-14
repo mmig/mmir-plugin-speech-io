@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import { Observable as RxObservable } from 'rxjs';
 ///////////////////////// HACK: typings from @angular/forms TODO should define own, independent interface ////////////////
 export interface FormControl extends AbstractControl {
     /**
@@ -198,7 +198,7 @@ export interface AbstractControl {
      * A multicasting observable that emits an event every time the value of the control changes, in
      * the UI or programmatically.
      */
-    readonly valueChanges: Observable<any>;
+    readonly valueChanges: RxObservable<any>;
     /**
      * A multicasting observable that emits an event every time the validation `status` of the control
      * recalculates.
@@ -206,7 +206,7 @@ export interface AbstractControl {
      * @see {@link AbstractControl.status}
      *
      */
-    readonly statusChanges: Observable<any>;
+    readonly statusChanges: RxObservable<any>;
     /**
      * Marks the control as `touched`. A control is touched by focus and
      * blur events that do not change the value.
