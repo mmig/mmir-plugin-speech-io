@@ -38,8 +38,6 @@ export class SpeechInputController {
 
   protected _debugMsg: boolean = false;
 
-  public dictationResults: Observable<RecognitionEmma>;//TODO remove?
-
   protected _speechEventSubscriptions: Map<SpeechEventName, Subscription>;
 
   protected _emma: EmmaUtil<any>;
@@ -58,6 +56,16 @@ export class SpeechInputController {
   public set debug(value: boolean) {
     this._debugMsg = value;
     this.dictTargetHandler.apply(handler => handler.debug = value);
+  }
+
+  public dictationResults: Observable<RecognitionEmma>;//TODO remove?
+
+  public get dicationTargets(): DictationTargetHandler {
+    return this.dictTargetHandler;
+  }
+
+  public get emma(): EmmaUtil<any> {
+    return this._emma;
   }
 
   constructor(
