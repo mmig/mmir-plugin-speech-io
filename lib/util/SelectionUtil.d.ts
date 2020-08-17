@@ -1,6 +1,10 @@
 import * as CaretPositionModule from '../lib/caretPosition';
 import * as LengthModule from '../lib/length';
 import { CaretOptions } from '../lib/caretPosition';
+export interface AbstractTarget {
+    container: any;
+    fieldName: string;
+}
 export declare class SelectionUtil {
     private unitUtil;
     private caretPos;
@@ -25,17 +29,16 @@ export declare class SelectionUtil {
      * 			If NULL, the selection marker will be cleared.
      * @param {Number} start
      * 			the starting index for the selection
-     * @param {Number}
+     * @param {Number} length
      * 			the length of the selection
+     * @param {string | AbstractTarget} [target]
+     * 			the "abstract" selection target: either the text string, or <code>target.container[target.fieldName]</code> should contain the current text for which the selection is applied
      * @param {Boolean} [forceDisplay] OPTIONAL
      * 			if present and TRUE, display of selection marker will be forced
      * 			(i.e. shown, even if elem has focus, length is 0, ...)
      *
      */
-    setSelectionMarker(elem: HTMLInputElement | HTMLTextAreaElement | null, start: number, length: number, target?: {
-        container: any;
-        fieldName: string;
-    } | string, forceDisplay?: boolean): void;
+    setSelectionMarker(elem: HTMLInputElement | HTMLTextAreaElement | null, start: number, length: number, target?: AbstractTarget | string, forceDisplay?: boolean): void;
     setSelectionColor(color: string): void;
     getSelectionColor(): string;
     /**

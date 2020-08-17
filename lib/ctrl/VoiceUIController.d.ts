@@ -49,9 +49,11 @@ export declare class VoiceUIController<CmdImpl extends Cmd> {
     get debug(): boolean;
     set debug(value: boolean);
     protected _speechEventSubscriptions: Map<SpeechEventName, Subscription>;
-    protected initializing: Promise<MmirService<CmdImpl>>;
+    protected initializing: Promise<VoiceUIController<CmdImpl>>;
+    protected _initialized: boolean;
+    get initialized(): boolean;
     constructor(mmirProvider: MmirService<CmdImpl>);
-    ready(): Promise<MmirService<CmdImpl>>;
+    ready(): Promise<VoiceUIController<CmdImpl>>;
     destroy(): void;
     getPromptReader(): PromptReader;
     /**
@@ -67,7 +69,21 @@ export declare class VoiceUIController<CmdImpl extends Cmd> {
     asrEngine(engine: string | null): void;
     ttsEngine(engine: string | null): void;
     enableBargeIn(enable: boolean): void;
-    enterView(asrActiveHandler: ((asrActive: boolean) => void) | null, ttsActiveHandler: ((ttsActive: boolean) => void) | null): void;
+    /** @deprecated use [[ enterView ]] */
+    enterViewWith(): Promise<VoiceUIController<CmdImpl>>;
+    /** @deprecated use [[ enterView ]] */
+    enterViewWith(asrActiveHandler: ((asrActive: boolean) => void)): Promise<VoiceUIController<CmdImpl>>;
+    /** @deprecated use [[ enterView ]] */
+    enterViewWith(asrActiveHandler: ((asrActive: boolean) => void), ttsActiveHandler: ((ttsActive: boolean) => void)): Promise<VoiceUIController<CmdImpl>>;
+    /**
+     * HELPER when entering a new view / page:
+     * resets handlers, subscriptions etc. from previous view and intializes handlers, subscriptions etc.
+     * for the new view.
+     *
+     * @param  [viewSubscriptions] OPITONAL subscriptions for the newly entered view (will be canceled when leaving the view or entering a new view)
+     * @return the READY promise for the VoiceUiController
+     */
+    enterView(viewSubscriptions?: Subscription[]): Promise<VoiceUIController<CmdImpl>>;
     /**
      * Remembers the subscription for the current/active view, and
      * unsubscribes when #leaveView is triggered.
@@ -75,6 +91,12 @@ export declare class VoiceUIController<CmdImpl extends Cmd> {
      * @param {Subscription} subscription
      */
     addViewSubscription(subscription: Subscription | Array<Subscription>): void;
+    /**
+     * HELPER for leaving a view / page:
+     *
+     * resets/cancels handlers, resources, subscriptions etc. from current view and intializes handlers,
+     * and cancels active ASR (if not <code>isPermanentCommandMode</code>) as well as active prompts/TTS.
+     */
     leaveView(): void;
     protected _asrEngine(engine: string | null): void;
     _ttsEngine(engine: string | null): void;
