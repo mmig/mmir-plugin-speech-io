@@ -80,7 +80,12 @@ export class VoiceUIController<CmdImpl extends Cmd> {
 
   protected _speechEventSubscriptions: Map<SpeechEventName, Subscription>;
 
-  protected initializing: Promise<MmirService<CmdImpl>>;
+  protected initializing: Promise<VoiceUIController<CmdImpl>>;
+  protected _initialized = false;
+
+  public get initialized(): boolean {
+    return this._initialized;
+  }
 
   constructor(
     mmirProvider: MmirService<CmdImpl>
@@ -100,7 +105,9 @@ export class VoiceUIController<CmdImpl extends Cmd> {
     this.isDictationOverlaySingleton = false;
     this.isReadOverlaySingleton = false;
 
-    this.initializing = mmirProvider.ready().then(mp => {
+    this.initializing = mmirProvider.ready().then(() => {
+
+      this._initialized = true;
 
       this.prompt = new PromptReader(this.speech, this.mmir.media);
       this.prompt.cancelOnNew = true;//FIXME retrieve from settings?
@@ -115,11 +122,11 @@ export class VoiceUIController<CmdImpl extends Cmd> {
         //'resetGuidedInputForCurrentControl' , 'startGuidedInput' , 'resetGuidedInput' , 'isDictAutoProceed'
       ], this);
 
-      return mp;
+      return this;
     });
   }
 
-  public ready(): Promise<MmirService<CmdImpl>> {
+  public ready(): Promise<VoiceUIController<CmdImpl>> {
     return this.initializing;
   }
 
@@ -197,20 +204,54 @@ export class VoiceUIController<CmdImpl extends Cmd> {
     }
   }
 
-  public enterView(asrActiveHandler: ((asrActive: boolean) => void) | null, ttsActiveHandler: ((ttsActive: boolean) => void) | null) : void {
+  /** @deprecated use [[ enterView ]] */
+  public enterViewWith() : Promise<VoiceUIController<CmdImpl>>;
+    /** @deprecated use [[ enterView ]] */
+  public enterViewWith(asrActiveHandler: ((asrActive: boolean) => void)) : Promise<VoiceUIController<CmdImpl>>;
+    /** @deprecated use [[ enterView ]] */
+  public enterViewWith(asrActiveHandler: ((asrActive: boolean) => void), ttsActiveHandler: ((ttsActive: boolean) => void)) : Promise<VoiceUIController<CmdImpl>>;
+    /** @deprecated use [[ enterView ]] */
+  public enterViewWith(asrActiveHandler?: ((asrActive: boolean) => void) | null, ttsActiveHandler?: ((ttsActive: boolean) => void)) : Promise<VoiceUIController<CmdImpl>> {
+
+
+    let viewSubscriptions: Subscription[] | undefined;
+    if(asrActiveHandler || ttsActiveHandler){
+      viewSubscriptions = [];
+    }
+
+    if(asrActiveHandler){
+      viewSubscriptions.push(this.asrActiveChange.subscribe(asrActiveHandler));
+    }
+
+    if(ttsActiveHandler){
+      viewSubscriptions.push(this.ttsActiveChange.subscribe(ttsActiveHandler));
+    }
+
+    return this.enterView(viewSubscriptions);
+  }
+
+  /**
+   * HELPER when entering a new view / page:
+   * resets handlers, subscriptions etc. from previous view and intializes handlers, subscriptions etc.
+   * for the new view.
+   *
+   * @param  [viewSubscriptions] OPITONAL subscriptions for the newly entered view (will be canceled when leaving the view or entering a new view)
+   * @return the READY promise for the VoiceUiController
+   */
+  public enterView(viewSubscriptions?: Subscription[]) : Promise<VoiceUIController<CmdImpl>> {
 
     //cancel any previous subscriptions:
     this.doUnsubscribeCurrentPage();
     this.dictTargetHandler.reset();
     this.readTargetHandler.reset();
 
-    if(asrActiveHandler){
-      this.activePageSubscriptions.push(this.asrActiveChange.subscribe(asrActiveHandler));
+    if(viewSubscriptions){
+      for(const subs of viewSubscriptions){
+        this.activePageSubscriptions.push(subs);
+      }
     }
 
-    if(ttsActiveHandler){
-      this.activePageSubscriptions.push(this.ttsActiveChange.subscribe(ttsActiveHandler));
-    }
+    return this.initializing;
   }
 
   /**
@@ -229,6 +270,12 @@ export class VoiceUIController<CmdImpl extends Cmd> {
     }
   }
 
+  /**
+   * HELPER for leaving a view / page:
+   *
+   * resets/cancels handlers, resources, subscriptions etc. from current view and intializes handlers,
+   * and cancels active ASR (if not <code>isPermanentCommandMode</code>) as well as active prompts/TTS.
+   */
   public leaveView() {
 
     this.doUnsubscribeCurrentPage();

@@ -13,7 +13,9 @@ export class VoiceUIService<CmdImpl extends Cmd> {
   protected mmirProvider: MmirService<CmdImpl>;
 
   protected _debug: boolean = false;
-  protected _initialized = false;
+  protected get _initialized(): boolean{
+    return this.vuiCtrl?.initialized;
+  }
 
 
   public get mmirService(): MmirService<CmdImpl> { return this.mmirProvider;}
@@ -54,10 +56,7 @@ export class VoiceUIService<CmdImpl extends Cmd> {
   }
 
   public async ready(): Promise<VoiceUIController<CmdImpl>> {
-    return this.vuiCtrl.ready().then(() => {
-      this._initialized = true;
-      return this.vuiCtrl;
-    });
+    return this.vuiCtrl.ready();
   }
 
   public asrCancel(): void {
