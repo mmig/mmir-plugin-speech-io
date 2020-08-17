@@ -144,15 +144,40 @@ export declare class CurrentInputData {
     _getTargetIndex(): number;
 }
 export interface DictationTarget {
-    /** the identifier for the dictation target */
+    /** the identifier for the dictation target:
+     *  must be unique w.r.t. active dictation targets
+     *
+     *  (i.e. usually only the dictation targets for the current page/view)
+     */
     id: string;
     /** the text-input (<input> or <textarea>) for this dictation target */
     input?: GuiElement;
     /** GUI control for starting/stopping dictation to this target */
     ctrl?: GuiElement;
-    /** containing object of the target field that will receive dictation results */
+    /** containing object of the target field that will receive dictation results (NOTE must also specify fieldName) */
     container?: any;
-    /** the name of the target field (within the container) that will receive dictation results */
+    /** the name of the target field (within the container) that will receive dictation results (NOTE must also specify container) */
     fieldName?: string;
+    /** an optional observable for tracking changes in input
+     *  (e.g. when specifying target via container & fieldName)
+     *
+     *  NOTE:
+     *  if not specified, speech input will not be able to be aware of changes made by other input types e.g. keyboard
+     */
+    onInputChange?: Observable<any>;
+    /**
+     * custom handler for applying text of the speech recognition to the input field/textara control
+     *
+     *  If not specified, the default mechanism is (and if container is specified) to set the <code>container[fieldName]</code> with the ASR result value.
+     *  If container & fieldName are not specified, the (native) text field value is updated with the new value.
+     */
+    applyRecognition?: (newText: string, targetId: string) => void;
+    /** alternative for specifying target via container & fieldName:
+     *  if sepcified, uses the form's <code>valueChanges</code> observable for tracking input changes
+     *  (i.e. <code>onInputChange</code> will be ignored, if specified), and handles <code>applyRecognition</code>
+     *  (this may be overriden, by explicitly specifying the <code>applyRecognition</code> handler).
+     *
+     *  NOTE: should not be used in combination with <code>container</code> and <code>fieldName</code>
+     */
     form?: FormControl;
 }

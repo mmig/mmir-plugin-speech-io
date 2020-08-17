@@ -20,7 +20,6 @@ export declare class SpeechInputController {
     protected mmirProvider: MmirService<any>;
     protected dictTargetHandler: DictationTargetHandler;
     protected _debugMsg: boolean;
-    dictationResults: Observable<RecognitionEmma>;
     protected _speechEventSubscriptions: Map<SpeechEventName, Subscription>;
     protected _emma: EmmaUtil<any>;
     protected _manager: SpeechIoManager<any>;
@@ -41,6 +40,9 @@ export declare class SpeechInputController {
     };
     get debug(): boolean;
     set debug(value: boolean);
+    dictationResults: Observable<RecognitionEmma>;
+    get dicationTargets(): DictationTargetHandler;
+    get emma(): EmmaUtil<any>;
     constructor(mmirProvider: MmirService<any>, dictTargetHandler: DictationTargetHandler);
     destroy(): void;
     createDictationTarget(target: DictationTarget, id: string, feedbackStyle?: SelectionMode): DictationHandler;
