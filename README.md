@@ -4,7 +4,7 @@
 [![GitHub package.json version](https://img.shields.io/github/package-json/v/mmig/mmir-plugin-speech-io/master)](https://github.com/mmig/mmir-plugin-speech-io)
 [![npm](https://img.shields.io/npm/v/mmir-plugin-speech-io)](https://www.npmjs.com/package/mmir-plugin-speech-io)
 
-Plugin for the [MMIR framework][3] that adds a state-machines for managing speech input/output states
+Plugin for the [MMIR framework][3] that adds state-machines for managing speech input/output states
 
 __NOTE__ currently this plugin requires a [webpack][1] build process (see [mmir-webpack][2]).
 
