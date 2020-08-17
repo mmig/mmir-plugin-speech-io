@@ -192,7 +192,7 @@ export class DictationHandler {
       this._inputData.set(currentText, false);
     }
     this.onTextChangeSubs = textChangeObservable.subscribe(text => {
-      if(this._debug) console.log('onInputTextChange: ', text);//DEBUG
+      if(this._debug) console.log('onInputChange: ', text);//DEBUG
       this._inputData.set(text, false);
     });
   }
@@ -213,12 +213,9 @@ export class DictationHandler {
 
     if(target.form){
       this.initFromTarget(target.form.value, target.form.valueChanges);
+    } else if(target.onInputChange){
+      this.initFromTarget(this.getText(), target.onInputChange);
     }
-
-    // if(target.onInputTextChange){
-    //   const text = target.container[target.fieldName];
-    //   this.initFromTarget(text, target.onInputTextChange);
-    // }
 
   }
 
@@ -368,10 +365,16 @@ export class DictationHandler {
         (this.textfield as any).autocomplete('search',text);
       }
 
+      let applied: boolean = false;
       if(this.target){
 
         const form: FormControl = this.target.form;
-        if(form){
+        if(this.target.applyRecognition){
+
+          this.target.applyRecognition(text, this.id);
+          applied = true;
+
+        } else if (form){
 
           form.setValue(text, {
             emitEvent: false
@@ -379,16 +382,16 @@ export class DictationHandler {
           if(!form.dirty){
             form.markAsDirty();
           }
+          applied = true;
 
-        // } else if(this.target.applyRecognition){
-        //   this.target.applyRecognition(text, this.id);
-        } else {
+        } else if(this.target.container){
+
           this.target.container[this.target.fieldName] = text;
-          // this.target.changeDect.detectChanges();
+          applied = true;
         }
+      }
 
-
-      } else if(this.nativeInput){
+      if(!applied && this.nativeInput){
 
         if(this.isPlainText){
           (this.nativeInput as HTMLInputElement).value = text;
@@ -439,9 +442,12 @@ export class DictationHandler {
         if(this.target.form){
           return this.target.form.value;
         }
-        return this.target.container[this.target.fieldName];
+        if(this.target.container){
+          return this.target.container[this.target.fieldName];
+        }
       }
-      else if(this.isPlainText){
+
+      if(this.isPlainText){
         return (this.nativeInput as HTMLInputElement).value;
       }
       else {
@@ -645,7 +651,7 @@ export class DictationHandler {
 
           //set visual selection, even when text-element is not focused:
           if(this.selectUtil){
-            this.selectUtil.setSelectionMarker(input, start, end - start, text? text : this.target as {container: any, fieldName: string});
+            this.selectUtil.setSelectionMarker(input, start, end - start, text);
           }
 
         } catch(err){
@@ -938,21 +944,44 @@ export class CurrentInputData {
 }
 
 export interface DictationTarget {
-  /** the identifier for the dictation target */
+  /** the identifier for the dictation target:
+   *  must be unique w.r.t. active dictation targets
+   *
+   *  (i.e. usually only the dictation targets for the current page/view)
+   */
   id: string;
   /** the text-input (<input> or <textarea>) for this dictation target */
   input?: GuiElement;
   /** GUI control for starting/stopping dictation to this target */
   ctrl?: GuiElement;
 
-  // applyRecognition?: (newText: string, targetId: string) => void;
-  // onInputTextChange?: Observable<string>;
 
   //TODO remove? NOTE container and fieldName are still used in SelectionUtil... replace by getter?
-  /** containing object of the target field that will receive dictation results */
+  /** containing object of the target field that will receive dictation results (NOTE must also specify fieldName) */
   container?: any;
-  /** the name of the target field (within the container) that will receive dictation results */
+  /** the name of the target field (within the container) that will receive dictation results (NOTE must also specify container) */
   fieldName?: string;
+  /** an optional observable for tracking changes in input
+   *  (e.g. when specifying target via container & fieldName)
+   *
+   *  NOTE:
+   *  if not specified, speech input will not be able to be aware of changes made by other input types e.g. keyboard
+   */
+  onInputChange?: Observable<any>;
+  /**
+   * custom handler for applying text of the speech recognition to the input field/textara control
+   *
+   *  If not specified, the default mechanism is (and if container is specified) to set the <code>container[fieldName]</code> with the ASR result value.
+   *  If container & fieldName are not specified, the (native) text field value is updated with the new value.
+   */
+  applyRecognition?: (newText: string, targetId: string) => void;
 
-  form?: FormControl
+  /** alternative for specifying target via container & fieldName:
+   *  if sepcified, uses the form's <code>valueChanges</code> observable for tracking input changes
+   *  (i.e. <code>onInputChange</code> will be ignored, if specified), and handles <code>applyRecognition</code>
+   *  (this may be overriden, by explicitly specifying the <code>applyRecognition</code> handler).
+   *
+   *  NOTE: should not be used in combination with <code>container</code> and <code>fieldName</code>
+   */
+  form?: FormControl;
 }
