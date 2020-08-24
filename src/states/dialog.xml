@@ -330,7 +330,6 @@
         <script>
             var engine = _event.data;
             asr_ctx = engine;
-            _util.appConfig.set('speechEngine', engine);
             if(_util.isDebugVui) console.warn('asr_ctx -> ', asr_ctx);
         </script>
       </transition>
