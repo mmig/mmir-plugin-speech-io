@@ -29,6 +29,7 @@ export declare class DictationHandler {
     isPlainText: boolean;
     isTextInputEl: boolean;
     isIntegerInput: boolean;
+    isNativeSelectable: boolean;
     _isAutocomplete?: boolean;
     _inputData: CurrentInputData;
     selectionMode: SelectionMode;
