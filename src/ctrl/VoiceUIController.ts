@@ -525,7 +525,7 @@ export class VoiceUIController<CmdImpl extends Cmd> {
 
     let handler: DictationHandler = this.dictTargetHandler.get(state.targetId);
     if(!handler){
-      console.log('ERROR: no dictation handler for dicatation target '+state.targetId);
+      if(this._debugMsg) console.log('WARN: no dictation handler for dicatation target '+state.targetId);
       if(!state.state){
         this.setSpeechOverlay(null, this.dictationOverlay, false);
       }
