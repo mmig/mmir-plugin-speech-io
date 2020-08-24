@@ -147,11 +147,10 @@
         _util.appConfig = data.appConfig;
 
         //apply setting for debug output:
-        _util.appConfig.get('showVuiDebugOutput').then(function(isEnabled){
-          if(typeof isEnabled === 'boolean'){
-            _util.isDebugVui = isEnabled;
-          }
-        });
+        var isEnabled = _util.conf.get('showVuiDebugOutput');
+        if(typeof isEnabled === 'boolean'){
+          _util.isDebugVui = isEnabled;
+        }
 
         //_util.logEmma = function(emma){};//stub
 
