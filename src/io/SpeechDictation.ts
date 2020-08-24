@@ -70,16 +70,14 @@ export class DictationHandler {
 
   private _selectionListener: (event: Event) => void;
 
-  //MIGRATE start
-  // input: textEl, -> textfield
-  isBrowserEnv: boolean;//ctrl._env.isBrowserEnv,
-  _isNeedFixFocus: boolean;//isRequireFocusFix,
-  isPlainText: boolean;//isPlainTextEl,
-  isTextInputEl: boolean;//isTextInputEl,
-  isIntegerInput: boolean;//isIntegerInput,
+  isBrowserEnv: boolean;
+  _isNeedFixFocus: boolean;
+  isPlainText: boolean;
+  isTextInputEl: boolean;
+  isIntegerInput: boolean;
+  isNativeSelectable: boolean;
   _isAutocomplete?: boolean;
   _inputData: CurrentInputData;
-  //MIGRATE end
 
   selectionMode: SelectionMode;
 
@@ -122,7 +120,13 @@ export class DictationHandler {
     }
 
     //if native input element is "selectable" (i.e. native event support for selecting text)
-    if(this.isPlainText || (this.isTextInputEl && /text|search|password|url|tel/i.test((textEl as HTMLInputElement).type))){
+    const selectable = this.isTextInputEl && /text|search|password|url|tel/i.test((textEl as HTMLInputElement).type);
+
+    //if input element can be selected (i.e. selection-marker can be applied: for non-text-input fields this is done by <span> elements)
+    this.isNativeSelectable = !this.isTextInputEl || selectable;
+
+    //if native text input element is "selectable" do init select change listener(s)
+    if(this.isPlainText || selectable){
       this.doInitSelectionChange();
     }
   }
@@ -616,7 +620,7 @@ export class DictationHandler {
 
         const input = this.nativeInput as HTMLInputElement;//NOTE may also be a HTMLTextAreaElement, but in this instance it does not matter
 
-        let omitNativeSel: boolean = false;
+        let omitNativeSel: boolean = this.isNativeSelectable;
         if(end <= start){
           omitNativeSel = true;
         } else {
