@@ -114,38 +114,44 @@ export class MmirService<CmdImpl extends Cmd> {
     //   setting is not really important for how the class functions, we just
     //   continue anyway)
     this.isDebugVui = true;
+    let initVuiDebugPromise: Promise<void>;
     if(this._isCreateAppConfigImpl === true && !this.appConfig){
 
       //... if no AppConfig implementation is available, we need to wait for
       //    mmir to initialize to create the default implementation
-      this._mmir.ready(() => {
+      initVuiDebugPromise = new Promise((resolve) => {
 
-        if(this._isCreateAppConfigImpl === true && !this.appConfig){
-          this.appConfig = createConfigSettingsImpl(this._mmir.conf);
-        }
+        this._mmir.ready(() => {
+          if(this._isCreateAppConfigImpl === true && !this.appConfig){
+            this.appConfig = createConfigSettingsImpl(this._mmir.conf);
+          }
+          resolve();
+        });
 
-        //... and actually initialize the VUI debug settings:
-        this.initDebugVui();
-      });
-    } else {
-      this.initDebugVui();
+      })
     }
 
+    initVuiDebugPromise = initVuiDebugPromise? initVuiDebugPromise.then(() => this.initDebugVui()) : Promise.resolve(this.initDebugVui());
+
     if(!this._initialize){
-      this._initialize = this.mmirInit();
+      this._initialize = initVuiDebugPromise.then(() => this.mmirInit());
     }
 
     return this._initialize;
   }
 
-  private initDebugVui(): void {
-    this.appConfig.get('showVuiDebugOutput').then(isEnabled => {
-      this.isDebugVui = isEnabled;
-      if(this.mmir && this.mmir.speechioManager){
-        let dlg = this.mmir.speechioManager;
-        dlg._isDebugVui = isEnabled;
-      }
-    });
+  private initDebugVui(): void { //Promise<void> {
+    //DISABLED: cannot use async-method on appConfig, since a custom implementation
+    //          may wait on the mmir-service to be ready before execution its get() method
+    //          (-> would never initialize, since this function is called from ini() )
+    // return this.appConfig.get('showVuiDebugOutput').then(isEnabled => {
+    const isEnabled = this.mmir.conf.getBoolean('showVuiDebugOutput');
+    this.isDebugVui = isEnabled;
+    if(this.mmir && this.mmir.speechioManager){
+      let dlg = this.mmir.speechioManager;
+      dlg._isDebugVui = isEnabled;
+    }
+    // });
   }
 
   public ready(): Promise<MmirService<CmdImpl>> {
