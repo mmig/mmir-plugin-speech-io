@@ -18,9 +18,10 @@ export declare class EmmaUtil<CmdImpl extends Cmd> {
     addProperty(emmaData: AnyEmma<CmdImpl>, name: string, value: any, isOverwrite?: boolean): AnyEmma<CmdImpl>;
     getTarget(emmaData: AnyEmma<CmdImpl>): any;
     getProperty(emmaData: AnyEmma<CmdImpl>, name: string): any;
-    _setEmmaFuncData(emmaEvent: AnyEmma<CmdImpl>, funcName: EmmaFunctionType, funcData: any, isOverwrite?: boolean): void;
+    _setEmmaFuncData(emmaEvent: AnyEmma<CmdImpl>, funcName: EmmaFunctionType, funcData: any, mode?: 'override' | 'merge'): void;
     _extractAsrData(asrEmmaEvent: AnyEmma<CmdImpl>): SpeechRecognitionResult;
     _extractAllAsrData(asrEmmaEvent: AnyEmma<CmdImpl>): SpeechRecognitionResult[];
     _extractEmmaFuncData(emmaEvent: AnyEmma<CmdImpl>, func: EmmaFunctionType): any;
+    _nextId(): number;
     static create<CmdImpl extends Cmd>(mmirCore: ExtMmirModule<CmdImpl>, deepCloneFunc?: Function): EmmaUtil<CmdImpl>;
 }
