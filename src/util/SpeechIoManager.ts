@@ -38,14 +38,14 @@ function init(mmirLib: MmirModule){
   }
 }
 
-async function createInstance(mmirLib: MmirModule): Promise<StateManager> {
+export async function createInstance(mmirLib: MmirModule): Promise<StateManager> {
   init(mmirLib);
   return managerFactory.then(factory => factory());
 }
 
 function upgrade(mng: DialogManager) : SpeechIoManager<any> {
   const speechMng = mng as SpeechIoManager<any>;
-  speechMng.emit = function(actionName: string, data?: any) {
+  speechMng.emit = function(this: SpeechIoManager<any>, actionName: string, data?: any) {
 
     if (this._isDebugVui) console.log('SpeechIOManager: emit action for '+actionName+' ', data);
     let speechEmitter: Subject<any> = this.eventEmitter[actionName];
