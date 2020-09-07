@@ -3,7 +3,7 @@ import { Subject , BehaviorSubject } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 
 import { MediaManager, PlayError , LogLevel , LogLevelNum, IAudio } from 'mmir-lib';
-import { ShowSpeechStateOptions, SpeechFeedbackOptions, RecognitionEmma, UnderstandingEmma , ReadingOptions , StopReadingOptions, ReadingShowOptions , Cmd } from './typings/';
+import { ShowSpeechStateOptions, SpeechFeedbackOptions, RecognitionEmma, UnderstandingEmma , ReadingOptions , StopReadingOptions, ReadingShowOptions , Cmd , TactileEmma , Emma } from './typings/';
 import { IAppSettings } from './typings/';
 
 import { EmmaUtil } from './util/EmmaUtil';
@@ -28,6 +28,8 @@ interface SpeechEventEmitterImpl<CmdImpl extends Cmd> extends SpeechEventEmitter
     showReadingStatus: BehaviorSubject<ReadingShowOptions>;
     //TODO GuidedInput events? //guidedInput: Subject<{reset?: boolean, start?: boolean, context?: /*default: */ 'global' | 'control'}>// ORIG: 'resetGuidedInputForCurrentControl' | 'startGuidedInput' | 'resetGuidedInput'
     playError: Subject<PlayError>;
+    tactile: Subject<TactileEmma>;
+    unknown: Subject<Emma>;
 }
 
 export class MmirService<CmdImpl extends Cmd> {
@@ -105,7 +107,10 @@ export class MmirService<CmdImpl extends Cmd> {
       //TODO GuidedInput events?
       //'guidedInput': {reset?: boolean, start?: boolean, context?: /*default: */ 'global' | 'control'}// ORIG: 'resetGuidedInputForCurrentControl' | 'startGuidedInput' | 'resetGuidedInput'
 
-      'playError': new Subject<PlayError>()
+      'playError': new Subject<PlayError>(),
+
+      'tactile': new Subject<TactileEmma>(),
+      'unknown': new Subject<Emma>(),
 
     } as SpeechEventEmitterImpl<CmdImpl>;
 

@@ -54,8 +54,8 @@
           <!-- script>if(logger.isd()) logger.log('entering initial speech processing state with :'+JSON.stringify(_event))</script-->
         </onentry>
 
-        <transition cond="touch_data &amp;&amp; (!touch_data.interpretation || !touch_data.interpretation['function'])" target="RawTouch"/>
-        <transition cond="touch_data &amp;&amp; touch_data.interpretation &amp;&amp; touch_data.interpretation['function'] &amp;&amp; typeof touch_data.interpretation['function'].understanding !== 'undefined'" target="TouchUnderstanding"/>
+        <transition cond="touch_data &amp;&amp; (!touch_data.interpretation || !touch_data.interpretation.value)" target="RawTouch"/>
+        <transition cond="touch_data &amp;&amp; touch_data.interpretation &amp;&amp; touch_data.interpretation.value &amp;&amp; typeof touch_data.interpretation.value.gesture !== 'undefined'" target="TouchUnderstanding"/>
         <transition cond="touch_data==null" target="TouchUnknown">
           <script>if(logger.isw()) logger.warn('could not process event :'+JSON.stringify(touch_data))</script>
         </transition>
@@ -120,8 +120,8 @@
           <!-- script>if(logger.isd()) logger.log('entering initial speech processing state with :'+JSON.stringify(_event))</script-->
         </onentry>
 
-        <transition cond="speech_data &amp;&amp; typeof speech_data.interpretation['function'].recognition !== 'undefined' &amp;&amp; typeof speech_data.interpretation['function'].understanding === 'undefined'" target="Recognition"/>
-        <transition cond="speech_data &amp;&amp; typeof speech_data.interpretation['function'].understanding !== 'undefined'" target="Understanding"/>
+        <transition cond="speech_data &amp;&amp; typeof speech_data.interpretation.value.recognition !== 'undefined' &amp;&amp; typeof speech_data.interpretation.value.understanding === 'undefined'" target="Recognition"/>
+        <transition cond="speech_data &amp;&amp; typeof speech_data.interpretation.value.understanding !== 'undefined'" target="Understanding"/>
         <transition cond="speech_data==null" target="Unknown">
           <script>if(logger.isw()) logger.warn('could not process event :'+JSON.stringify(speech_data))</script>
         </transition>

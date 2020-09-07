@@ -28,7 +28,7 @@
 
   <state id="InitialSpeechIo" name="InitialSpeechIo">
 
-    <transition event="init" name="init" target="Gui">
+    <transition event="init" name="init" target="Ui">
       <script>//<![CDATA[
 
         var data = _event.data;
@@ -43,36 +43,36 @@
              *              }
              */
             createVuiOptions: function(eventData){return {
-                    mode:      eventData && eventData.mode?       eventData.mode       : speech_mode,
-                    inputMode: eventData && eventData.inputMode?  eventData.inputMode  : input_mode,
-                    targetId:  eventData && eventData.targetId?   eventData.targetId   : target_id,
-                };
+                mode:      eventData && eventData.mode?       eventData.mode       : speech_mode,
+                inputMode: eventData && eventData.inputMode?  eventData.inputMode  : input_mode,
+                targetId:  eventData && eventData.targetId?   eventData.targetId   : target_id,
+              };
             },
             /** @returns TRUE if event.data.interpretation.speechMode is "command" */
             isSpeechCommand: function(eventData){
-                return this.isSpeechMode(eventData, 'command');
+              return this.isSpeechMode(eventData, 'command');
             },
             /** @returns TRUE if event.data.interpretation.speechMode is "dictation" */
             isSpeechDictation: function(eventData){
-                return this.isSpeechMode(eventData, 'dictation');
+              return this.isSpeechMode(eventData, 'dictation');
             },
             /** @returns TRUE if event.data.interpretation.inputMode is "guided" */
             isSpeechGuided: function(eventData){
-                return (eventData && eventData.inputMode === 'guided') || input_mode === 'guided';
+              return (eventData && eventData.inputMode === 'guided') || input_mode === 'guided';
             },
             /** @returns TRUE if event.data.interpretation.speechMode is <mode>, where <mode>: "command" | "dictation"*/
             isSpeechMode: function(eventData, theSpeechMode){
-                if(eventData && eventData.interpretation && eventData.interpretation.speechMode){
-                    return eventData.interpretation.speechMode === theSpeechMode;
-                }
-                return speech_mode === theSpeechMode;
+              if(eventData && eventData.interpretation && eventData.interpretation.speechMode){
+                return eventData.interpretation.speechMode === theSpeechMode;
+              }
+              return speech_mode === theSpeechMode;
             },
             /** HELPER: IFF event has on option-setting for inputMode for input_mode -> apply it to the state-variable */
             applyInputMode: function(event){
-                if(event.data && typeof event.data.inputMode !== 'undefined'){
-                    input_mode = event.data.inputMode;
-                }
-                return input_mode;
+              if(event.data && typeof event.data.inputMode !== 'undefined'){
+                input_mode = event.data.inputMode;
+              }
+              return input_mode;
             },
             /** HELPER: get ASR configuration value depending on speech-mode, fallback etc. */
             getAsrConfig: function(configName, defaultValue, speechMode){
@@ -85,6 +85,21 @@
                 return defaultValue;
               }
               return val;
+            },
+            /** @returns TRUE if event.data.interpretation.medium is "tactile" */
+            isTouch: function(eventData){
+              if(eventData && eventData.interpretation){
+                return eventData.interpretation.medium === 'tactile';
+              }
+              return false;
+            },
+            /** @returns TRUE if isTouch() and eventData.interpretation.value is defined, but eventData.interpretation.value.gesture is NOT defined */
+            isTouchRaw: function(eventData){
+                return this.isTouch(eventData) && eventData.interpretation.value && !eventData.interpretation.value.gesture;
+            },
+            /** @returns TRUE if isTouch() and eventData.interpretation.value.understanding is defined */
+            isTouchUnderstanding: function(eventData){
+                return this.isTouch(eventData) && eventData.interpretation.value && eventData.interpretation.value.understanding;
             },
             /** HELPER: get PromptHandler of PromptReader from VoiceUIService (may be undefined if none is set) */
             getPromptHandler: function(){
@@ -166,7 +181,7 @@
     <!--transition event="speech-input-started" name="speech-input-started" target="AsrActive" /-->
     <!--transition event="speech-input-stopped" name="speech-input-stopped" target="AsrInactive" /-->
 
-    <state id="Gui" name="Gui">
+    <state id="Ui" name="Ui">
 
       <!-- datamodel>
           <data id="test_input_modality" expr="''"/>
@@ -230,6 +245,20 @@
         </script>
       </transition>
 
+      <transition event="touch-raw" name="touch-raw" cond="_util.isTouchRaw(_event.data)">
+        <script>
+            if(_util.isDebugVui) console.info('touch-raw with data ', _event.data);
+            _util.dlg.emit('unknown', _event.data);
+        </script>
+      </transition>
+
+      <transition event="touch-understanding" name="touch-understanding" cond="_util.isTouchUnderstanding(_event.data)">
+        <script>
+            if(_util.isDebugVui) console.info('touch-understanding with data ', _event.data);
+            _util.dlg.emit('tactile', _event.data);
+        </script>
+      </transition>
+
       <transition event="speech-recognition" name="speech-recognition" cond="_util.isSpeechCommand(_event.data)">
         <script>
             if(_util.isDebugVui) console.info('speech-recognition (command-mode) with data ', _event.data);
@@ -260,7 +289,7 @@
         </script>
       </transition>
 
-    </state><!-- END OF: <state id="Gui">  -->
+    </state><!-- END OF: <state id="Ui">  -->
 
     <state id="Vui" name="Vui" initial="AsrInactive">
 

@@ -1,5 +1,5 @@
 
-import { Emma , RecognitionEmma , UnderstandingEmma , TactileEmma, SpeechRecognitionResult , Cmd , Interpretation } from '../typings/';
+import { Emma , RecognitionEmma , UnderstandingEmma , TactileEmma, SpeechRecognitionResult , Cmd , Interpretation , RecognitionInterpretation, UnderstandingInterpretation, TactileInterpretation , RecognitionType , SpeechInterpretation } from '../typings/';
 import { EventLike , AnyEmma , RecognitionData , UnderstandingData , EmmaFunctionType } from '../typings/';
 import { ExtMmirModule } from '../typings/';
 
@@ -8,30 +8,33 @@ import { ExtMmirModule } from '../typings/';
   // var mmir: ExtMmirModule<any>;
 
   /** @memberOf Emma# */
-  var defaultTactileInterpretation = {
+  const defaultTactileInterpretation = {
       mode: "gui",
       medium: "tactile",
       confidence: 1.0,
-      gesture: {}
+      'function': 'gesture',
+      value: {
+        gesture: {}
+      }
   };
   /** @memberOf Emma# */
-  var defaultSpeechInterpretation = {
+  const defaultSpeechInterpretation = {
       mode: "voice",
       medium: "acoustic",
-      'function': {}
+      value: {}
   };
 
   /** @memberOf Emma# */
-  var EVENT_SUFFIXES = ['start', 'move', 'end', 'cancel'];
+  const EVENT_SUFFIXES = ['start', 'move', 'end', 'cancel'];
   /** @memberOf Emma# */
-  var EVENT_SUFFIXES_HORIZONTAL = ['left', 'right'];
+  const EVENT_SUFFIXES_HORIZONTAL = ['left', 'right'];
   /** @memberOf Emma# */
-  var EVENT_SUFFIXES_VERTICAL = ['up', 'down'];
+  const EVENT_SUFFIXES_VERTICAL = ['up', 'down'];
   /** @memberOf Emma# */
-  var RE_TACTILE_SUB_TYPES = new RegExp('('+EVENT_SUFFIXES.concat(EVENT_SUFFIXES_HORIZONTAL, EVENT_SUFFIXES_VERTICAL).join('|')+')$', 'i');
+  const RE_TACTILE_SUB_TYPES = new RegExp('('+EVENT_SUFFIXES.concat(EVENT_SUFFIXES_HORIZONTAL, EVENT_SUFFIXES_VERTICAL).join('|')+')$', 'i');
 
   /** @memberOf Emma# */
-  var DEFAULT_TACTILE_TYPES = {
+  const DEFAULT_TACTILE_TYPES = {
     click: 'click',
     mouse: 'mouse',
     pan: 'pan',
@@ -43,17 +46,17 @@ import { ExtMmirModule } from '../typings/';
     touch: 'touch'
   };
   /** @memberOf Emma# */
-  var DEFAULT_SPEECH_TYPE = 'speech';
+  const DEFAULT_SPEECH_TYPE = 'speech';
+  // /** @memberOf Emma# */
+  // const SPEECH_RECOGNITION_RESULT_NAME = 'text';
   /** @memberOf Emma# */
-  var SPEECH_RECOGNITION_RESULT_NAME = 'text';
+  const SPEECH_UNDERSTANDING_RESULTS_NAME = 'nlu';
   /** @memberOf Emma# */
-  var SPEECH_UNDERSTANDING_RESULTS_NAME = 'nlu';
+  const SPEECH_UNDERSTANDING_SEMANTICS_NAME = 'semantic';// <- asr.semantic
   /** @memberOf Emma# */
-  var SPEECH_UNDERSTANDING_SEMANTICS_NAME = 'semantic';// <- asr.semantic
+  const SPEECH_UNDERSTANDING_PREPROCESSED_PHRASE_NAME = 'preproc'; // <- asr.phrase
   /** @memberOf Emma# */
-  var SPEECH_UNDERSTANDING_PREPROCESSED_PHRASE_NAME = 'preproc'; // <- asr.phrase
-  /** @memberOf Emma# */
-  var SPEECH_UNDERSTANDING_SEMANTICS_PARTS_NAME = 'phrases';// <- asr.phrases
+  const SPEECH_UNDERSTANDING_SEMANTICS_PARTS_NAME = 'phrases';// <- asr.phrases
 
 //	/** @memberOf Emma# */
 //	function guid() {
@@ -73,6 +76,11 @@ import { ExtMmirModule } from '../typings/';
     return ++_iGuid;//FIXME this is not really "global" but within this session it will be unique...
   }
 
+  //INTERNAL typeguard: does not extensively check, if obj is an alternative RecognitionResult, but only if it "could" be a alternitve RecognitionResult
+  function _isAlternativeRecognitionResult(obj: any): obj is {result: string, score: number} {
+    return obj && typeof obj === 'object';
+  }
+
   /** @memberOf Emma# */
   function isTactile<CmdImpl extends Cmd>(event: MouseEvent | TouchEvent | Emma | RecognitionEmma | UnderstandingEmma<CmdImpl> | EventLike, _data: any): event is TactileEmma {
     const evt: EventLike = event as EventLike;
@@ -90,27 +98,35 @@ import { ExtMmirModule } from '../typings/';
   ////////////////////// HELPER functions for click/touch events //////////////////////////////////
 
   /** @memberOf Emma# */
-  function getType(evt, _data?: any): string {
+  function getType(evt: any, _data?: any): string {
     return evt.originalEvent? evt.originalEvent.type : evt.type;
   }
 
   /** @memberOf Emma# */
-  function setModality(emmaIntp, modality, evt){
+  function setModality(emmaIntp: Interpretation | RecognitionInterpretation | UnderstandingInterpretation<any> | TactileInterpretation, func: EmmaFunctionType, evt: any): void {
 
-    if( ! emmaIntp[modality]){
-      emmaIntp[modality] = {};
+    if(!emmaIntp.value){
+      emmaIntp.value = {};
     }
 
-    extend(emmaIntp[modality], {
+    if(!emmaIntp.value[func]){
+      emmaIntp.value[func] = {};
+    }
+
+    extend(emmaIntp.value[func], {
       type: getType(evt)
     });
   }
 
   /** @memberOf Emma# */
-  function setSource(emmaIntp, modality, evt){
+  function setSource(emmaIntp: Interpretation | RecognitionInterpretation | UnderstandingInterpretation<any> | TactileInterpretation, func: EmmaFunctionType, evt: any): void {
 
-    if( ! emmaIntp[modality]){
-      emmaIntp[modality] = {};
+    if(!emmaIntp.value){
+      emmaIntp.value = {};
+    }
+
+    if(!emmaIntp.value[func]){
+      emmaIntp.value[func] = {};
     }
 
     var src = evt.currentTarget || evt.target;
@@ -118,14 +134,12 @@ import { ExtMmirModule } from '../typings/';
       return;////////// EARLY EXIT ///////////////////////
     }
 
-    var classesSet = {
-      keys: src['className'].split(/\s+/gm).filter(function(value){
-        if(value) return true;
-        return false;
-      })
-    };
-    classesSet.keys.forEach(function(value){
-      classesSet[value] = true;
+    const classesSet: {[className: string]: string} = {};
+
+    src['className'].split(/\s+/gm).filter(function(value: string){
+      return !!value;
+    }).forEach(function(value: string){
+      classesSet[value] = value;
     });
 
     var data = {};
@@ -133,7 +147,7 @@ import { ExtMmirModule } from '../typings/';
       data[n] = src.dataset[n];
     }
 
-    extend(emmaIntp[modality], {
+    extend(emmaIntp.value[func], {
       reference: {
         type: src['tagName'],
         id: src['id'],
@@ -147,19 +161,19 @@ import { ExtMmirModule } from '../typings/';
   ////////////////////// HELPER functions for speech events //////////////////////////////////
 
   /** @memberOf Emma# */
-  function isRecognition(evt, data){
+  function isRecognition(evt: any, data: any): boolean {
     //FIXME should check the data argument!!!
     return ! isUnderstanding(evt, data);
   }
 
   /** @memberOf Emma# */
-  function isUnderstanding(evt, data){
+  function isUnderstanding(evt: any, data: any): boolean {
     //FIXME should check the data argument!!!
     return _isGrammarUnderstanding(evt,data);//FIXME: add, when implementd: || _isUnderstanding(evt, data);
   }
 
   /** @memberOf Emma# */
-  function _isGrammarUnderstanding(_evt: any, data: any){
+  function _isGrammarUnderstanding(_evt: any, data: any): boolean {
     //FIXME should check the data argument!!!
     return typeof data.semantic !== 'undefined';
   }
@@ -171,9 +185,9 @@ import { ExtMmirModule } from '../typings/';
 //	}
 
   /** @memberOf Emma# */
-  function setSpeechRecognition(emmaData: Interpretation, _event: any, data: RecognitionData): void {
+  function setSpeechRecognition(emmaData: Interpretation, _event: any, data: RecognitionData, keepExistingFunction?: boolean): void {
 
-//		emma.interpretation['function'].recognition = {
+//		emma.interpretation.value.recognition = {
 //				confidence: 0.0,
 //				id: guid(),
 //				//....
@@ -189,39 +203,43 @@ import { ExtMmirModule } from '../typings/';
     var asrList = [];
     addRecognition(asrList, result, score, type, unstable);
 
-    if(alternatives) for(var i=0,size=alternatives.length; i < size; ++i){
+    if(alternatives) for(var i=0, size=alternatives.length; i < size; ++i){
       addRecognition(asrList, alternatives[i]);
     }
 
-    emmaData['function']['recognition'] = asrList;
+    if(!emmaData['function'] || keepExistingFunction !== true){
+      emmaData['function'] = 'recognition';
+    }
+    emmaData.value['recognition'] = asrList;
   }
 
   /** @memberOf Emma# */
-  function addRecognition(emmaRecogList, result, score?, resultType?, unstablePart?){
+  function addRecognition(emmaRecogList: SpeechRecognitionResult[], result: string | {result: string, score: number}, score?: number, resultType?: RecognitionType, unstablePart?: string){
 
     //normalize arguments
-    if(typeof result === 'object' && result !== null){
+    if(_isAlternativeRecognitionResult(result)){
       //convert object argument
       score = result.score;
       result = result.result;
     }
 
     //create data object
-    var data = {
+    var data: SpeechRecognitionResult = {
         id: guid(),
         confidence: score,
         unstable: unstablePart,
-        type: resultType
+        type: resultType,
+        text: result as string
     };
-    data[SPEECH_RECOGNITION_RESULT_NAME] = result;
+    // data[SPEECH_RECOGNITION_RESULT_NAME] = result;
 
     emmaRecogList.push(data);
   }
 
   /** @memberOf Emma# */
-  function setSpeechUnderstanding(emmaData: Interpretation, _event: any, data: UnderstandingData): void {
+  function setSpeechUnderstanding(emmaData: Interpretation, _event: any, data: UnderstandingData, keepExistingFunction?: boolean): void {
 
-//		emma.interpretation['function'].understanding = {
+//		emma.interpretation.value.understanding = {
 //        id: guid(),//number;		//INT "server-wide" ID
 //        start: number;	//INT UNIX timestamp (incl. milli-seconds)
 //        sourceId: number;		//INT interpretation-ID from the request (i.e. req.interpretation.id)
@@ -231,9 +249,9 @@ import { ExtMmirModule } from '../typings/';
     var semantics = {
         confidence: 1.0
     };
-    semantics[SPEECH_UNDERSTANDING_SEMANTICS_NAME] 				= data.semantic;
-    semantics[SPEECH_UNDERSTANDING_PREPROCESSED_PHRASE_NAME]	= data.phrase;
-    semantics[SPEECH_UNDERSTANDING_SEMANTICS_PARTS_NAME]		= data.phrases;
+    semantics[SPEECH_UNDERSTANDING_SEMANTICS_NAME]           = data.semantic;
+    semantics[SPEECH_UNDERSTANDING_PREPROCESSED_PHRASE_NAME] = data.phrase;
+    semantics[SPEECH_UNDERSTANDING_SEMANTICS_PARTS_NAME]     = data.phrases;
 
     var understanding = {
         id: guid(),
@@ -242,7 +260,10 @@ import { ExtMmirModule } from '../typings/';
     };
     understanding[SPEECH_UNDERSTANDING_RESULTS_NAME] 				= [semantics];
 
-    emmaData['function']['understanding'] = understanding;
+    if(!emmaData['function'] || keepExistingFunction !== true){
+      emmaData['function'] = 'understanding';
+    }
+    emmaData.value['understanding'] = understanding;
   }
 
 
@@ -254,33 +275,26 @@ import { ExtMmirModule } from '../typings/';
   export class EmmaUtil<CmdImpl extends Cmd> {
 
     /** @memberOf Emma.prototype */
+    toEmma(event: MouseEvent | TouchEvent | EventLike, data?: any): TactileEmma;
+    toEmma(event: RecognitionEmma, data?: any): RecognitionEmma;
+    toEmma(event: UnderstandingEmma<CmdImpl>, data?: any): UnderstandingEmma<CmdImpl>;
     toEmma(event: MouseEvent | TouchEvent | Emma | RecognitionEmma | UnderstandingEmma<CmdImpl> | EventLike, data?: any): RecognitionEmma | UnderstandingEmma<CmdImpl> | TactileEmma {
 
-      var emma;
+      var emma: Emma;
 
       if(isTactile<CmdImpl>(event, data)){
 
-        emma = {};
-        emma.interpretation = {
-            start: (event as unknown as MouseEvent).timeStamp
-  //					, end: event.timeStamp
-            , id: guid()
+        emma = {
+          interpretation: {
+              start: (event as unknown as MouseEvent).timeStamp || Date.now(),
+              id: guid()
+          } as Interpretation
         };
 
         extend(true, emma.interpretation, defaultTactileInterpretation);
 
         setModality(emma.interpretation, 'gesture', event);
         setSource(emma.interpretation, 'gesture', event);
-
-//		        emma.interpretation.action = {};
-//
-//		        emma.interpretation.action.name = args[1].event.target.name;
-//
-//		        emma.interpretation.action.data = args[1].data;
-//
-//		        // @chsc03 FIXME div element cannot be converted to JSON due to circular reference
-//
-//		        emma.interpretation.action.source = new XMLSerializer().serializeToString(args[1].source);
       }
 
       if(isSpeech(event, data)){
@@ -293,11 +307,11 @@ import { ExtMmirModule } from '../typings/';
         }
         else {
           //start new speech event data...
-          emma = {};
-          emma.interpretation = {
-              start: new Date().getTime()//really is not really the start-time ...
-//							, end: event.timeStamp
-              , id: guid()
+          emma = {
+            interpretation: {
+              start: new Date().getTime(),//really is not really the start-time ...
+              id: guid()
+            } as SpeechInterpretation,
           };
           extend(true, emma.interpretation, defaultSpeechInterpretation);
         }
@@ -312,7 +326,7 @@ import { ExtMmirModule } from '../typings/';
         //HACK
         if((event as any).mode){
           //FIXME make this spec-compliant!!! -> EMMA standard...
-          emma.interpretation.speechMode = (event as any).mode;
+          (emma.interpretation as SpeechInterpretation).speechMode = (event as any).mode;
         }
 
 
@@ -333,7 +347,7 @@ import { ExtMmirModule } from '../typings/';
 
       //console.info(emma);//FIXM DEBUG
 
-      return emma;
+      return emma as RecognitionEmma | UnderstandingEmma<CmdImpl> | TactileEmma;
     }
 
     // fire(rawEvent: MouseEvent | TouchEvent | Emma | RecognitionEmma | UnderstandingEmma<CmdImpl> | EventLike, data?: any): RecognitionEmma | UnderstandingEmma<CmdImpl> | TactileEmma {
@@ -343,21 +357,21 @@ import { ExtMmirModule } from '../typings/';
     // }
 
     isTactileEvent(emmaData: AnyEmma<CmdImpl>) : boolean {
-      if( (emmaData as TactileEmma as any).interpretation.gesture ) return true;
+      if( (emmaData as TactileEmma).interpretation.value && (emmaData as TactileEmma).interpretation.value.gesture ) return true;
       return false;
     }
 
     isSpeechEvent(emmaData: AnyEmma<CmdImpl>) : boolean {
-      if( emmaData.interpretation['function'] ) return true;
+      if( emmaData.interpretation.value && (emmaData.interpretation.value.recognition || emmaData.interpretation.value.understanding) ) return true;
       return false;
     }
 
-    setSpeechRecognition(emmaData: AnyEmma<CmdImpl>, event: any, data: RecognitionData): void {
-      setSpeechRecognition(emmaData.interpretation, event, data);
+    setSpeechRecognition(emmaData: AnyEmma<CmdImpl>, event: any, data: RecognitionData, keepExistingFunction?: boolean): void {
+      setSpeechRecognition(emmaData.interpretation, event, data, keepExistingFunction);
     }
 
-    setSpeechUnderstanding(emmaData: AnyEmma<CmdImpl>, event: any, data: UnderstandingData): void {
-      setSpeechUnderstanding(emmaData.interpretation, event, data);
+    setSpeechUnderstanding(emmaData: AnyEmma<CmdImpl>, event: any, data: UnderstandingData, keepExistingFunction?: boolean): void {
+      setSpeechUnderstanding(emmaData.interpretation, event, data, keepExistingFunction);
     }
 
     addTarget(emmaData: AnyEmma<CmdImpl>, target: any, isOverwrite?: boolean): AnyEmma<CmdImpl> {
@@ -415,15 +429,16 @@ import { ExtMmirModule } from '../typings/';
       if(!emmaEvent.interpretation){
         emmaEvent.interpretation = {} as Interpretation;
       }
-      if(!emmaEvent.interpretation['function']){
-        emmaEvent.interpretation['function'] = {};
+      if(!emmaEvent.interpretation.value){
+        emmaEvent.interpretation.value = {};
       }
-      if(!emmaEvent.interpretation['function'][funcName]){
-        emmaEvent.interpretation['function'][funcName] = {};
+      if(!emmaEvent.interpretation.value[funcName]){
+        emmaEvent.interpretation.value[funcName] = {};
       } else if(!isOverwrite){
         return;///////////////////////;
       }
-      emmaEvent.interpretation['function'][funcName] = funcData;
+      emmaEvent.interpretation['function'] = funcName;
+      emmaEvent.interpretation.value[funcName] = funcData;
     }
 
     _extractAsrData(asrEmmaEvent: AnyEmma<CmdImpl>): SpeechRecognitionResult {
@@ -435,7 +450,7 @@ import { ExtMmirModule } from '../typings/';
     }
 
     _extractAllAsrData(asrEmmaEvent: AnyEmma<CmdImpl>): SpeechRecognitionResult[] {
-      var recog;
+      let recog: SpeechRecognitionResult[];
       if(asrEmmaEvent && (recog = this._extractEmmaFuncData(asrEmmaEvent, 'recognition'))){
         return recog;
       }
@@ -443,8 +458,8 @@ import { ExtMmirModule } from '../typings/';
     }
 
     _extractEmmaFuncData(emmaEvent: AnyEmma<CmdImpl>, func: EmmaFunctionType): any {//}(emmaEvent, func){//func: 'recognition' | 'understanding'
-      if(emmaEvent && emmaEvent.interpretation && emmaEvent.interpretation['function'] && emmaEvent.interpretation['function'][func]){
-        return emmaEvent.interpretation['function'][func];
+      if(emmaEvent && emmaEvent.interpretation && emmaEvent.interpretation.value && emmaEvent.interpretation.value[func]){
+        return emmaEvent.interpretation.value[func];
       }
       return {};
     }

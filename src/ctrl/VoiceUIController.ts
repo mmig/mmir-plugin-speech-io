@@ -349,8 +349,8 @@ export class VoiceUIController<CmdImpl extends Cmd> {
 
     // this.inp.raise('touch_input_event');
     // this.inp.raise('click_on_' + name, data);
-    let emmaEvt = this.mmir.emma.toEmma(event, data);
-    this.mmir.emma._setEmmaFuncData(emmaEvt, 'understanding', {
+    let emmaEvt = this.mmir.emma.toEmma(event as EventLike, data);
+    this.mmir.emma._setEmmaFuncData(emmaEvt, 'gesture', {
       name: name,
       data: data
     });
