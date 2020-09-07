@@ -22,6 +22,16 @@ export interface WaitReadyOptions {
   module: string;
 }
 
+export interface ASRError {
+  type: 'asr';
+  error: string | Error | any;
+}
+
+export interface TTSError {
+  type: 'tts';
+  error: string | Error | any;
+}
+
 export type SpeechEventName = 'showSpeechInputState' |                  //ISpeechState
                         'changeMicLevels' | 'waitReadyState' |          //ISpeechFeedback
                         'showDictationResult' |                         //ISpeechDictate
@@ -44,9 +54,11 @@ export interface SpeechEventEmitter<CmdImpl extends Cmd> {
     stopReading: Observable<StopReadingOptions>;
     showReadingStatus: Observable<ReadingShowOptions>;
     //'resetGuidedInputForCurrentControl' | 'startGuidedInput' | 'resetGuidedInput' | 'isDictAutoProceed'
-    playError: Observable<PlayError>;
     tactile: Observable<TactileEmma>;
     unknown: Observable<Emma>;
+    asrError: Observable<ASRError>;
+    ttsError: Observable<TTSError>;
+    playError: Observable<PlayError>;
 }
 
 export interface IPromptHandler {

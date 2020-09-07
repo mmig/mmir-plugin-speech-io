@@ -439,9 +439,10 @@
                     },
                     error: function(error){
 
-                        console.error('[ERROR] speechioManager.'+asrFunc+': '+JSON.stringify(arguments)+' (prompt: '+temp_prompt_data+', restart: '+temp_restart_speech_with_id+')');
+                        if(_util.isDebugVui) console.error('[ERROR] speechioManager.'+asrFunc+': '+JSON.stringify(arguments)+' (prompt: '+temp_prompt_data+', restart: '+temp_restart_speech_with_id+')');
 
                         _util.dlg.raise('speech-input-stopped');
+                        _util.dlg.emit('asrError', {type: 'asr', error: error});
 
                     },
                     intermediate: true,
@@ -533,11 +534,11 @@
                     },
                     error: function(error){
 
-                        console.error('[ERROR] speechioManager.stopRecord: '+JSON.stringify(arguments)+' (prompt: '+temp_prompt_data+', restart: '+temp_restart_speech_with_id+')');
+                        if(_util.isDebugVui) console.error('[ERROR] speechioManager.stopRecord: '+JSON.stringify(arguments)+' (prompt: '+temp_prompt_data+', restart: '+temp_restart_speech_with_id+')');
 
                         if(temp_prompt_data){
 
-                            console.error('on ERROR stopRecord: starting prompt '+temp_prompt_data+', then restart '+target_id);
+                            if(_util.isDebugVui) console.error('on ERROR stopRecord: starting prompt '+temp_prompt_data+', then restart '+target_id);
 
                             var promptData = temp_prompt_data;
                             temp_prompt_data = null;
@@ -549,7 +550,7 @@
                         }
                         else if(temp_resume_speech_with_id){
 
-                            console.error('on stopRecord: prepare to resume speech-input for '+temp_resume_speech_with_id+' after reading has finished ');
+                            if(_util.isDebugVui) console.error('on stopRecord: prepare to resume speech-input for '+temp_resume_speech_with_id+' after reading has finished ');
 
                             temp_restart_speech_with_id = temp_resume_speech_with_id;
                             temp_resume_speech_with_id = '';
@@ -557,7 +558,7 @@
                         }
                         else if(temp_restart_speech_with_id){
 
-                            console.error('on ERROR stopRecord: restart '+target_id +' -> '+ temp_restart_speech_with_id);
+                            if(_util.isDebugVui) console.error('on ERROR stopRecord: restart '+target_id +' -> '+ temp_restart_speech_with_id);
 
                             target_id = temp_restart_speech_with_id;
                             temp_restart_speech_with_id = '';
@@ -568,6 +569,7 @@
                         }
                         else {
                             _util.dlg.raise('speech-input-stopped');
+                            _util.dlg.emit('asrError', {type: 'asr', error: error});
                         }
                     }
                 }]);
@@ -1104,6 +1106,7 @@
             }
             else {
                 console.error('Cannot invoke readField: invalid data.field value ', _event.data);
+                _util.dlg.emit('ttsError', {type: 'tts', error: new Error('invalid read data: missing field data.field')});
             }
         </script>
       </transition>

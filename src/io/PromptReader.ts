@@ -97,7 +97,7 @@ export class PromptReader {
 
         if(self._isLogError()) self._logError('doRead: error reading '+JSON.stringify(text), err);//DEBUG
         self.dlg.raise('reading-stopped');
-
+        self.dlg.emit('ttsError', {type: 'tts', error: err});
       }
     };
 
