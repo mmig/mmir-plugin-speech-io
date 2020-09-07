@@ -770,7 +770,7 @@ export interface Interpretation {
     /** (absolute) timestamp for end */
     end?: number;
     /** (application wide) ID for the interpretation */
-    id: number;
+    id: number | string;
     /** the mode used for the interpretation input  */
     mode: EmmaMode;
     /** the medium ~ "type of sensor" that captures the user input */
@@ -780,7 +780,7 @@ export interface Interpretation {
     deviceType?: EmmaDeviceType;
     /**
      * IETF Best Current Practice 47
-     * @see https://w3c.github.io/emma/emma2_0/emma_2_0_editor_draft.html#BCP47
+     * @see https://www.rfc-editor.org/rfc/bcp/bcp47.txt
      * @example "fr"
      * @example "en-US"
      */
@@ -794,11 +794,24 @@ export interface Interpretation {
     dialogTurn?: string;
     /** the (intended) use of the interpretation */
     function?: EmmaFunction;
+    location?: EmmaLocation;
     //non-emma-spec attributes:
     /** target of the interpretation, e.g. ID of the button that started the evaluation/interpretation */
     target?: any;
     /** the (application specific) value of the interpretation */
     value?: any;
+}
+export interface EmmaLocation {
+    id: number | string;
+    latitude?: number;
+    longitude?: number;
+    accuracy?: number;
+    altitude?: number;
+    altitudeAccuracy?: number;
+    heading?: number;
+    speed?: number;
+    description?: string;
+    address?: string;
 }
 export interface SpeechInterpretation extends Interpretation {
     mode: 'voice';
@@ -844,15 +857,26 @@ export interface TactileFunc extends Func {
     gesture: Gesture;
 }
 export interface Gesture {
+    name: string;
+    data?: any;
     type: EmmaGestureType;
     reference: GestureSource;
 }
 export interface GestureSource {
-    type: string; //HTML tag name, e.g. a or div
-    id?: string; //ID attribute if present
-    name?: string; //ID attribute if present
-    classes?: Array<string>; //list of classes if present
-    data?: string; //attached data if present
+    /** value of element.tagName attribute (if present) */
+    type?: string;
+    /** value of element.id attribute (if present) */
+    id?: string;
+    /** value of element.name attribute (if present) */
+    name?: string;
+    /** css classes of element.className attribute (if present) */
+    classes?: {
+        [className: string]: string;
+    };
+    /** entries of element.dataset attribute (if present) */
+    data?: {
+        [dataName: string]: string;
+    };
 }
 ////////////////////////////////////// Speech Commands /////////////////////////////
 export interface UnderstandigResult<CmdImpl extends Cmd> {

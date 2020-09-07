@@ -121,7 +121,7 @@ export declare class VoiceUIController<CmdImpl extends Cmd> {
      *                          style for visualizing unstable/interim part of dictation result/text
      *                          DEFAULT: uses #_defaultDictationFeedbackStyle
      */
-    dictationClicked(event: Event, targetId: string | DictationTarget, feedbackStyle?: SelectionMode, touchFeedback?: InputOutputOption): void;
+    dictationClicked(event: Event | EventLike, targetId: string | DictationTarget, feedbackStyle?: SelectionMode, touchFeedback?: InputOutputOption): void;
     initDictationTarget(targetId: string | DictationTarget, feedbackStyle?: SelectionMode): DictationHandler;
     private updateCurrentDictationTarget;
     /**
