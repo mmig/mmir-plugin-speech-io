@@ -238,7 +238,7 @@ export class VoiceUIController<CmdImpl extends Cmd> {
    * @param  [viewSubscriptions] OPITONAL subscriptions for the newly entered view (will be canceled when leaving the view or entering a new view)
    * @return the READY promise for the VoiceUiController
    */
-  public enterView(viewSubscriptions?: Subscription[]) : Promise<VoiceUIController<CmdImpl>> {
+  public enterView(viewSubscriptions?: Subscription[] | Subscription) : Promise<VoiceUIController<CmdImpl>> {
 
     //cancel any previous subscriptions:
     this.doUnsubscribeCurrentPage();
@@ -246,9 +246,7 @@ export class VoiceUIController<CmdImpl extends Cmd> {
     this.readTargetHandler.reset();
 
     if(viewSubscriptions){
-      for(const subs of viewSubscriptions){
-        this.activePageSubscriptions.push(subs);
-      }
+      this.addViewSubscription(viewSubscriptions);
     }
 
     return this.initializing;
@@ -260,7 +258,7 @@ export class VoiceUIController<CmdImpl extends Cmd> {
    *
    * @param {Subscription} subscription
    */
-  public addViewSubscription(subscription: Subscription | Array<Subscription>): void {
+  public addViewSubscription(subscription: Subscription[] | Subscription): void {
     if(Array.isArray(subscription)){
       for(let subs of subscription){
         this.activePageSubscriptions.push(subs);
