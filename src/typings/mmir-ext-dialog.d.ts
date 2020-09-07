@@ -1,4 +1,4 @@
-import type { Cmd , ShowSpeechStateOptions , SpeechFeedbackOptions , RecognitionEmma , UnderstandingEmma , ReadingOptions , StopReadingOptions , ReadingShowOptions } from './';
+import type { Cmd , ShowSpeechStateOptions , SpeechFeedbackOptions , RecognitionEmma , UnderstandingEmma , ReadingOptions , StopReadingOptions , ReadingShowOptions , TactileEmma, Emma } from './';
 
 import type { Observable } from 'rxjs';
 
@@ -45,6 +45,8 @@ export interface SpeechEventEmitter<CmdImpl extends Cmd> {
     showReadingStatus: Observable<ReadingShowOptions>;
     //'resetGuidedInputForCurrentControl' | 'startGuidedInput' | 'resetGuidedInput' | 'isDictAutoProceed'
     playError: Observable<PlayError>;
+    tactile: Observable<TactileEmma>;
+    unknown: Observable<Emma>;
 }
 
 export interface IPromptHandler {

@@ -262,8 +262,10 @@ export interface ReadingData {
 ////////////////////////////////////// EMMA ////////////////////////////////////////
 
 
-export type EmmaMode = 'voice' | 'gui';
-export type EmmaMedium = 'acoustic' | 'tactile';
+export type EmmaMode = 'voice' | 'gui' | 'keys' | 'video' | 'photograph' | 'dtmf' | 'ink' | string;
+export type EmmaFunction = 'recording' | 'transcription' | 'dialog' | 'verification' | string;
+export type EmmaDeviceType = 'microphone'|'keypad'|'keyboard'|'touchscreen'|'touchpad'|'mouse'|'pen'|'joystick'|'thumbwheel'|'camera_2d'|'camera_3d'|'scanner'|string;
+export type EmmaMedium = 'acoustic' | 'tactile' | 'visual';
 export type EmmaGestureType = 'click' | 'touch' | 'swipe';//TODO add more gesture types
 export type RecognitionType = 'FINAL' | 'INTERMEDIATE' | 'INTERIM';
 
@@ -273,7 +275,7 @@ export interface Emma {
 }
 
 export interface RecognitionEmma extends Emma {
-    interpretation: RecogitionInterpretation;
+    interpretation: RecognitionInterpretation;
 }
 
 export interface UnderstandingEmma<CmdImpl extends Cmd> extends Emma {
@@ -285,34 +287,72 @@ export interface TactileEmma extends Emma {
 }
 
 export interface Interpretation {
-    start: number;//timestamp
-    id: number;//app-wide ID
-    target?: any;//target of the interpretation, e.g. ID of the button that started the evaluation/interpretation
+    /** (absolute) timestamp for start */
+    start: number;
+    /** (absolute) timestamp for end */
+    end?: number;
+    /** (application wide) ID for the interpretation */
+    id: number;
+    /** the mode used for the interpretation input  */
     mode: EmmaMode;
+    /** the medium ~ "type of sensor" that captures the user input */
     medium: EmmaMedium;
-    func: Func;
+
+    /** distinguishes verbal use of an input mode from non-verbal, supplying a command via written words vs. symbolic input like drawn arrows */
+    verbal?: boolean
+
+    deviceType?: EmmaDeviceType;
+    /**
+     * IETF Best Current Practice 47
+     * @see https://w3c.github.io/emma/emma2_0/emma_2_0_editor_draft.html#BCP47
+     * @example "fr"
+     * @example "en-US"
+     */
+    lang?: string;
+    /** The source of an interpreted input
+     * @example "http://example.com/microphone/NC-61"
+     * @example "http://example.com/microphone/NC-4024"
+     */
+    source?: string;
+    /** application specific ID for identifying a dialog turn */
+    dialogTurn?: string;
+
+    /** the (intended) use of the interpretation */
+    function?: EmmaFunction;
+
+    //non-emma-spec attributes:
+    /** target of the interpretation, e.g. ID of the button that started the evaluation/interpretation */
+    target?: any;
+    /** the (application specific) value of the interpretation */
+    value?: any
 }
 
 export interface SpeechInterpretation extends Interpretation {
     mode: 'voice';
     medium: 'acoustic';
+
+    // non-emma-spec attributes:
+    speechMode: SpeechInterpretation;
     isGuided?: boolean;
     context?: 'form-overlay'//information for special app/gui context from which the ASR was triggered
     inputMode?: SpeechInputMode;
 }
 
-export interface RecogitionInterpretation extends SpeechInterpretation {
-    func: RecognitionFunc;
+export interface RecognitionInterpretation extends SpeechInterpretation {
+    function: 'recognition';
+    value: RecognitionFunc;
 }
 
 export interface UnderstandingInterpretation<CmdImpl extends Cmd> extends SpeechInterpretation {
-    func: UnderstandingFunc<CmdImpl>;
+    function: 'understanding';
+    value: UnderstandingFunc<CmdImpl>;
 }
 
 export interface TactileInterpretation extends Interpretation {
     mode: 'gui';
     medium: 'tactile';
-    func: TactileFunc;
+    function: 'gesture';
+    value: TactileFunc;
 }
 
 export interface Func {
