@@ -82,14 +82,14 @@ export declare class VoiceUIController<CmdImpl extends Cmd> {
      * @param  [viewSubscriptions] OPITONAL subscriptions for the newly entered view (will be canceled when leaving the view or entering a new view)
      * @return the READY promise for the VoiceUiController
      */
-    enterView(viewSubscriptions?: Subscription[]): Promise<VoiceUIController<CmdImpl>>;
+    enterView(viewSubscriptions?: Subscription[] | Subscription): Promise<VoiceUIController<CmdImpl>>;
     /**
      * Remembers the subscription for the current/active view, and
      * unsubscribes when #leaveView is triggered.
      *
      * @param {Subscription} subscription
      */
-    addViewSubscription(subscription: Subscription | Array<Subscription>): void;
+    addViewSubscription(subscription: Subscription[] | Subscription): void;
     /**
      * HELPER for leaving a view / page:
      *
