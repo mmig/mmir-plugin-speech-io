@@ -75,10 +75,12 @@
         <onentry>
           <script>
 
-                  var emma = mmir.emma._extractEmmaFuncData(touch_data, 'understanding');
-                  if(logger.isi()) logger.info('entered Touch.Understanding with '+ JSON.stringify(emma));
+                  if(logger.isi()) {
+                    var emma = mmir.emma._extractEmmaFuncData(touch_data, 'gesture');
+                    logger.info('entered Touch.Understanding with '+ JSON.stringify(emma));
+                  }
 
-                  mmir.speechioManager.raise(emma.name, emma.data);
+                  mmir.speechioManager.raise('touch-understanding', touch_data);
           </script>
         </onentry>
       </state>

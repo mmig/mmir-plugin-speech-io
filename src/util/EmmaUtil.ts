@@ -13,9 +13,7 @@ import { ExtMmirModule } from '../typings/';
       medium: "tactile",
       confidence: 1.0,
       'function': 'gesture',
-      value: {
-        gesture: {}
-      }
+      value: {}
   };
   /** @memberOf Emma# */
   const defaultSpeechInterpretation = {
@@ -293,6 +291,10 @@ import { ExtMmirModule } from '../typings/';
 
         extend(true, emma.interpretation, defaultTactileInterpretation);
 
+        if(data) {
+          this._setEmmaFuncData(emma, 'gesture', {data: data});
+        }
+
         setModality(emma.interpretation, 'gesture', event);
         setSource(emma.interpretation, 'gesture', event);
       }
@@ -425,7 +427,7 @@ import { ExtMmirModule } from '../typings/';
       }
     }
 
-    _setEmmaFuncData(emmaEvent: AnyEmma<CmdImpl>, funcName: EmmaFunctionType, funcData: any, isOverwrite?: boolean): void {
+    _setEmmaFuncData(emmaEvent: AnyEmma<CmdImpl>, funcName: EmmaFunctionType, funcData: any, mode?: 'override' | 'merge'): void {
       if(!emmaEvent.interpretation){
         emmaEvent.interpretation = {} as Interpretation;
       }
@@ -434,11 +436,15 @@ import { ExtMmirModule } from '../typings/';
       }
       if(!emmaEvent.interpretation.value[funcName]){
         emmaEvent.interpretation.value[funcName] = {};
-      } else if(!isOverwrite){
+      } else if(mode === 'override'){
         return;///////////////////////;
       }
       emmaEvent.interpretation['function'] = funcName;
-      emmaEvent.interpretation.value[funcName] = funcData;
+      if(emmaEvent.interpretation.value[funcName]){
+        extend(emmaEvent.interpretation.value[funcName], funcData);
+      } else {
+        emmaEvent.interpretation.value[funcName] = funcData;
+      }
     }
 
     _extractAsrData(asrEmmaEvent: AnyEmma<CmdImpl>): SpeechRecognitionResult {
