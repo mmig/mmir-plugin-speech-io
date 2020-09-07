@@ -57,7 +57,7 @@ import { ExtMmirModule } from '../typings/';
   const SPEECH_UNDERSTANDING_SEMANTICS_PARTS_NAME = 'phrases';// <- asr.phrases
 
 //	/** @memberOf Emma# */
-//	function guid() {
+//	function nextId() {
 //        var d = new Date().getTime();
 //        var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
 //            var r = (d + Math.random() * 16) % 16 | 0;
@@ -70,8 +70,8 @@ import { ExtMmirModule } from '../typings/';
   /** @memberOf Emma# */
   var _iGuid = new Date().getTime();
   /** @memberOf Emma# */
-  function guid(){
-    return ++_iGuid;//FIXME this is not really "global" but within this session it will be unique...
+  function nextId(){
+    return ++_iGuid;//NOTE this does not create a "global ID" but within this session/runtime it will be unique...
   }
 
   //INTERNAL typeguard: does not extensively check, if obj is an alternative RecognitionResult, but only if it "could" be a alternitve RecognitionResult
@@ -187,7 +187,7 @@ import { ExtMmirModule } from '../typings/';
 
 //		emma.interpretation.value.recognition = {
 //				confidence: 0.0,
-//				id: guid(),
+//				id: nextId(),
 //				//....
 //		}
 
@@ -223,7 +223,7 @@ import { ExtMmirModule } from '../typings/';
 
     //create data object
     var data: SpeechRecognitionResult = {
-        id: guid(),
+        id: nextId(),
         confidence: score,
         unstable: unstablePart,
         type: resultType,
@@ -238,7 +238,7 @@ import { ExtMmirModule } from '../typings/';
   function setSpeechUnderstanding(emmaData: Interpretation, _event: any, data: UnderstandingData, keepExistingFunction?: boolean): void {
 
 //		emma.interpretation.value.understanding = {
-//        id: guid(),//number;		//INT "server-wide" ID
+//        id: nextId(),//number;		//INT "server-wide" ID
 //        start: number;	//INT UNIX timestamp (incl. milli-seconds)
 //        sourceId: number;		//INT interpretation-ID from the request (i.e. req.interpretation.id)
 //        nlu: event//or semantic? Array<CmdImpl>;
@@ -252,7 +252,7 @@ import { ExtMmirModule } from '../typings/';
     semantics[SPEECH_UNDERSTANDING_SEMANTICS_PARTS_NAME]     = data.phrases;
 
     var understanding = {
-        id: guid(),
+        id: nextId(),
         // start: ,//TODO from recoginition emma
         // startId: //TODO from recoginition emma
     };
@@ -285,7 +285,7 @@ import { ExtMmirModule } from '../typings/';
         emma = {
           interpretation: {
               start: (event as unknown as MouseEvent).timeStamp || Date.now(),
-              id: guid()
+              id: nextId()
           } as Interpretation
         };
 
@@ -312,7 +312,7 @@ import { ExtMmirModule } from '../typings/';
           emma = {
             interpretation: {
               start: new Date().getTime(),//really is not really the start-time ...
-              id: guid()
+              id: nextId()
             } as SpeechInterpretation,
           };
           extend(true, emma.interpretation, defaultSpeechInterpretation);
@@ -468,6 +468,10 @@ import { ExtMmirModule } from '../typings/';
         return emmaEvent.interpretation.value[func];
       }
       return {};
+    }
+
+    _nextId(): number {
+      return nextId();
     }
 
     static create<CmdImpl extends Cmd>(mmirCore: ExtMmirModule<CmdImpl>, deepCloneFunc?: Function): EmmaUtil<CmdImpl> {//WORKAROUND for "converting" mmir/requirejs impl. to node module-like
