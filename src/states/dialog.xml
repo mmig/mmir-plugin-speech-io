@@ -97,9 +97,9 @@
             isTouchRaw: function(eventData){
                 return this.isTouch(eventData) && eventData.interpretation.value && !eventData.interpretation.value.gesture;
             },
-            /** @returns TRUE if isTouch() and eventData.interpretation.value.understanding is defined */
+            /** @returns TRUE if isTouch() and eventData.interpretation.value.gesture is defined */
             isTouchUnderstanding: function(eventData){
-                return this.isTouch(eventData) && eventData.interpretation.value && eventData.interpretation.value.understanding;
+                return this.isTouch(eventData) && eventData.interpretation.value && eventData.interpretation.value.gesture;
             },
             /** HELPER: get PromptHandler of PromptReader from VoiceUIService (may be undefined if none is set) */
             getPromptHandler: function(){

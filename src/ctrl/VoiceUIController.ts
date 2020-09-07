@@ -349,8 +349,7 @@ export class VoiceUIController<CmdImpl extends Cmd> {
     // this.inp.raise('click_on_' + name, data);
     let emmaEvt = this.mmir.emma.toEmma(event as EventLike, data);
     this.mmir.emma._setEmmaFuncData(emmaEvt, 'gesture', {
-      name: name,
-      data: data
+      name: name
     });
     // this.mmir.emma.addTarget(emmaEvt, name, true);
     // this.mmir.emma.addProperty(emmaEvt, 'data', data, true);
@@ -430,9 +429,11 @@ export class VoiceUIController<CmdImpl extends Cmd> {
    *                          style for visualizing unstable/interim part of dictation result/text
    *                          DEFAULT: uses #_defaultDictationFeedbackStyle
    */
-  public dictationClicked(event: Event, targetId: string | DictationTarget, feedbackStyle?: SelectionMode, touchFeedback?: InputOutputOption): void {
+  public dictationClicked(event: Event | EventLike, targetId: string | DictationTarget, feedbackStyle?: SelectionMode, touchFeedback?: InputOutputOption): void {
 
-    event.preventDefault();
+    if(event && (event as any).preventDefault){
+      (event as any).preventDefault();
+    }
 
     //if(this._debugMsg) console.log('dictationClicked');
 

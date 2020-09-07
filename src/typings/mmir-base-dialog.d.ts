@@ -381,16 +381,23 @@ export interface TactileFunc extends Func {
 }
 
 export interface Gesture {
+  name: string;
+  data?: any;
   type: EmmaGestureType;
   reference: GestureSource;
 }
 
 export interface GestureSource {
-  type: string;//HTML tag name, e.g. a or div
-  id?: string;//ID attribute if present
-  name?: string;//ID attribute if present
-  classes?: Array<string>;//list of classes if present
-  data?: string;//attached data if present
+  /** value of element.tagName attribute (if present) */
+  type?: string;
+  /** value of element.id attribute (if present) */
+  id?: string;
+  /** value of element.name attribute (if present) */
+  name?: string;
+  /** css classes of element.className attribute (if present) */
+  classes?: {[className: string]: string};
+  /** entries of element.dataset attribute (if present) */
+  data?: {[dataName: string]: string};
 }
 
 ////////////////////////////////////// Speech Commands /////////////////////////////
