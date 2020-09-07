@@ -3,7 +3,7 @@ import { Subject , BehaviorSubject } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 
 import { MediaManager, PlayError , LogLevel , LogLevelNum, IAudio } from 'mmir-lib';
-import { ShowSpeechStateOptions, SpeechFeedbackOptions, RecognitionEmma, UnderstandingEmma , ReadingOptions , StopReadingOptions, ReadingShowOptions , Cmd , TactileEmma , Emma } from './typings/';
+import { ShowSpeechStateOptions, SpeechFeedbackOptions, RecognitionEmma, UnderstandingEmma , ReadingOptions , StopReadingOptions, ReadingShowOptions , Cmd , TactileEmma , Emma , ASRError, TTSError } from './typings/';
 import { IAppSettings } from './typings/';
 
 import { EmmaUtil } from './util/EmmaUtil';
@@ -26,10 +26,12 @@ interface SpeechEventEmitterImpl<CmdImpl extends Cmd> extends SpeechEventEmitter
     read: Subject<string|ReadingOptions>;
     stopReading: Subject<StopReadingOptions>;
     showReadingStatus: BehaviorSubject<ReadingShowOptions>;
-    //TODO GuidedInput events? //guidedInput: Subject<{reset?: boolean, start?: boolean, context?: /*default: */ 'global' | 'control'}>// ORIG: 'resetGuidedInputForCurrentControl' | 'startGuidedInput' | 'resetGuidedInput'
-    playError: Subject<PlayError>;
     tactile: Subject<TactileEmma>;
     unknown: Subject<Emma>;
+    //TODO GuidedInput events? //guidedInput: Subject<{reset?: boolean, start?: boolean, context?: /*default: */ 'global' | 'control'}>// ORIG: 'resetGuidedInputForCurrentControl' | 'startGuidedInput' | 'resetGuidedInput'
+    asrError: Subject<ASRError>;
+    ttsError: Subject<TTSError>;
+    playError: Subject<PlayError>;
 }
 
 export class MmirService<CmdImpl extends Cmd> {
@@ -104,13 +106,15 @@ export class MmirService<CmdImpl extends Cmd> {
                   state1.readingData === state2.readingData;
         })),
 
+      'tactile': new Subject<TactileEmma>(),
+      'unknown': new Subject<Emma>(),
+
       //TODO GuidedInput events?
       //'guidedInput': {reset?: boolean, start?: boolean, context?: /*default: */ 'global' | 'control'}// ORIG: 'resetGuidedInputForCurrentControl' | 'startGuidedInput' | 'resetGuidedInput'
 
+      'asrError': new Subject<ASRError>(),
+      'ttsError': new Subject<TTSError>(),
       'playError': new Subject<PlayError>(),
-
-      'tactile': new Subject<TactileEmma>(),
-      'unknown': new Subject<Emma>(),
 
     } as SpeechEventEmitterImpl<CmdImpl>;
 
