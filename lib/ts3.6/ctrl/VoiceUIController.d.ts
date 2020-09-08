@@ -1,5 +1,5 @@
 import { Subscription, BehaviorSubject } from 'rxjs';
-import { RecognitionEmma, UnderstandingEmma, ShowSpeechStateOptions, ReadingShowOptions, StopReadingOptions, SpeechFeedbackOptions, Cmd } from '../typings/';
+import { RecognitionEmma, UnderstandingEmma, SpeechInputStateOptions, ReadingStateOptions, StopReadingOptions, Cmd } from '../typings/';
 import { FeedbackOption } from '../io/HapticFeedback';
 import { PromptReader } from '../io/PromptReader';
 import { SpeechInputController } from '../ctrl/SpeechInputController';
@@ -105,7 +105,6 @@ export declare class VoiceUIController<CmdImpl extends Cmd> {
     protected releaseUiResources(force: boolean): void;
     handleClick(event: MouseEvent | TouchEvent | RecognitionEmma | UnderstandingEmma<CmdImpl> | EventLike, name: string, data?: any): void;
     localize(res: string): string;
-    evalSemantics(asr_result: string): void;
     triggerTouchFeedback(_event: MouseEvent | TouchEvent | RecognitionEmma | UnderstandingEmma<CmdImpl> | EventLike, feedbackOptions?: FeedbackOption): void;
     commandClicked(event: MouseEvent | TouchEvent | RecognitionEmma | UnderstandingEmma<CmdImpl> | EventLike, btnId: string, feedbackOptions?: InputOutputOption): void;
     /**
@@ -164,50 +163,22 @@ export declare class VoiceUIController<CmdImpl extends Cmd> {
     private updateReadOverlay;
     private doSetReadOverlay;
     private updateCurrentReadTarget;
-    protected showSpeechInputState(options: ShowSpeechStateOptions): void;
+    protected speechInputState(options: SpeechInputStateOptions): void;
+    protected readingState(options: ReadingStateOptions): void;
     /**
-     * If <code>options.isStart === true</code>:
-     * Called when GUI should show indicator for Microphone input levels.
+     * Default implementation for `stopReading` (triggered by"reading-stopped" event):
+     * cancel TTS reading, i.e. `this.ttsCancel(options)`
      *
-     * This should also initialize/start listening to mic-levels changes, e.g.
-     * register a listener:
-     * <pre>
-     * mmir.MediaManager.on('miclevelchanged', miclevelsChandeHandler);
-     * </pre>
-     * where miclevelsChandeHandler:
-     *    function(micLevel: number)
-     *
-     *
-     * If <code>options.isStart === false</code>:
-     * Called when GUI should hide/deactivate indicator for Microphone input levels.
-     *
-     * This should destroy/free resource that were set up for visualizing mic-level
-     * changes, e.g. could stop listening to mic-level changes, i.e. unregister listener:
-     * <pre>
-     * mmir.MediaManager.off('miclevelchanged', miclevelsChandeHandler);
-     * </pre>
-     *
-     * @param {SpeechFeedbackOptions} options
-     *              the data specifying the (changed) speech input state etc.
-     */
-    protected changeMicLevels(options: SpeechFeedbackOptions): void;
-    protected showReadingStatus(options: ReadingShowOptions): void;
-    /**
-     * Called when reading should be stopped / aborted.
-     *
-     * If reading is/was active and is stopped, the "reading-stopped" event must be
-     * triggered:
-     *
-     * <pre>
-     * mmir.speechioManager.raise('reading-stopped')
-     * </pre>
+     * NOTE: overwrite for changing the default behavior.
      *
      * @param  {StopReadingOptions} data the data specifying, which TTS engine should be stopped
      */
-    protected stopReading(options: StopReadingOptions): void;
+    stopReading(options: StopReadingOptions): void;
     /**
-     * Called when speech input (ASR; recogintion) AND speech output (TTS; synthesis)
-     * should be stopped.
+     * Default implementation for `cancelSpeechIO`:
+     * cancel TTS reading and ASR input, i.e. `this.ttsCancel()` and `this.asrCancel(this.isPermanentCommandMode)`
+     *
+     * NOTE: overwrite for changing the default behavior.
      */
     cancelSpeechIO(): void;
 }

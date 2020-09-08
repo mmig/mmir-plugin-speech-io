@@ -1,21 +1,21 @@
 import { Subject, BehaviorSubject } from 'rxjs';
 import { PlayError, LogLevel, LogLevelNum } from 'mmir-lib';
-import { ShowSpeechStateOptions, SpeechFeedbackOptions, RecognitionEmma, UnderstandingEmma, ReadingOptions, StopReadingOptions, ReadingShowOptions, Cmd, TactileEmma, Emma, ASRError, TTSError } from './typings/';
+import { SpeechInputStateOptions, SpeechFeedbackOptions, RecognitionEmma, UnderstandingEmma, ReadingOptions, StopReadingOptions, ReadingStateOptions, Cmd, TactileEmma, Emma, ASRError, TTSError } from './typings/';
 import { IAppSettings } from './typings/';
 import { SpeechEventEmitter, WaitReadyOptions, ExtMmirModule } from './typings/';
 interface SpeechEventEmitterImpl<CmdImpl extends Cmd> extends SpeechEventEmitter<CmdImpl> {
-    showSpeechInputState: BehaviorSubject<ShowSpeechStateOptions>;
+    speechInputState: BehaviorSubject<SpeechInputStateOptions>;
     changeMicLevels: BehaviorSubject<SpeechFeedbackOptions>;
     waitReadyState: BehaviorSubject<WaitReadyOptions>;
-    showDictationResult: Subject<RecognitionEmma>;
-    determineSpeechCmd: Subject<RecognitionEmma>;
-    execSpeechCmd: Subject<UnderstandingEmma<CmdImpl>>;
+    dictationResult: Subject<RecognitionEmma>;
+    speechCommand: Subject<RecognitionEmma>;
+    commandAction: Subject<UnderstandingEmma<CmdImpl>>;
     cancelSpeechIO: Subject<void>;
     read: Subject<string | ReadingOptions>;
     stopReading: Subject<StopReadingOptions>;
-    showReadingStatus: BehaviorSubject<ReadingShowOptions>;
+    readingState: BehaviorSubject<ReadingStateOptions>;
     tactile: Subject<TactileEmma>;
-    unknown: Subject<Emma>;
+    tactileError: Subject<Emma>;
     asrError: Subject<ASRError>;
     ttsError: Subject<TTSError>;
     playError: Subject<PlayError>;
