@@ -183,7 +183,7 @@ import { ExtMmirModule } from '../typings/';
 //	}
 
   /** @memberOf Emma# */
-  function setSpeechRecognition(emmaData: Interpretation, _event: any, data: RecognitionData, keepExistingFunction?: boolean): void {
+  function setSpeechRecognition(emmaData: Interpretation, data: RecognitionData, keepExistingFunction?: boolean): void {
 
 //		emma.interpretation.value.recognition = {
 //				confidence: 0.0,
@@ -235,7 +235,7 @@ import { ExtMmirModule } from '../typings/';
   }
 
   /** @memberOf Emma# */
-  function setSpeechUnderstanding(emmaData: Interpretation, _event: any, data: UnderstandingData, keepExistingFunction?: boolean): void {
+  function setSpeechUnderstanding(emmaData: Interpretation, data: UnderstandingData, keepExistingFunction?: boolean): void {
 
 //		emma.interpretation.value.understanding = {
 //        id: nextId(),//number;		//INT "server-wide" ID
@@ -334,12 +334,12 @@ import { ExtMmirModule } from '../typings/';
 
         if(isRecognition(event, data)){
 
-          setSpeechRecognition(emma.interpretation, event, data);
+          setSpeechRecognition(emma.interpretation, data);
 
         }
         else if(isUnderstanding(event, data)){
 
-          setSpeechUnderstanding(emma.interpretation, event, data);
+          setSpeechUnderstanding(emma.interpretation, data);
 
         }
         else {
@@ -368,12 +368,12 @@ import { ExtMmirModule } from '../typings/';
       return false;
     }
 
-    setSpeechRecognition(emmaData: AnyEmma<CmdImpl>, event: any, data: RecognitionData, keepExistingFunction?: boolean): void {
-      setSpeechRecognition(emmaData.interpretation, event, data, keepExistingFunction);
+    setSpeechRecognition(emmaData: AnyEmma<CmdImpl>, data: RecognitionData, keepExistingFunction?: boolean): void {
+      setSpeechRecognition(emmaData.interpretation, data, keepExistingFunction);
     }
 
-    setSpeechUnderstanding(emmaData: AnyEmma<CmdImpl>, event: any, data: UnderstandingData, keepExistingFunction?: boolean): void {
-      setSpeechUnderstanding(emmaData.interpretation, event, data, keepExistingFunction);
+    setSpeechUnderstanding(emmaData: AnyEmma<CmdImpl>, data: UnderstandingData, keepExistingFunction?: boolean): void {
+      setSpeechUnderstanding(emmaData.interpretation, data, keepExistingFunction);
     }
 
     addTarget(emmaData: AnyEmma<CmdImpl>, target: any, isOverwrite?: boolean): AnyEmma<CmdImpl> {

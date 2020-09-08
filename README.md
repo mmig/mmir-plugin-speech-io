@@ -211,9 +211,99 @@ Configuration values:
    * @default false
    */
   inputCtrlAutoProceed?: boolean;
+
+  /**
+   * if enabled:
+   * the `mmir-service` will not raise an 'init' event upon intialization on the `mmir.dialog` instance.
+   *
+   * Otherwise, the `mmir-service` will raise an 'init' event with event data:
+   * ```
+   * {
+   *  appConfig: IAppSettings,
+   *  mmir: ExtMmirModule<CmdImpl>,
+   *  emma: EmmaUtil<CmdImpl>
+   * }
+   * ```
+   * This event and its data can be used in the `dialog.xml` state definition's inital state by
+   * defining a transition for the event `init` (see example).
+   *
+   * @default false
+   * @example
+   * <scxml xmlns="http://www.w3.org/2005/07/scxml" version="1.0"
+   *        profile="ecmascript" id="scxmlRoot" initial="AppStart">
+   * <state id="AppStart">
+   *   <!-- transition for init-event, which in this example will trigger state-change to "MainApp" -->
+   *   <transition event="init" target="MainApp">
+   *    <script>
+   *      // get event data contents:
+   *      var appConfig = _event.data.appConfig;
+   *      var mmir = _event.data.mmir;
+   *      var emmaUtil = _event.data.emma;
+   *      //... use them somehow (e.g. could be stored in data model variable)
+   */
+  preventDialogManagerInit?: boolean;
+
+  /**
+   * if a prompt is active (i.e. TTS is playing), when a new one is requested:
+   * cancel the current/active one (and read the new one)?
+   *
+   * If `false`, the the new prompt may be discarded, or cancel/replace the active one,
+   * depending on the `ReadOptions` of the new prompt.
+   *
+   * @default true
+   */
+  cancelOnNewPrompt?: boolean;
 }
 
 ```
+
+## Example Usage
+
+
+### `speechCommand`
+
+`speechCommand` will be triggered, if speech-input is in `command` mode, and an (stable) ASR result becomes available
+
+ 1. register for `speechCommand`
+    ```typescript
+    ...
+    vuiCtrl.ctrl.enterView(mmirService.speechEvents.speechCommand.subscribe(result => this.evalSemantics(result)));
+    ```
+
+ 2. parse ASR result in `speechCommand`, and create appropriate interpretation, and trigger `commandAction`
+    ```typescript
+    public evalSemantics(emma: RecognitionEmma){
+
+      const asrResult = this.mmir.emma._extractAsrData(emma);
+      const text = asrResult.text;
+
+      this.mmir.semantic.interpret(text, null, result => {
+
+        let semantic: any;
+        if(result.semantic != null) {
+          semantic = result.semantic;
+          semantic.phrase = text;
+          if(this._debugMsg) console.log("semantic : " + result.semantic);//DEBUG
+        }
+        else {
+
+          //create "no-match" semantic-object:
+          semantic = {
+            "NoMatch": {
+              "phrase": text
+            }
+          };
+        }
+
+        this.mmir.emma.setSpeechUnderstanding(emma, semantic);
+
+        // will trigger/emit commandAction:
+        this.mmir.speechioInput.raise("speech",  semantic);
+
+      });
+
+    }
+    ```
 
 [0]: https://github.com/mmig/mmir-plugin-speech-io
 [1]: https://www.npmjs.com/package/webpack

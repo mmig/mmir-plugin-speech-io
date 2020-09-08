@@ -3,7 +3,7 @@ import { Subject , BehaviorSubject } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 
 import { MediaManager, PlayError , LogLevel , LogLevelNum, IAudio , IWaitReadyImpl } from 'mmir-lib';
-import { ShowSpeechStateOptions, SpeechFeedbackOptions, RecognitionEmma, UnderstandingEmma , ReadingOptions , StopReadingOptions, ReadingShowOptions , Cmd , TactileEmma , Emma , ASRError, TTSError } from './typings/';
+import { SpeechInputStateOptions, SpeechFeedbackOptions, RecognitionEmma, UnderstandingEmma , ReadingOptions , StopReadingOptions, ReadingStateOptions , Cmd , TactileEmma , Emma , ASRError, TTSError } from './typings/';
 import { IAppSettings } from './typings/';
 
 import { EmmaUtil } from './util/EmmaUtil';
@@ -16,18 +16,18 @@ import { createConfigSettingsImpl } from './util/SettingsUtils';
 // var __mmir: MmirModule = mmir as MmirModule;
 
 interface SpeechEventEmitterImpl<CmdImpl extends Cmd> extends SpeechEventEmitter<CmdImpl> {
-    showSpeechInputState: BehaviorSubject<ShowSpeechStateOptions>;
+    speechInputState: BehaviorSubject<SpeechInputStateOptions>;
     changeMicLevels: BehaviorSubject<SpeechFeedbackOptions>;
     waitReadyState: BehaviorSubject<WaitReadyOptions>;
-    showDictationResult: Subject<RecognitionEmma>;
-    determineSpeechCmd: Subject<RecognitionEmma>;
-    execSpeechCmd: Subject<UnderstandingEmma<CmdImpl>>;
+    dictationResult: Subject<RecognitionEmma>;
+    speechCommand: Subject<RecognitionEmma>;
+    commandAction: Subject<UnderstandingEmma<CmdImpl>>;
     cancelSpeechIO: Subject<void>;
     read: Subject<string|ReadingOptions>;
     stopReading: Subject<StopReadingOptions>;
-    showReadingStatus: BehaviorSubject<ReadingShowOptions>;
+    readingState: BehaviorSubject<ReadingStateOptions>;
     tactile: Subject<TactileEmma>;
-    unknown: Subject<Emma>;
+    tactileError: Subject<Emma>;
     //TODO GuidedInput events? //guidedInput: Subject<{reset?: boolean, start?: boolean, context?: /*default: */ 'global' | 'control'}>// ORIG: 'resetGuidedInputForCurrentControl' | 'startGuidedInput' | 'resetGuidedInput'
     asrError: Subject<ASRError>;
     ttsError: Subject<TTSError>;
@@ -74,30 +74,30 @@ export class MmirService<CmdImpl extends Cmd> {
     }
 
     this.evt = {
-      'showSpeechInputState': new BehaviorSubject<ShowSpeechStateOptions>(
-          {state: false, mode: 'command', inputMode: ''}//<-initial state
-        ).pipe(distinctUntilChanged((state1: ShowSpeechStateOptions, state2: ShowSpeechStateOptions) => {
-          return state1.state === state2.state && state1.mode === state2.mode && state1.inputMode === state2.inputMode && state1.targetId === state2.targetId;
+      'speechInputState': new BehaviorSubject<SpeechInputStateOptions>(
+          {active: false, mode: 'command', inputMode: ''}//<-initial state
+        ).pipe(distinctUntilChanged((state1: SpeechInputStateOptions, state2: SpeechInputStateOptions) => {
+          return state1.active === state2.active && state1.mode === state2.mode && state1.inputMode === state2.inputMode && state1.targetId === state2.targetId;
         })),
       'changeMicLevels': new BehaviorSubject<SpeechFeedbackOptions>(
-          {isStart: false, state: false, mode: 'command', inputMode: ''}//<-initial state
+          {isStart: false, active: false, mode: 'command', inputMode: ''}//<-initial state
         ).pipe(distinctUntilChanged((state1: SpeechFeedbackOptions, state2: SpeechFeedbackOptions) => {
-          return state1.isStart === state2.isStart && state1.state === state2.state && state1.mode === state2.mode && state1.inputMode === state2.inputMode && state1.targetId === state2.targetId;
+          return state1.isStart === state2.isStart && state1.active === state2.active && state1.mode === state2.mode && state1.inputMode === state2.inputMode && state1.targetId === state2.targetId;
         })),
       'waitReadyState': new BehaviorSubject<WaitReadyOptions>(
           {state: 'ready', module: ''}//<-initial state
         ).pipe(distinctUntilChanged((state1: WaitReadyOptions, state2: WaitReadyOptions) => {
           return state1.state === state2.state && state1.module === state2.module;
         })),
-      'showDictationResult': new Subject<RecognitionEmma>(),
-      'determineSpeechCmd': new Subject<RecognitionEmma>(),
-      'execSpeechCmd': new Subject<UnderstandingEmma<CmdImpl>>(),
+      'dictationResult': new Subject<RecognitionEmma>(),
+      'speechCommand': new Subject<RecognitionEmma>(),
+      'commandAction': new Subject<UnderstandingEmma<CmdImpl>>(),
       'cancelSpeechIO': new Subject<void>(),
       'read': new Subject<string|ReadingOptions>(),
       'stopReading': new Subject<StopReadingOptions>(),
-      'showReadingStatus': new BehaviorSubject<ReadingShowOptions>(
+      'readingState': new BehaviorSubject<ReadingStateOptions>(
           {active: false, contextId: ''}//<-initial state
-        ).pipe(distinctUntilChanged((state1: ReadingShowOptions, state2: ReadingShowOptions) => {
+        ).pipe(distinctUntilChanged((state1: ReadingStateOptions, state2: ReadingStateOptions) => {
           if(state1.test || state2.test){
             return false;
           }
@@ -107,7 +107,7 @@ export class MmirService<CmdImpl extends Cmd> {
         })),
 
       'tactile': new Subject<TactileEmma>(),
-      'unknown': new Subject<Emma>(),
+      'tactileError': new Subject<Emma>(),
 
       //TODO GuidedInput events?
       //'guidedInput': {reset?: boolean, start?: boolean, context?: /*default: */ 'global' | 'control'}// ORIG: 'resetGuidedInputForCurrentControl' | 'startGuidedInput' | 'resetGuidedInput'

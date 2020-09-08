@@ -1,8 +1,8 @@
 
 import { Subscription , BehaviorSubject } from 'rxjs';
 
-import { RecognitionEmma , UnderstandingEmma , ShowSpeechStateOptions, ReadingShowOptions , StopReadingOptions, SpeechFeedbackOptions , Cmd } from '../typings/';
-import { SPEECH_ACTIVE , READ_ACTIVE } from '../consts';
+import { RecognitionEmma , UnderstandingEmma , SpeechInputStateOptions, ReadingStateOptions , StopReadingOptions, Cmd } from '../typings/';
+import { SPEECH_ACTIVE , READ_ACTIVE , PLUGIN_ID } from '../consts';
 import { triggerClickFeedback , FeedbackOption } from '../io/HapticFeedback';
 import { PromptReader } from '../io/PromptReader';
 import { SpeechInputController } from '../ctrl/SpeechInputController';
@@ -110,15 +110,15 @@ export class VoiceUIController<CmdImpl extends Cmd> {
       this._initialized = true;
 
       this.prompt = new PromptReader(this.speech, this.mmir.media);
-      this.prompt.cancelOnNew = true;//FIXME retrieve from settings?
+      this.prompt.cancelOnNew = this.mmir.conf.getBoolean([PLUGIN_ID, 'cancelOnNewPrompt'], true);
       this.speechIn = new SpeechInputController(mmirProvider, this.dictTargetHandler);
       this.speechOut = new SpeechOutputController(this.prompt, mmirProvider);
       this._speechEventSubscriptions = SubscriptionUtil.subscribe(mmirProvider.speechEvents, [
-        'showSpeechInputState',
-        'changeMicLevels',
+        'speechInputState',
+        // 'changeMicLevels',
         'cancelSpeechIO',
         'stopReading',
-        'showReadingStatus'
+        'readingState'
         //'resetGuidedInputForCurrentControl' , 'startGuidedInput' , 'resetGuidedInput' , 'isDictAutoProceed'
       ], this);
 
@@ -366,32 +366,6 @@ export class VoiceUIController<CmdImpl extends Cmd> {
     }
   }
 
-  public evalSemantics(asr_result: string){//TODO use emma-recognition event as input
-
-    this.mmir.semantic.interpret(asr_result, null, result => {
-
-      let semantic: any;
-      if(result.semantic != null) {
-        semantic = result.semantic;
-        semantic.phrase = asr_result;
-        if(this._debugMsg) console.log("semantic : " + result.semantic);//DEBUG
-      }
-      else {
-
-        //create "no-match" semantic-object:
-        semantic = {
-          "NoMatch": {
-            "phrase": asr_result
-          }
-        };
-      }
-      //TODO create emma-understanding event
-      this.mmir.speechioInput.raise("speech_input_event",  semantic);
-
-    });
-
-  }
-
   public triggerTouchFeedback(_event: MouseEvent | TouchEvent | RecognitionEmma | UnderstandingEmma<CmdImpl> | EventLike, feedbackOptions?: FeedbackOption){
     triggerClickFeedback(feedbackOptions);
   }
@@ -508,15 +482,15 @@ export class VoiceUIController<CmdImpl extends Cmd> {
   }
 
   private updateDictationOverlayToCurrentState(){
-      const subj = this._mmirProvider.speechEvents.showSpeechInputState as any;
+      const subj = this._mmirProvider.speechEvents.speechInputState as any;
       if(subj && subj.source && subj.source.value){
         this.updateDictationOverlay(subj.source.value);
       }
   }
 
-  private updateDictationOverlay(state: ShowSpeechStateOptions){
+  private updateDictationOverlay(state: SpeechInputStateOptions){
 
-    this.updateCurrentDictationTarget(state.targetId, state.state);
+    this.updateCurrentDictationTarget(state.targetId, state.active);
 
     if(!this.dictationOverlay || state.mode !== 'dictation'){
       return;
@@ -525,11 +499,11 @@ export class VoiceUIController<CmdImpl extends Cmd> {
     let handler: DictationHandler = this.dictTargetHandler.get(state.targetId);
     if(!handler){
       if(this._debugMsg) console.log('WARN: no dictation handler for dicatation target '+state.targetId);
-      if(!state.state){
+      if(!state.active){
         this.setSpeechOverlay(null, this.dictationOverlay, false);
       }
     } else {
-      this.setSpeechOverlay(handler.activationCtrl, this.dictationOverlay, state.state);
+      this.setSpeechOverlay(handler.activationCtrl, this.dictationOverlay, state.active);
     }
   }
 
@@ -637,13 +611,13 @@ export class VoiceUIController<CmdImpl extends Cmd> {
   }
 
   private updateReadOverlayToCurrentState(){
-      const subj = this._mmirProvider.speechEvents.showReadingStatus as any;
+      const subj = this._mmirProvider.speechEvents.readingState as any;
       if(subj && subj.source && subj.source.value){
         this.updateReadOverlay(subj.source.value, this.readTargetHandler.activeHandler);
       }
   }
 
-  private updateReadOverlay(state: ReadingShowOptions, targetId?: string | ReadHandler){
+  private updateReadOverlay(state: ReadingStateOptions, targetId?: string | ReadHandler){
 
     let active: boolean = state.active;
     if(!active && (state as StopReadingOptions).continuesReading){
@@ -722,46 +696,17 @@ export class VoiceUIController<CmdImpl extends Cmd> {
   // }
 
 
-  protected showSpeechInputState(options: ShowSpeechStateOptions): void {
-    if(this._debugMsg) console.log('showSpeechInputState -> ', options);
-    this._asrActive = options.state;
+  protected speechInputState(options: SpeechInputStateOptions): void {
+    if(this._debugMsg) console.log('speechInputState -> ', options);
+    this._asrActive = options.active;
     this.updateDictationOverlay(options);
     this.asrActiveChange.next(this._asrActive);
   };
 
-  /**
-   * If <code>options.isStart === true</code>:
-   * Called when GUI should show indicator for Microphone input levels.
-   *
-   * This should also initialize/start listening to mic-levels changes, e.g.
-   * register a listener:
-   * <pre>
-   * mmir.MediaManager.on('miclevelchanged', miclevelsChandeHandler);
-   * </pre>
-   * where miclevelsChandeHandler:
-   *    function(micLevel: number)
-   *
-   *
-   * If <code>options.isStart === false</code>:
-   * Called when GUI should hide/deactivate indicator for Microphone input levels.
-   *
-   * This should destroy/free resource that were set up for visualizing mic-level
-   * changes, e.g. could stop listening to mic-level changes, i.e. unregister listener:
-   * <pre>
-   * mmir.MediaManager.off('miclevelchanged', miclevelsChandeHandler);
-   * </pre>
-   *
-   * @param {SpeechFeedbackOptions} options
-   *              the data specifying the (changed) speech input state etc.
-   */
-  protected changeMicLevels(options: SpeechFeedbackOptions): void {
-    if(this._debugMsg) console.log('changeMicLevels -> ', options);
-  };
-
   ////////////////////////////////////////// Speech Output Event Handlers ///////////////////////
 
-  protected showReadingStatus(options: ReadingShowOptions): void {
-    if(this._debugMsg) console.log('showReadingStatus -> ', options);
+  protected readingState(options: ReadingStateOptions): void {
+    if(this._debugMsg) console.log('readingState -> ', options);
 
     this.prompt.setActive(options.active);
     this.updateReadOverlay(options, this.readTargetHandler.activeHandler);
@@ -770,18 +715,14 @@ export class VoiceUIController<CmdImpl extends Cmd> {
   };
 
   /**
-   * Called when reading should be stopped / aborted.
+   * Default implementation for `stopReading` (triggered by"reading-stopped" event):
+   * cancel TTS reading, i.e. `this.ttsCancel(options)`
    *
-   * If reading is/was active and is stopped, the "reading-stopped" event must be
-   * triggered:
-   *
-   * <pre>
-   * mmir.speechioManager.raise('reading-stopped')
-   * </pre>
+   * NOTE: overwrite for changing the default behavior.
    *
    * @param  {StopReadingOptions} data the data specifying, which TTS engine should be stopped
    */
-  protected stopReading(options: StopReadingOptions): void {
+  public stopReading(options: StopReadingOptions): void {
     if(this._debugMsg) console.log('stopReading -> ', options);
     //NOTE raising 'reading-stopped' etc. is handled in prompt.cancel()
     this.ttsCancel(options);
@@ -789,8 +730,10 @@ export class VoiceUIController<CmdImpl extends Cmd> {
 
 
   /**
-   * Called when speech input (ASR; recogintion) AND speech output (TTS; synthesis)
-   * should be stopped.
+   * Default implementation for `cancelSpeechIO`:
+   * cancel TTS reading and ASR input, i.e. `this.ttsCancel()` and `this.asrCancel(this.isPermanentCommandMode)`
+   *
+   * NOTE: overwrite for changing the default behavior.
    */
   public cancelSpeechIO(): void {
     if(this._debugMsg) console.log('cancelSpeechIO -> ()');

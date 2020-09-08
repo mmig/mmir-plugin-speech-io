@@ -230,4 +230,15 @@ export interface SpeechIoPluginConfigurationBaseEntry {
    *      //... use them somehow (e.g. could be stored in data model variable)
    */
   preventDialogManagerInit?: boolean;
+
+  /**
+   * if a prompt is active (i.e. TTS is playing), when a new one is requested:
+   * cancel the current/active one (and read the new one)?
+   *
+   * If `false`, the the new prompt may be discarded, or cancel/replace the active one,
+   * depending on the `ReadOptions` of the new prompt.
+   *
+   * @default true
+   */
+  cancelOnNewPrompt?: boolean;
 }

@@ -1,4 +1,4 @@
-import type { Cmd , ShowSpeechStateOptions , SpeechFeedbackOptions , RecognitionEmma , UnderstandingEmma , ReadingOptions , StopReadingOptions , ReadingShowOptions , TactileEmma, Emma, Logger } from './';
+import type { Cmd , SpeechInputStateOptions , SpeechFeedbackOptions , RecognitionEmma , UnderstandingEmma , ReadingOptions , StopReadingOptions , ReadingStateOptions , TactileEmma, Emma, Logger } from './';
 
 import type { Observable , Subject } from 'rxjs';
 
@@ -32,32 +32,68 @@ export interface TTSError {
   error: string | Error | any;
 }
 
-export type SpeechEventName = 'showSpeechInputState' |                  //ISpeechState
-                        'changeMicLevels' | 'waitReadyState' |          //ISpeechFeedback
-                        'showDictationResult' |                         //ISpeechDictate
-                        'determineSpeechCmd' | 'execSpeechCmd' |        //ISpeechCommand
-                        'cancelSpeechIO' |                              //ISpeechInputProcessor
-                        'read' | 'stopReading' | 'showReadingStatus' |  //ISpeechOutput
-                        'playError' |                                   // rejected audio.play() promise (e.g. due to auto-play policy -> because user did not interact yet with page)
+export type SpeechEventName = 'speechInputState' |                  //ISpeechState
+                        'changeMicLevels' | 'waitReadyState' |      //ISpeechFeedback
+                        'dictationResult' |                         //ISpeechDictate
+                        'speechCommand' | 'commandAction' |    //ISpeechCommand
+                        'cancelSpeechIO' |                          //ISpeechInputProcessor
+                        'read' | 'stopReading' | 'readingState' |   //ISpeechOutput
+                        'playError' |                               // rejected audio.play() promise (e.g. due to auto-play policy -> because user did not interact yet with page)
+                        'asrError' | 'ttsError' |                   // errors during ASR and/or TTS
+                        'tactile' | 'tactileError' |                      // tactile and raw tactile (i.e. tactileError) EMMA events
                         'resetGuidedInputForCurrentControl' | 'startGuidedInput' | 'resetGuidedInput' | 'isDictAutoProceed' //IGuidedSpeechInput
                         ;
 
 export interface SpeechEventEmitter<CmdImpl extends Cmd> {
-    showSpeechInputState: Observable<ShowSpeechStateOptions>;
+    /** notifys changes for speech-input state (i.e. recording started / stopped etc) */
+    speechInputState: Observable<SpeechInputStateOptions>;
+    /** notifys changes for microphone-levels */
     changeMicLevels: Observable<SpeechFeedbackOptions>;
+    /** notifys changes regarding ready-wait state (i.e. when ASR or TTS are (temporarily) preparing input/output) */
     waitReadyState: Observable<WaitReadyOptions>;
-    showDictationResult: Observable<RecognitionEmma>;
-    determineSpeechCmd: Observable<RecognitionEmma>;
-    execSpeechCmd: Observable<UnderstandingEmma<CmdImpl>>;
-    cancelSpeechIO: Observable<void>;
+    /** is triggered when new ARS results become available in `dication` mode */
+    dictationResult: Observable<RecognitionEmma>;
+    /** is triggered when new (stable) ARS results become available in `command` mode */
+    speechCommand: Observable<RecognitionEmma>;
+    /** is triggered when new actions for command interpretation(s) have been processed */
+    commandAction: Observable<UnderstandingEmma<CmdImpl>>;
+    /** is triggered when a prompt should be read */
     read: Observable<string|ReadingOptions>;
+    /** notifys changes for speech-output i.e. reading state (i.e. reading started / stopped etc) */
+      readingState: Observable<ReadingStateOptions>;
+    /**
+     * is triggered when speech input and output (i.e. ASR and TTS) should be canceled
+     *
+     * @see default implementation [[VoiceUiController.cancelSpeechIO]]
+     */
+    cancelSpeechIO: Observable<void>;
+    /**
+     * is triggered when current prompt should be canceled
+     *
+     * @see default implementation [[VoiceUiController.stopReading]]
+     */
     stopReading: Observable<StopReadingOptions>;
-    showReadingStatus: Observable<ReadingShowOptions>;
     //'resetGuidedInputForCurrentControl' | 'startGuidedInput' | 'resetGuidedInput' | 'isDictAutoProceed'
+
+    /** is triggered when a tactile interaction occured (e.g. via [[VoiceUiController.handleClick]]) */
     tactile: Observable<TactileEmma>;
-    unknown: Observable<Emma>;
+    /** is triggered when an unknown (emma) interaction occured */
+    tactileError: Observable<Emma>;
+    /** is triggered when an ASR error occured */
     asrError: Observable<ASRError>;
+    /** is triggered when an TTS error occured */
     ttsError: Observable<TTSError>;
+    /**
+     * is triggered when an audio play error occured:
+     *
+     * a special case for this is, when the execution environment (e.g. browser)
+     * prohibits playing a sound or TTS audio due to the fact that the user did
+     * not yet interact explicitly with the application (i.e. "supressing auto play").
+     *
+     * In this case, the application could show an error dialog/overlay that explicitly
+     * forces the user to interact with the application and thus enable playing audio
+     * for the future.
+     */
     playError: Observable<PlayError>;
 }
 
