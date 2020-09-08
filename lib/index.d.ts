@@ -5,4 +5,4 @@ export { DictationTarget } from './io/SpeechDictation';
 export { PromptReader } from './io/PromptReader';
 export { EmmaUtil } from './util/EmmaUtil';
 export { SubscriptionUtil } from './util/SubscriptionUtil';
-export { raiseInternal as raiseStateInternal, createInstance as createStateManager } from './util/SpeechIoManager';
+export { raiseInternal as raiseStateInternal, createInstance as createStateManager, upgrade as createEmitFunction } from './util/SpeechIoManager';

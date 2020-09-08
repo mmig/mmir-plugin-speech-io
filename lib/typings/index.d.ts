@@ -539,9 +539,9 @@ export interface ISpeechState {
 
   /**
    * Called when GUI should update visual feedback for current Speech Input state.
-   * @param {ShowSpeechStateOptions} options the data specifying the (changed) speech input state etc.
+   * @param {SpeechInputStateOptions} options the data specifying the (changed) speech input state etc.
    */
-  showSpeechInputState(options: ShowSpeechStateOptions): void;
+  speechInputState(options: SpeechInputStateOptions): void;
 }
 
 export interface ISpeechFeedback {
@@ -584,7 +584,7 @@ export interface ISpeechDictate {
    * @param  {RecognitionEmma} emma the EMMA event contain an ASR result(s) from
    *                                 speech recognition.
    */
-  showDictationResult(asrEmmaEvent: RecognitionEmma): void;
+  dictationResult(asrEmmaEvent: RecognitionEmma): void;
 }
 
 export interface ISpeechCommand {
@@ -608,7 +608,7 @@ export interface ISpeechCommand {
    * @param  {RecognitionEmma} emma the EMMA event contain an ASR result(s) from
    *                                 speech recognition.
    */
-  determineSpeechCmd(asrEmmaEvent: RecognitionEmma): void;
+  speechCommand(asrEmmaEvent: RecognitionEmma): void;
   /**
    * Called for "applying" an understood command.
    *
@@ -626,7 +626,7 @@ export interface ISpeechCommand {
    * @param  {semanticEmmaEvent} emma the EMMA event contain an understanding result with a list
    *                                    understood Cmd(s)
    */
-  execSpeechCmd<CmdImpl extends Cmd>(semanticEmmaEvent: UnderstandingEmma<CmdImpl>): void;
+  commandAction<CmdImpl extends Cmd>(semanticEmmaEvent: UnderstandingEmma<CmdImpl>): void;
 
 }
 
@@ -691,9 +691,9 @@ export interface ISpeechOutput {
    * For options.active === false, this function should stop the read-feedback
    * (if some feedback was started).
    *
-   * @param  {ReadingShowOptions} options the data for updating the reading status feedback
+   * @param  {ReadingStateOptions} options the data for updating the reading status feedback
    */
-  showReadingStatus(options: ReadingShowOptions): void;
+  readingState(options: ReadingStateOptions): void;
 
 }
 
@@ -720,14 +720,14 @@ export interface IGuidedSpeechInput {
 export type SpeechMode = 'command' | 'dictation';//TODO shorten these (need to change SCXML): 'cmd' | 'dict'
 export type SpeechInputMode = '' | 'guided';// '' (DEFAULT) | 'guided' //TODO should this be a 3rd type for SpeechMode? would need to change SCXML / utils!
 
-export interface ShowSpeechStateOptions {
-  state: boolean;// is active/inactive
+export interface SpeechInputStateOptions {
+  active: boolean;// is active/inactive
   mode: SpeechMode;
   inputMode: SpeechInputMode;	// '' (default) | 'guided'
   targetId?: any;//target-id for GUI widget (which should show/update its Speech State feedback)
 }
 
-export interface SpeechFeedbackOptions extends ShowSpeechStateOptions {
+export interface SpeechFeedbackOptions extends SpeechInputStateOptions {
   //indicates that mic-levels feedback should be initialized (and possibly started) now
   isStart?: boolean;
 }
@@ -770,14 +770,14 @@ export interface ReadingOptions {
   cancelActivePrompts?: boolean;
 }
 
-export interface ReadingShowOptions extends ReadingOptions {
+export interface ReadingStateOptions extends ReadingOptions {
   /**context for reading target (may also be used for selecting reading target/text)*/
   contextId: any;
   /**if reading is active or inactive*/
   active: boolean;
 }
 
-export interface StopReadingOptions extends ReadingShowOptions {
+export interface StopReadingOptions extends ReadingStateOptions {
 
   /**when guided speech input is active: indicates that speech-guidance should be canceled*/
   cancelGuidance?: boolean;
@@ -966,7 +966,7 @@ export interface Cmd {
 
 
 
-import type { Observable } from 'rxjs';
+import type { Observable , Subject } from 'rxjs';
 
 import type { MmirModule , DialogManager, InputManager , DialogEngine , PlayError } from 'mmir-lib';
 import type { EmmaUtil } from '../util/EmmaUtil';
@@ -998,32 +998,68 @@ export interface TTSError {
   error: string | Error | any;
 }
 
-export type SpeechEventName = 'showSpeechInputState' |                  //ISpeechState
-                        'changeMicLevels' | 'waitReadyState' |          //ISpeechFeedback
-                        'showDictationResult' |                         //ISpeechDictate
-                        'determineSpeechCmd' | 'execSpeechCmd' |        //ISpeechCommand
-                        'cancelSpeechIO' |                              //ISpeechInputProcessor
-                        'read' | 'stopReading' | 'showReadingStatus' |  //ISpeechOutput
-                        'playError' |                                   // rejected audio.play() promise (e.g. due to auto-play policy -> because user did not interact yet with page)
+export type SpeechEventName = 'speechInputState' |                  //ISpeechState
+                        'changeMicLevels' | 'waitReadyState' |      //ISpeechFeedback
+                        'dictationResult' |                         //ISpeechDictate
+                        'speechCommand' | 'commandAction' |    //ISpeechCommand
+                        'cancelSpeechIO' |                          //ISpeechInputProcessor
+                        'read' | 'stopReading' | 'readingState' |   //ISpeechOutput
+                        'playError' |                               // rejected audio.play() promise (e.g. due to auto-play policy -> because user did not interact yet with page)
+                        'asrError' | 'ttsError' |                   // errors during ASR and/or TTS
+                        'tactile' | 'tactileError' |                      // tactile and raw tactile (i.e. tactileError) EMMA events
                         'resetGuidedInputForCurrentControl' | 'startGuidedInput' | 'resetGuidedInput' | 'isDictAutoProceed' //IGuidedSpeechInput
                         ;
 
 export interface SpeechEventEmitter<CmdImpl extends Cmd> {
-    showSpeechInputState: Observable<ShowSpeechStateOptions>;
+    /** notifys changes for speech-input state (i.e. recording started / stopped etc) */
+    speechInputState: Observable<SpeechInputStateOptions>;
+    /** notifys changes for microphone-levels */
     changeMicLevels: Observable<SpeechFeedbackOptions>;
+    /** notifys changes regarding ready-wait state (i.e. when ASR or TTS are (temporarily) preparing input/output) */
     waitReadyState: Observable<WaitReadyOptions>;
-    showDictationResult: Observable<RecognitionEmma>;
-    determineSpeechCmd: Observable<RecognitionEmma>;
-    execSpeechCmd: Observable<UnderstandingEmma<CmdImpl>>;
-    cancelSpeechIO: Observable<void>;
+    /** is triggered when new ARS results become available in `dication` mode */
+    dictationResult: Observable<RecognitionEmma>;
+    /** is triggered when new (stable) ARS results become available in `command` mode */
+    speechCommand: Observable<RecognitionEmma>;
+    /** is triggered when new actions for command interpretation(s) have been processed */
+    commandAction: Observable<UnderstandingEmma<CmdImpl>>;
+    /** is triggered when a prompt should be read */
     read: Observable<string|ReadingOptions>;
+    /** notifys changes for speech-output i.e. reading state (i.e. reading started / stopped etc) */
+      readingState: Observable<ReadingStateOptions>;
+    /**
+     * is triggered when speech input and output (i.e. ASR and TTS) should be canceled
+     *
+     * @see default implementation [[VoiceUiController.cancelSpeechIO]]
+     */
+    cancelSpeechIO: Observable<void>;
+    /**
+     * is triggered when current prompt should be canceled
+     *
+     * @see default implementation [[VoiceUiController.stopReading]]
+     */
     stopReading: Observable<StopReadingOptions>;
-    showReadingStatus: Observable<ReadingShowOptions>;
     //'resetGuidedInputForCurrentControl' | 'startGuidedInput' | 'resetGuidedInput' | 'isDictAutoProceed'
+
+    /** is triggered when a tactile interaction occured (e.g. via [[VoiceUiController.handleClick]]) */
     tactile: Observable<TactileEmma>;
-    unknown: Observable<Emma>;
+    /** is triggered when an unknown (emma) interaction occured */
+    tactileError: Observable<Emma>;
+    /** is triggered when an ASR error occured */
     asrError: Observable<ASRError>;
+    /** is triggered when an TTS error occured */
     ttsError: Observable<TTSError>;
+    /**
+     * is triggered when an audio play error occured:
+     *
+     * a special case for this is, when the execution environment (e.g. browser)
+     * prohibits playing a sound or TTS audio due to the fact that the user did
+     * not yet interact explicitly with the application (i.e. "supressing auto play").
+     *
+     * In this case, the application could show an error dialog/overlay that explicitly
+     * forces the user to interact with the application and thus enable playing audio
+     * for the future.
+     */
     playError: Observable<PlayError>;
 }
 
@@ -1037,14 +1073,25 @@ export interface EmmaModule<CmdImpl extends Cmd> {
   emma: EmmaUtil<CmdImpl>;
 }
 
-export interface SpeechIoManager<CmdImpl extends Cmd> extends DialogManager, EmmaModule<CmdImpl> {
+
+
+export interface EventManager {
   emit: (actionName: string, data?: any) => any;
-  eventEmitter: SpeechEventEmitter<CmdImpl>;
-  _isDebugVui: boolean;
+  eventEmitter: {[eventName: string]: Subject<any>} | SpeechEventEmitter<any>;
+  _log: Logger;//FIXME when updating to mmir >= v6.2: remove
 }
 
-export interface ExtStateEngine extends DialogEngine {
+export interface SpeechIoManager<CmdImpl extends Cmd> extends DialogManager, EmmaModule<CmdImpl>, EventManager {
+  _isDebugVui: boolean;
+  eventEmitter: SpeechEventEmitter<CmdImpl>;
+}
+
+export interface ExtStateEngine extends DialogEngine {//FIXME when updating to mmir >= v6.2: change "extends DialogEngine" -> "extends StateEngine"
   worker: any;
+}
+
+export interface ExtDialogManager extends DialogManager, EmmaModule<any>, EventManager {
+  eventEmitter: {[eventName: string]: Subject<any>};
 }
 
 export interface ExtMmirModule<CmdImpl extends Cmd> extends MmirModule, EmmaModule<CmdImpl> {
@@ -1052,6 +1099,10 @@ export interface ExtMmirModule<CmdImpl extends Cmd> extends MmirModule, EmmaModu
   speechioEngine: ExtStateEngine;
   speechioInput: InputManager;
   speechioInputEngine: ExtStateEngine;
+
+  dialog: ExtDialogManager;
+  dialogEngine: ExtStateEngine;
+  inputEngine: ExtStateEngine;
 }
 
 export interface InputOutputOption extends FeedbackOption {
@@ -1066,18 +1117,90 @@ export interface InputOutputOption extends FeedbackOption {
 }
 
 
+import type { LogLevel , LogLevelNum } from 'mmir-lib';
+
 export type ManagerFactory = () => StateManager;
 
-export interface StateManager {
+export interface StateManager {//FIXME  when updating to mmir >= v6.2: remove/replace with typing from mmir-lib
   raise: (eventName: string, data?: any) => void;
   _init: (moduleId: string, config: StateManagerConfig, isRegisterEngine?: boolean) => Promise<{manager: StateManager, engine: any}>;
+  _log: Logger;
 }
 
-export interface StateManagerConfig {
+export interface StateManagerConfig {//FIXME  when updating to mmir >= v6.2: remove/replace with typing from mmir-lib
   modelUri: string;
   mode?: 'simple' | 'extended';
   engineId?: string;
   logLevel?: number | string;
+}
+
+export interface Logger {//FIXME  when updating to mmir >= v6.2: remove/replace with typing from mmir-lib
+
+	verbose(msg: string): void;
+	verbose(className: string, msg?: string): void;
+	verbose(className: string, funcName?: string, msg?: string): void;
+	v(msg: string): void;
+	v(className: string, msg?: string): void;
+	v(className: string, funcName?: string, msg?: string): void;
+
+	debug(msg: string): void;
+	debug(className: string, msg?: string): void;
+	debug(className: string, funcName?: string, msg?: string): void;
+	d(msg: string): void;
+	d(className: string, msg?: string): void;
+	d(className: string, funcName?: string, msg?: string): void;
+
+	log(msg: string): void;
+	log(className: string, msg?: string): void;
+	log(className: string, funcName?: string, msg?: string): void;
+	l(msg: string): void;
+	l(className: string, msg?: string): void;
+	l(className: string, funcName?: string, msg?: string): void;
+
+	info(msg: string): void;
+	info(className: string, msg?: string): void;
+	info(className: string, funcName?: string, msg?: string): void;
+	i(msg: string): void;
+	i(className: string, msg?: string): void;
+	i(className: string, funcName?: string, msg?: string): void;
+
+	warn(msg: string): void;
+	warn(className: string, msg?: string): void;
+	warn(className: string, funcName?: string, msg?: string): void;
+	w(msg: string): void;
+	w(className: string, msg?: string): void;
+	w(className: string, funcName?: string, msg?: string): void;
+
+	error(msg: string, error?: any): void;
+	error(className: string, msg?: string, error?: any): void;
+	error(className: string, funcName?: string, msg?: string, error?: any): void;
+	e(msg: string, error?: any): void;
+	e(className: string, msg?: string, error?: any): void;
+	e(className: string, funcName?: string, msg?: string, error?: any): void;
+
+	critical(msg: string, error?: any): void;
+	critical(className: string, msg?: string, error?: any): void;
+	critical(className: string, funcName?: string, msg?: string, error?: any): void;
+	c(msg: string, error?: any): void;
+	c(className: string, msg?: string, error?: any): void;
+	c(className: string, funcName?: string, msg?: string, error?: any): void;
+
+	getLevel(): LogLevelNum;
+	setLevel(loggingLevel: LogLevel | LogLevelNum): void;
+
+	isCritical(): boolean;
+	isDebug(): boolean;
+	isDisabled(): boolean;
+	isError(): boolean;
+	isInfo(): boolean;
+	isVerbose(): boolean;
+	isWarn(): boolean;
+	isc(): boolean;
+	isd(): boolean;
+	ise(): boolean;
+	isi(): boolean;
+	isv(): boolean;
+	isw(): boolean;
 }
 
 

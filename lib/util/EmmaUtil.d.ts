@@ -12,8 +12,8 @@ export declare class EmmaUtil<CmdImpl extends Cmd> {
     toEmma(event: UnderstandingEmma<CmdImpl>, data?: any): UnderstandingEmma<CmdImpl>;
     isTactileEvent(emmaData: AnyEmma<CmdImpl>): boolean;
     isSpeechEvent(emmaData: AnyEmma<CmdImpl>): boolean;
-    setSpeechRecognition(emmaData: AnyEmma<CmdImpl>, event: any, data: RecognitionData, keepExistingFunction?: boolean): void;
-    setSpeechUnderstanding(emmaData: AnyEmma<CmdImpl>, event: any, data: UnderstandingData, keepExistingFunction?: boolean): void;
+    setSpeechRecognition(emmaData: AnyEmma<CmdImpl>, data: RecognitionData, keepExistingFunction?: boolean): void;
+    setSpeechUnderstanding(emmaData: AnyEmma<CmdImpl>, data: UnderstandingData, keepExistingFunction?: boolean): void;
     addTarget(emmaData: AnyEmma<CmdImpl>, target: any, isOverwrite?: boolean): AnyEmma<CmdImpl>;
     addProperty(emmaData: AnyEmma<CmdImpl>, name: string, value: any, isOverwrite?: boolean): AnyEmma<CmdImpl>;
     getTarget(emmaData: AnyEmma<CmdImpl>): any;

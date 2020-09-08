@@ -1,5 +1,5 @@
 import { Observable, Subscription } from 'rxjs';
-import { RecognitionEmma, UnderstandingEmma, RecognitionType, SpeechRecognitionResult } from '../typings/';
+import { RecognitionEmma, RecognitionType, SpeechRecognitionResult } from '../typings/';
 import { EmmaUtil } from '../util/EmmaUtil';
 import { DictationTargetHandler, DictationHandler, DictationTarget, CurrentInputData, SelectionMode } from '../io/SpeechDictation';
 import { SelectionUtil } from '../util/SelectionUtil';
@@ -69,46 +69,8 @@ export declare class SpeechInputController {
      * @param  {RecognitionEmma} emma the EMMA event contain an ASR result(s) from
      *                                 speech recognition.
      */
-    showDictationResult(asrEmmaEvent: RecognitionEmma): void;
+    dictationResult(asrEmmaEvent: RecognitionEmma): void;
     protected _processDictationResult(asrEmmaEvent: RecognitionEmma): RecognitionEmma;
-    /**
-     * Called for determining the understanding of an ASR result.
-     *
-     * E.g. apply a grammar to the ASR text, or keyword spotting, or some other
-     * kind of "natural language understanding" (NLU).
-     *
-     * With the NLU result, this function should invoke
-     * <pre>
-     * InputManager.raise('speech', understandingResult);
-     * </pre>
-     * for the understood ASR, where understandingResult should have type UnderstandigResult.
-     *
-     * NOTE: for "not understood" ASR text, there could be a corresponding Command
-     *       (i.e. calling InputManager.raise('speech', notUnderstoodCmd)) or some
-     *       other form of feedback/processing should be triggered.
-     *
-     * @param  {RecognitionEmma} emma the EMMA event contain an ASR result(s) from
-     *                                 speech recognition.
-     */
-    determineSpeechCmd(asrEmmaEvent: RecognitionEmma): void;
-    /**
-     * Called for "applying" an understood command.
-     *
-     * This function should select the "best" command(s) from semanticEmmaEvent and
-     * execute it/them.
-     *
-     * When selecting / before executing, it should be checked, if the commands can
-     * actually be executed.
-     *
-     * If no "best" command can be selected/executed, this function should instead invoke
-     * a diambiguation dialog (when there are some potential, but no clear command candiates)
-     * or a feedback should be triggerd, stating that there was no corresponding command
-     * found for the user input.
-     *
-     * @param  {semanticEmmaEvent} emma the EMMA event contain an understanding result with a list
-     *                                    understood Cmd(s)
-     */
-    execSpeechCmd(semanticEmmaEvent: UnderstandingEmma<any>): void;
     protected doHandleDictationResult(asrEmmaEvent: RecognitionEmma, inputElem: DictationHandler): void;
     protected _printCurrentInput(targetId: string, isCommitAutoComplete: boolean, inputElem: DictationHandler): void;
     /**
