@@ -1,7 +1,7 @@
 import { Subject } from 'rxjs';
 import { MmirModule, DialogManager } from 'mmir-lib';
 import { StateManager, ManagerFactory } from '../typings/';
-import { ExtMmirModule , SpeechIoManager , ExtStateEngine } from '../typings/';
+import { ExtMmirModule , SpeechIoManager , ExtStateEngine , EventManager } from '../typings/';
 import { SPEECH_IO_INPUT_STATES_ID , SPEECH_IO_INPUT_ID , SPEECH_IO_STATES_ID , SPEECH_IO_MANAGER_ID , SPEECH_IO_ENGINE_ID , SPEECH_IO_INPUT_ENGINE_ID } from '../consts';
 
 declare var WEBPACK_BUILD: boolean;
@@ -43,11 +43,21 @@ export async function createInstance(mmirLib: MmirModule): Promise<StateManager>
   return managerFactory.then(factory => factory());
 }
 
-function upgrade(mng: DialogManager) : SpeechIoManager<any> {
-  const speechMng = mng as SpeechIoManager<any>;
+/**
+ * HELPER: extend a state manager instance with an emit() method according to the EventManager interface
+ *
+ * @param  mng the state manager to upgrade (NOTE in-out parameter)
+ * @return the upgraded state manager
+ */
+export function upgrade<T extends EventManager>(mng: DialogManager) : T {
+  const speechMng = mng as unknown as T;
   speechMng.emit = function(this: SpeechIoManager<any>, actionName: string, data?: any) {
 
-    if (this._isDebugVui) console.log('SpeechIOManager: emit action for '+actionName+' ', data);
+    if (this._log.isd()) {
+      let d: any;
+      try{d = JSON.stringify(data)} catch(err){}
+      this._log.log('emit action for '+actionName+' ' + d);
+    }
     let speechEmitter: Subject<any> = this.eventEmitter[actionName];
     if(speechEmitter){
       if(typeof data !== 'undefined'){
@@ -55,8 +65,10 @@ function upgrade(mng: DialogManager) : SpeechIoManager<any> {
       } else {
         speechEmitter.next();
       }
-    } else {
-      console.warn('SpeechIOManager: could not emit UNKNWON action "'+actionName+'"'+(data? ' with data ' : ''), data);
+    } else if(this._log.isw()) {
+      let d: any;
+      if(data) try{d = JSON.stringify(data)} catch(err){}
+      this._log.warn('could not emit UNKNWON action "'+actionName+'"'+(data? ' with data ' : '')+ d);
     }
   };
   return speechMng;
