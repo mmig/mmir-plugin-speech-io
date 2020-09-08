@@ -199,4 +199,35 @@ export interface SpeechIoPluginConfigurationBaseEntry {
    * @default false
    */
   inputCtrlAutoProceed?: boolean;
+
+  /**
+   * if enabled:
+   * the `mmir-service` will not raise an 'init' event upon intialization on the `mmir.dialog` instance.
+   *
+   * Otherwise, the `mmir-service` will raise an 'init' event with event data:
+   * ```
+   * {
+   *  appConfig: IAppSettings,
+   *  mmir: ExtMmirModule<CmdImpl>,
+   *  emma: EmmaUtil<CmdImpl>
+   * }
+   * ```
+   * This event and its data can be used in the `dialog.xml` state definition's inital state by
+   * defining a transition for the event `init` (see example).
+   *
+   * @default false
+   * @example
+   * <scxml xmlns="http://www.w3.org/2005/07/scxml" version="1.0"
+   *        profile="ecmascript" id="scxmlRoot" initial="AppStart">
+   * <state id="AppStart">
+   *   <!-- transition for init-event, which in this example will trigger state-change to "MainApp" -->
+   *   <transition event="init" target="MainApp">
+   *    <script>
+   *      // get event data contents:
+   *      var appConfig = _event.data.appConfig;
+   *      var mmir = _event.data.mmir;
+   *      var emmaUtil = _event.data.emma;
+   *      //... use them somehow (e.g. could be stored in data model variable)
+   */
+  preventDialogManagerInit?: boolean;
 }

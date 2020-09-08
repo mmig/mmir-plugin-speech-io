@@ -1,6 +1,6 @@
-import type { Cmd , ShowSpeechStateOptions , SpeechFeedbackOptions , RecognitionEmma , UnderstandingEmma , ReadingOptions , StopReadingOptions , ReadingShowOptions , TactileEmma, Emma } from './';
+import type { Cmd , ShowSpeechStateOptions , SpeechFeedbackOptions , RecognitionEmma , UnderstandingEmma , ReadingOptions , StopReadingOptions , ReadingShowOptions , TactileEmma, Emma, Logger } from './';
 
-import type { Observable } from 'rxjs';
+import type { Observable , Subject } from 'rxjs';
 
 import type { MmirModule , DialogManager, InputManager , DialogEngine , PlayError } from 'mmir-lib';
 import type { EmmaUtil } from '../util/EmmaUtil';
@@ -71,14 +71,25 @@ export interface EmmaModule<CmdImpl extends Cmd> {
   emma: EmmaUtil<CmdImpl>;
 }
 
-export interface SpeechIoManager<CmdImpl extends Cmd> extends DialogManager, EmmaModule<CmdImpl> {
+
+
+export interface EventManager {
   emit: (actionName: string, data?: any) => any;
-  eventEmitter: SpeechEventEmitter<CmdImpl>;
-  _isDebugVui: boolean;
+  eventEmitter: {[eventName: string]: Subject<any>} | SpeechEventEmitter<any>;
+  _log: Logger;//FIXME when updating to mmir >= v6.2: remove
 }
 
-export interface ExtStateEngine extends DialogEngine {
+export interface SpeechIoManager<CmdImpl extends Cmd> extends DialogManager, EmmaModule<CmdImpl>, EventManager {
+  _isDebugVui: boolean;
+  eventEmitter: SpeechEventEmitter<CmdImpl>;
+}
+
+export interface ExtStateEngine extends DialogEngine {//FIXME when updating to mmir >= v6.2: change "extends DialogEngine" -> "extends StateEngine"
   worker: any;
+}
+
+export interface ExtDialogManager extends DialogManager, EmmaModule<any>, EventManager {
+  eventEmitter: {[eventName: string]: Subject<any>};
 }
 
 export interface ExtMmirModule<CmdImpl extends Cmd> extends MmirModule, EmmaModule<CmdImpl> {
@@ -86,6 +97,10 @@ export interface ExtMmirModule<CmdImpl extends Cmd> extends MmirModule, EmmaModu
   speechioEngine: ExtStateEngine;
   speechioInput: InputManager;
   speechioInputEngine: ExtStateEngine;
+
+  dialog: ExtDialogManager;
+  dialogEngine: ExtStateEngine;
+  inputEngine: ExtStateEngine;
 }
 
 export interface InputOutputOption extends FeedbackOption {

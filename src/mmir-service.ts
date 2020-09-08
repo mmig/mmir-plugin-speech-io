@@ -2,14 +2,14 @@
 import { Subject , BehaviorSubject } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 
-import { MediaManager, PlayError , LogLevel , LogLevelNum, IAudio } from 'mmir-lib';
+import { MediaManager, PlayError , LogLevel , LogLevelNum, IAudio , IWaitReadyImpl } from 'mmir-lib';
 import { ShowSpeechStateOptions, SpeechFeedbackOptions, RecognitionEmma, UnderstandingEmma , ReadingOptions , StopReadingOptions, ReadingShowOptions , Cmd , TactileEmma , Emma , ASRError, TTSError } from './typings/';
 import { IAppSettings } from './typings/';
 
 import { EmmaUtil } from './util/EmmaUtil';
 
-import { SpeechEventEmitter , WaitReadyOptions , SpeechIoManager , ExtStateEngine , ExtMmirModule } from './typings/';
-import { createSpeechioManager , raiseInternal } from './util/SpeechIoManager';
+import { SpeechEventEmitter , WaitReadyOptions , SpeechIoManager , ExtMmirModule } from './typings/';
+import { createSpeechioManager , raiseInternal , upgrade } from './util/SpeechIoManager';
 import { SPEECH_IO_MANAGER_ID , SPEECH_IO_INPUT_ID , SPEECH_IO_INPUT_ENGINE_ID , SPEECH_IO_ENGINE_ID , PLUGIN_ID } from './consts';
 import { createConfigSettingsImpl } from './util/SettingsUtils';
 
@@ -223,7 +223,7 @@ export class MmirService<CmdImpl extends Cmd> {
             ready: function(module: string){
               this.eventHandler.waitReadyState.next({state: 'ready', module: module});
             }
-          } as any;
+          } as IWaitReadyImpl;
 
           const dlg: SpeechIoManager<CmdImpl> = this.mmir.speechioManager;
           dlg.eventEmitter = this.evt;
@@ -234,14 +234,27 @@ export class MmirService<CmdImpl extends Cmd> {
 
           //circumvent message-queue for init-event:
           // (this allows to pass non-stringified and non-stringifyable object instances)
-          let dlgEngine: ExtStateEngine = this.mmir.speechioEngine;
-          raiseInternal(dlgEngine, 'init', {
+          raiseInternal(this.mmir.speechioEngine, 'init', {
             appConfig: this.appConfig,
             mmir: this._mmir,
             emma: dlg.emma,
             pluginId: PLUGIN_ID
           });
 
+          const dialog = this.mmir.dialog;
+          dialog.eventEmitter = {};
+          dialog.emma = this._mmir.emma;
+          upgrade(dialog);
+
+          if(this.mmir.conf.getBoolean([PLUGIN_ID, 'preventDialogManagerInit']) !== true){
+            //circumvent message-queue for init-event:
+            // (this allows to pass non-stringified and non-stringifyable object instances)
+            raiseInternal(this.mmir.dialogEngine, 'init', {
+              appConfig: this.appConfig,
+              mmir: this._mmir,
+              emma: dlg.emma
+            });
+          }
 
           if(this._resolveReadyWait){
             this._resolveReadyWait(this);
