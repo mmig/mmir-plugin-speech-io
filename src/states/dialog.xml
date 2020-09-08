@@ -200,8 +200,8 @@
 
               //close cmd-dialog ect. if necessary, before leaving:
               var options = _util.createVuiOptions(_event.data);
-              options.state = false;
-              _util.dlg.emit('showSpeechInputState', options);
+              options.active = false;
+              _util.dlg.emit('speechInputState', options);
 
               //stop reading
               _util.dlg.raise('stop-reading');
@@ -211,18 +211,18 @@
       <transition event="showSpeechStateActive" name="showSpeechStateActive">
         <script>
             var options = _util.createVuiOptions(_event.data);
-            options.state = true;
+            options.active = true;
             if(_util.isDebugVui) console.warn('showSpeechStateActive: ', options);
-            _util.dlg.emit('showSpeechInputState', options);
+            _util.dlg.emit('speechInputState', options);
         </script>
       </transition>
 
       <transition event="showSpeechStateInactive" name="showSpeechStateInactive">
         <script>
             var options = _util.createVuiOptions(_event.data);
-            options.state = false;
+            options.active = false;
             if(_util.isDebugVui) console.warn('showSpeechStateInactive: ', options);
-            _util.dlg.emit('showSpeechInputState', options);
+            _util.dlg.emit('speechInputState', options);
         </script>
       </transition>
 
@@ -247,8 +247,8 @@
 
       <transition event="touch-raw" name="touch-raw" cond="_util.isTouchRaw(_event.data)">
         <script>
-            if(_util.isDebugVui) console.info('touch-raw with data ', _event.data);
-            _util.dlg.emit('unknown', _event.data);
+            if(_util.isDebugVui) console.warn('touch-raw with data ', _event.data);
+            _util.dlg.emit('tactileError', _event.data);
         </script>
       </transition>
 
@@ -262,7 +262,7 @@
       <transition event="speech-recognition" name="speech-recognition" cond="_util.isSpeechCommand(_event.data)">
         <script>
             if(_util.isDebugVui) console.info('speech-recognition (command-mode) with data ', _event.data);
-            _util.dlg.emit('determineSpeechCmd', _event.data);
+            _util.dlg.emit('speechCommand', _event.data);
         </script>
       </transition>
 
@@ -270,14 +270,14 @@
         <script>
             if(_util.isDebugVui) console.info('speech-recognition (dictation-mode) with data ', _event.data);
             var data = _event.data;//_util.emma.addTarget(_event.data, target_id);
-            _util.dlg.emit('showDictationResult', data);
+            _util.dlg.emit('dictationResult', data);
         </script>
       </transition>
 
       <transition event="speech-understanding" name="speech-understanding">
         <script>
             if(_util.isDebugVui) console.info('speech-understanding with data ', _event.data);
-            _util.dlg.emit('execSpeechCmd', _event.data);
+            _util.dlg.emit('commandAction', _event.data);
         </script>
       </transition>
 
@@ -584,7 +584,7 @@
 
           <transition event="showSpeechState" name="showSpeechState">
             <!-- script>
-                _util.dlg.emit('showSpeechInputState', {state: true, mode: speech_mode});
+                _util.dlg.emit('speechInputState', {state: true, mode: speech_mode});
             </script-->
             <raise event="showSpeechStateActive"/>
           </transition>
@@ -912,7 +912,7 @@
 
           <transition event="showSpeechState" name="showSpeechState">
             <script>
-                //_util.dlg.emit('showSpeechInputState', {state: false, mode: speech_mode});
+                //_util.dlg.emit('speechInputState', {state: false, mode: speech_mode});
 
                 if(_util.isDebugVui) console.debug(
                     'AsrInactive.showSpeechState, event: '+ JSON.stringify(_event)
@@ -1160,7 +1160,7 @@
             var consumed = _util.dlg.emit('read', options);
             if(consumed === false){
                 reading_status = false;
-                _util.dlg.emit('showReadingStatus', {contextId: dialog_id || page_id, readingId: reading_id, active: reading_status, targetId: temp_restart_speech_with_id});
+                _util.dlg.emit('readingState', {contextId: dialog_id || page_id, readingId: reading_id, active: reading_status, targetId: temp_restart_speech_with_id});
             }
         </script>
       </transition>
@@ -1195,7 +1195,7 @@
             //console.debug('reading has started...');
             reading_status = true;
 
-            _util.dlg.emit('showReadingStatus', {contextId: dialog_id || page_id, readingId: reading_id, active: reading_status, targetId: temp_restart_speech_with_id});
+            _util.dlg.emit('readingState', {contextId: dialog_id || page_id, readingId: reading_id, active: reading_status, targetId: temp_restart_speech_with_id});
         </script>
       </transition>
 
@@ -1209,7 +1209,7 @@
                 temp_resume_speech_with_id = '';
             }
 
-            _util.dlg.emit('showReadingStatus', {contextId: dialog_id || page_id, readingId: reading_id, active: reading_status, targetId: temp_restart_speech_with_id});
+            _util.dlg.emit('readingState', {contextId: dialog_id || page_id, readingId: reading_id, active: reading_status, targetId: temp_restart_speech_with_id});
 
             if(temp_reading_data){
                 var options = temp_reading_data;

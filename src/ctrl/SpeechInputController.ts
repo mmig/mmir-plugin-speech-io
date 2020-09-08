@@ -2,7 +2,7 @@
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { RecognitionEmma , UnderstandingEmma , RecognitionType , SpeechRecognitionResult } from '../typings/';
+import { RecognitionEmma , RecognitionType , SpeechRecognitionResult } from '../typings/';
 import { EmmaUtil } from '../util/EmmaUtil';
 
 import { SubscriptionUtil } from '../util/SubscriptionUtil';
@@ -80,13 +80,13 @@ export class SpeechInputController {
       this._manager = mmirp.mmir.speechioManager;
 
       this._speechEventSubscriptions = SubscriptionUtil.subscribe(mmirProvider.speechEvents, [
-        'showDictationResult',
-        'determineSpeechCmd',
-        'execSpeechCmd'
+        'dictationResult',
+        // 'speechCommand',
+        // 'commandAction'
         //'resetGuidedInputForCurrentControl' , 'startGuidedInput' , 'resetGuidedInput' , 'isDictAutoProceed'
       ], this);
 
-      this.dictationResults = mmirProvider.speechEvents.showDictationResult.pipe(map(dictation => this._processDictationResult(dictation)));
+      this.dictationResults = mmirProvider.speechEvents.dictationResult.pipe(map(dictation => this._processDictationResult(dictation)));
 
       //FIXME should get configuration from somewhere else?
       const stopWord = this._mmir.conf.get([PLUGIN_ID, 'dictStopWord'], '');
@@ -103,11 +103,12 @@ export class SpeechInputController {
         //TODO move this, since it's application specific...
         //style faux-span: must force some global-styling for SPAN to use the selection's own style
         //                 -> set ID for faux SPAN and specify style for "reseting" global styling
+        const fauxId = PLUGIN_ID+'-sel-marker-faux';
         const opt = this._selectionUtil.getSelectionOptions();
-        opt.fauxId = 'sel-marker-faux';
+        opt.fauxId = fauxId;
 
         const fauxStyle = document.createElement('style');
-        fauxStyle.textContent = '#sel-marker-faux {font-size:inherit;text-align:inherit;}';
+        fauxStyle.textContent = '#'+fauxId+' {font-size:inherit;text-align:inherit;}';
         document.head.appendChild(fauxStyle);
       }
     });
@@ -265,8 +266,8 @@ export class SpeechInputController {
    * @param  {RecognitionEmma} emma the EMMA event contain an ASR result(s) from
    *                                 speech recognition.
    */
-  public showDictationResult(asrEmmaEvent: RecognitionEmma): void {
-    if(this._debugMsg) console.log('showDictationResult -> ', asrEmmaEvent);
+  public dictationResult(asrEmmaEvent: RecognitionEmma): void {
+    if(this._debugMsg) console.log('dictationResult -> ', asrEmmaEvent);
 
     let targetId = this._emma.getTarget(asrEmmaEvent);
     let target = this.dictTargetHandler.get(targetId);
@@ -287,52 +288,6 @@ export class SpeechInputController {
   protected _processDictationResult(asrEmmaEvent: RecognitionEmma): RecognitionEmma {//TODO remove?
     if(this._debugMsg) console.log('_processDictationResult -> ', asrEmmaEvent);
     return asrEmmaEvent;
-  }
-
-  /**
-   * Called for determining the understanding of an ASR result.
-   *
-   * E.g. apply a grammar to the ASR text, or keyword spotting, or some other
-   * kind of "natural language understanding" (NLU).
-   *
-   * With the NLU result, this function should invoke
-   * <pre>
-   * InputManager.raise('speech', understandingResult);
-   * </pre>
-   * for the understood ASR, where understandingResult should have type UnderstandigResult.
-   *
-   * NOTE: for "not understood" ASR text, there could be a corresponding Command
-   *       (i.e. calling InputManager.raise('speech', notUnderstoodCmd)) or some
-   *       other form of feedback/processing should be triggered.
-   *
-   * @param  {RecognitionEmma} emma the EMMA event contain an ASR result(s) from
-   *                                 speech recognition.
-   */
-  public determineSpeechCmd(asrEmmaEvent: RecognitionEmma): void {
-    if(this._debugMsg) console.log('determineSpeechCmd -> ', asrEmmaEvent);
-    // let cmd = ;
-    // this.inp.raise('speech', cmd);
-  }
-
-  /**
-   * Called for "applying" an understood command.
-   *
-   * This function should select the "best" command(s) from semanticEmmaEvent and
-   * execute it/them.
-   *
-   * When selecting / before executing, it should be checked, if the commands can
-   * actually be executed.
-   *
-   * If no "best" command can be selected/executed, this function should instead invoke
-   * a diambiguation dialog (when there are some potential, but no clear command candiates)
-   * or a feedback should be triggerd, stating that there was no corresponding command
-   * found for the user input.
-   *
-   * @param  {semanticEmmaEvent} emma the EMMA event contain an understanding result with a list
-   *                                    understood Cmd(s)
-   */
-  public execSpeechCmd(semanticEmmaEvent: UnderstandingEmma<any>): void {
-    if(this._debugMsg) console.log('execSpeechCmd -> ', semanticEmmaEvent);
   }
 
   protected doHandleDictationResult(asrEmmaEvent: RecognitionEmma, inputElem: DictationHandler){

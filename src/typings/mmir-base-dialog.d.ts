@@ -6,9 +6,9 @@ export interface ISpeechState {
 
   /**
    * Called when GUI should update visual feedback for current Speech Input state.
-   * @param {ShowSpeechStateOptions} options the data specifying the (changed) speech input state etc.
+   * @param {SpeechInputStateOptions} options the data specifying the (changed) speech input state etc.
    */
-  showSpeechInputState(options: ShowSpeechStateOptions): void;
+  speechInputState(options: SpeechInputStateOptions): void;
 }
 
 export interface ISpeechFeedback {
@@ -51,7 +51,7 @@ export interface ISpeechDictate {
    * @param  {RecognitionEmma} emma the EMMA event contain an ASR result(s) from
    *                                 speech recognition.
    */
-  showDictationResult(asrEmmaEvent: RecognitionEmma): void;
+  dictationResult(asrEmmaEvent: RecognitionEmma): void;
 }
 
 export interface ISpeechCommand {
@@ -75,7 +75,7 @@ export interface ISpeechCommand {
    * @param  {RecognitionEmma} emma the EMMA event contain an ASR result(s) from
    *                                 speech recognition.
    */
-  determineSpeechCmd(asrEmmaEvent: RecognitionEmma): void;
+  speechCommand(asrEmmaEvent: RecognitionEmma): void;
   /**
    * Called for "applying" an understood command.
    *
@@ -93,7 +93,7 @@ export interface ISpeechCommand {
    * @param  {semanticEmmaEvent} emma the EMMA event contain an understanding result with a list
    *                                    understood Cmd(s)
    */
-  execSpeechCmd<CmdImpl extends Cmd>(semanticEmmaEvent: UnderstandingEmma<CmdImpl>): void;
+  commandAction<CmdImpl extends Cmd>(semanticEmmaEvent: UnderstandingEmma<CmdImpl>): void;
 
 }
 
@@ -158,9 +158,9 @@ export interface ISpeechOutput {
    * For options.active === false, this function should stop the read-feedback
    * (if some feedback was started).
    *
-   * @param  {ReadingShowOptions} options the data for updating the reading status feedback
+   * @param  {ReadingStateOptions} options the data for updating the reading status feedback
    */
-  showReadingStatus(options: ReadingShowOptions): void;
+  readingState(options: ReadingStateOptions): void;
 
 }
 
@@ -187,14 +187,14 @@ export interface IGuidedSpeechInput {
 export type SpeechMode = 'command' | 'dictation';//TODO shorten these (need to change SCXML): 'cmd' | 'dict'
 export type SpeechInputMode = '' | 'guided';// '' (DEFAULT) | 'guided' //TODO should this be a 3rd type for SpeechMode? would need to change SCXML / utils!
 
-export interface ShowSpeechStateOptions {
-  state: boolean;// is active/inactive
+export interface SpeechInputStateOptions {
+  active: boolean;// is active/inactive
   mode: SpeechMode;
   inputMode: SpeechInputMode;	// '' (default) | 'guided'
   targetId?: any;//target-id for GUI widget (which should show/update its Speech State feedback)
 }
 
-export interface SpeechFeedbackOptions extends ShowSpeechStateOptions {
+export interface SpeechFeedbackOptions extends SpeechInputStateOptions {
   //indicates that mic-levels feedback should be initialized (and possibly started) now
   isStart?: boolean;
 }
@@ -237,14 +237,14 @@ export interface ReadingOptions {
   cancelActivePrompts?: boolean;
 }
 
-export interface ReadingShowOptions extends ReadingOptions {
+export interface ReadingStateOptions extends ReadingOptions {
   /**context for reading target (may also be used for selecting reading target/text)*/
   contextId: any;
   /**if reading is active or inactive*/
   active: boolean;
 }
 
-export interface StopReadingOptions extends ReadingShowOptions {
+export interface StopReadingOptions extends ReadingStateOptions {
 
   /**when guided speech input is active: indicates that speech-guidance should be canceled*/
   cancelGuidance?: boolean;
