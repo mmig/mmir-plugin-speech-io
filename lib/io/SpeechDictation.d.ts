@@ -24,6 +24,7 @@ export declare class DictationHandler {
     nativeCtrl: HTMLElement;
     private onTextChangeSubs;
     private _selectionListener;
+    private _focusListener;
     isBrowserEnv: boolean;
     _isNeedFixFocus: boolean;
     isPlainText: boolean;
@@ -73,6 +74,13 @@ export declare class DictationHandler {
      * @returns
      */
     doSetUnfocused(isForce?: boolean): void;
+    /**
+     * HELPER for fixing the issue, that some Android devices will "pull" focus to the input-element
+     * 			when text is entered / a selection is made
+     * @param isForce
+     * @returns
+     */
+    isFocused(input?: HTMLElement): boolean;
     /**
      * HELPER: set "system initiated" selection (see #setSysSel)
      *

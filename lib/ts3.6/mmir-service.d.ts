@@ -34,7 +34,7 @@ export declare class MmirService<CmdImpl extends Cmd> {
     readonly mmir: ExtMmirModule<CmdImpl>;
     readonly speechEvents: SpeechEventEmitterImpl<CmdImpl>;
     constructor(mmir: ExtMmirModule<CmdImpl>);
-    init(appConfig: IAppSettings, ..._args: any[]): Promise<MmirService<CmdImpl>>;
+    init(appConfig: IAppSettings | null, ..._args: any[]): Promise<MmirService<CmdImpl>>;
     private initDebugVui;
     ready(): Promise<MmirService<CmdImpl>>;
     protected mmirInit(): Promise<MmirService<CmdImpl>>;

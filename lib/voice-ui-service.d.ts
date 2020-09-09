@@ -7,7 +7,7 @@ export declare class VoiceUIService<CmdImpl extends Cmd> {
     protected vuiCtrl: VoiceUIController<CmdImpl>;
     protected mmirProvider: MmirService<CmdImpl>;
     protected _debug: boolean;
-    protected get _initialized(): boolean;
+    get isReady(): boolean;
     get mmirService(): MmirService<CmdImpl>;
     get mmir(): ExtMmirModule<CmdImpl>;
     get prompt(): PromptReader;
