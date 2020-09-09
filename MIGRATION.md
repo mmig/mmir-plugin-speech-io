@@ -50,6 +50,13 @@ SpeechInputStateOptions.state -> SpeechInputStateOptions.active // or before ren
    EmmaUtil.setSpeechUnderstanding(emmaData: AnyEmma<CmdImpl>, data: UnderstandingData, keepExistingFunction?: boolean): void
    ```
 
+ * add parameter `readingData` at 3rd position:
+   ```
+   VoiceUiController.ttsClicked(event?: Event | string | GuiElement | HTMLElement, target?: string | GuiElement | HTMLElement, feedbackOptions?: FeedbackOption): void {
+   ->
+   VoiceUiController.ttsClicked(event?: Event | string | GuiElement | HTMLElement, target?: string | GuiElement | HTMLElement, readingData?: ReadingOptions, feedbackOptions?: FeedbackOption): void {
+   ```
+
 ### Removed Methods
 
 The following methods were removed without replacement
