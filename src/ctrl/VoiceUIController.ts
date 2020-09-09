@@ -1,7 +1,7 @@
 
 import { Subscription , BehaviorSubject } from 'rxjs';
 
-import { RecognitionEmma , UnderstandingEmma , SpeechInputStateOptions, ReadingStateOptions , StopReadingOptions, Cmd } from '../typings/';
+import { RecognitionEmma , UnderstandingEmma , SpeechInputStateOptions, ReadingStateOptions , StopReadingOptions, ReadingOptions, Cmd } from '../typings/';
 import { SPEECH_ACTIVE , READ_ACTIVE , PLUGIN_ID } from '../consts';
 import { triggerClickFeedback , FeedbackOption } from '../io/HapticFeedback';
 import { PromptReader } from '../io/PromptReader';
@@ -372,7 +372,8 @@ export class VoiceUIController<CmdImpl extends Cmd> {
 
   ////////////////////////////////////////// Speech IO ////////////////////////
 
-  public commandClicked(event: MouseEvent | TouchEvent | RecognitionEmma | UnderstandingEmma<CmdImpl> | EventLike, btnId: string, feedbackOptions?: InputOutputOption){
+  /** trigger click/touch feedback & toggle command-mode ASR */
+  public commandClicked(event: MouseEvent | TouchEvent | RecognitionEmma | UnderstandingEmma<CmdImpl> | EventLike, btnId: string, feedbackOptions?: InputOutputOption): void {
 
     if(event && (event as any).preventDefault){
       (event as any).preventDefault();
@@ -387,11 +388,18 @@ export class VoiceUIController<CmdImpl extends Cmd> {
     // if(!isSyntheticClick(event))//TODO detect programatically triggered invocations of this function?
     this.triggerTouchFeedback(event, feedbackOptions);
 
+    this.toggleCommand(btnId);
+  }
+
+  /** toggle command-mode ASR */
+  public toggleCommand(btnId: string): void {
+
     this.speech.raise('toggleSpeechInputState', {mode: 'command', targetId: btnId});
     this.speech.raise('showSpeechState');
   }
 
   /**
+   * trigger click/touch feedback & toggle dictation-mode ASR
    *
    * dictationClicked(event: Event, target: DictationTarget, feedbackMode?: SelectionMode)
    *
@@ -403,7 +411,7 @@ export class VoiceUIController<CmdImpl extends Cmd> {
    *                          style for visualizing unstable/interim part of dictation result/text
    *                          DEFAULT: uses #_defaultDictationFeedbackStyle
    */
-  public dictationClicked(event: Event | EventLike, targetId: string | DictationTarget, feedbackStyle?: SelectionMode, touchFeedback?: InputOutputOption): void {
+  public dictationClicked(event: Event | EventLike, targetId: string | DictationTarget, feedbackStyle?: SelectionMode, touchFeedback?: InputOutputOption, replaceExistingHandler?: boolean): void {
 
     if(event && (event as any).preventDefault){
       (event as any).preventDefault();
@@ -418,13 +426,19 @@ export class VoiceUIController<CmdImpl extends Cmd> {
     // if(!isSyntheticClick(event))//TODO detect programatically triggered invocations of this function?
     this.triggerTouchFeedback(event, touchFeedback);
 
-    const handler = this.initDictationTarget(targetId, feedbackStyle);
+    this.toggleDictation(targetId, feedbackStyle, replaceExistingHandler);
+  }
+
+  /** toggle dictation-mode ASR */
+  public toggleDictation(targetId: string | DictationTarget, feedbackStyle?: SelectionMode, replaceExistingHandler?: boolean): void {
+
+    const handler = this.initDictationTarget(targetId, feedbackStyle, replaceExistingHandler);
 
     this.speech.raise('toggleSpeechInputState', {mode: 'dictation', targetId: handler? handler.id : targetId});
     this.speech.raise('showSpeechState');
   }
 
-  public initDictationTarget(targetId: string | DictationTarget, feedbackStyle?: SelectionMode) : DictationHandler {
+  public initDictationTarget(targetId: string | DictationTarget, feedbackStyle?: SelectionMode, replaceExistingHandler?: boolean) : DictationHandler {
 
     let targetRef: DictationTarget;
     if(typeof targetId !== 'string'){
@@ -434,7 +448,7 @@ export class VoiceUIController<CmdImpl extends Cmd> {
 
     feedbackStyle = feedbackStyle? feedbackStyle : this._defaultDictationFeedbackStyle;
 
-    let handler: DictationHandler = this.dictTargetHandler.get(targetId);
+    let handler: DictationHandler = replaceExistingHandler? null : this.dictTargetHandler.get(targetId);
     if(!handler){
       if(targetRef){
         handler = this.speechIn.createDictationTarget(targetRef, targetId, feedbackStyle);
@@ -448,6 +462,10 @@ export class VoiceUIController<CmdImpl extends Cmd> {
     handler.prepare();
 
     return handler;
+  }
+
+  public resetDictationHandlers(): void {
+    this.dictTargetHandler.reset();
   }
 
   private updateCurrentDictationTarget(targetId: string, active: boolean){
@@ -538,34 +556,55 @@ export class VoiceUIController<CmdImpl extends Cmd> {
    * ttsClicked(event: Event, targetId?: string | ElementRef | HTMLElement)
    * ttsClicked(targetId: string | ElementRef | HTMLElement)
    *
-   * @param  {Event} [event]
+   * @param  {Event} [event] if given, touch-feedback will be triggered
    * @param  {string | ElementRef | HTMLElement} [target]
    *                          The reading "target"/control widget (if omitted, the target of the event will be used)
+   *                          (if omitted, but event is given, `event.target` will be used as reading target)
+   * @param [readingData] if given, reading will be started for this reading data
+   * @param [feedbackOptions] options for the touch feedback
    */
-  public ttsClicked(event?: Event | string | GuiElement | HTMLElement, targetId?: string | GuiElement | HTMLElement, feedbackOptions?: FeedbackOption): void {
+  /**
+   * [ttsClicked description]
+   * @param event [description]
+   * @param target [description]
+   */
+  public ttsClicked(event?: Event | string | GuiElement | HTMLElement, target?: string | GuiElement | HTMLElement, readingData?: ReadingOptions, feedbackOptions?: FeedbackOption): void {
 
     if(event && (event as any).preventDefault){
       (event as any).preventDefault();
       this.triggerTouchFeedback(event as any, feedbackOptions);
     }
 
-    if(!event || !(event as Event).target) {
-      targetId = event as any;
+    if(!target && event && (event as Event).target) {
+      target = (event as Event).target as HTMLElement;
       event = null;
     }
 
-    let target = this.readTargetHandler.tryGetAndPut(targetId, event as Event);
+    this.startReading(readingData, target);
+  }
+
+  /**
+   * [startReading description]
+   * @param readingData [description]
+   * @param target [description]
+   */
+  public startReading(readingData?: ReadingOptions, target?: string | GuiElement | HTMLElement): void {
+
+    if(readingData){
+      this.speech.raise('read-prompt', readingData);
+    }
+
+    let readTarget = this.readTargetHandler.tryGetAndPut(target);
     if(target){
 
-      this.readTargetHandler.activeHandler = target;
+      this.readTargetHandler.activeHandler = readTarget;
 
-      const ctrl = target.ctrl;
+      const ctrl = readTarget.ctrl;
       if(this.readOverlay){
         // this.readOverlay.target = ctrl;
         this.readOverlay.startReading(event, ctrl);
       }
     }
-
   }
 
   /**
