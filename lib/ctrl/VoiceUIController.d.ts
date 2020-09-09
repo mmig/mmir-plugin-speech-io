@@ -1,5 +1,5 @@
 import { Subscription, BehaviorSubject } from 'rxjs';
-import { RecognitionEmma, UnderstandingEmma, SpeechInputStateOptions, ReadingStateOptions, StopReadingOptions, Cmd } from '../typings/';
+import { RecognitionEmma, UnderstandingEmma, SpeechInputStateOptions, ReadingStateOptions, StopReadingOptions, ReadingOptions, Cmd } from '../typings/';
 import { FeedbackOption } from '../io/HapticFeedback';
 import { PromptReader } from '../io/PromptReader';
 import { SpeechInputController } from '../ctrl/SpeechInputController';
@@ -107,8 +107,12 @@ export declare class VoiceUIController<CmdImpl extends Cmd> {
     handleClick(event: MouseEvent | TouchEvent | RecognitionEmma | UnderstandingEmma<CmdImpl> | EventLike, name: string, data?: any): void;
     localize(res: string): string;
     triggerTouchFeedback(_event: MouseEvent | TouchEvent | RecognitionEmma | UnderstandingEmma<CmdImpl> | EventLike, feedbackOptions?: FeedbackOption): void;
+    /** trigger click/touch feedback & toggle command-mode ASR */
     commandClicked(event: MouseEvent | TouchEvent | RecognitionEmma | UnderstandingEmma<CmdImpl> | EventLike, btnId: string, feedbackOptions?: InputOutputOption): void;
+    /** toggle command-mode ASR */
+    toggleCommand(btnId: string): void;
     /**
+     * trigger click/touch feedback & toggle dictation-mode ASR
      *
      * dictationClicked(event: Event, target: DictationTarget, feedbackMode?: SelectionMode)
      *
@@ -120,8 +124,11 @@ export declare class VoiceUIController<CmdImpl extends Cmd> {
      *                          style for visualizing unstable/interim part of dictation result/text
      *                          DEFAULT: uses #_defaultDictationFeedbackStyle
      */
-    dictationClicked(event: Event | EventLike, targetId: string | DictationTarget, feedbackStyle?: SelectionMode, touchFeedback?: InputOutputOption): void;
-    initDictationTarget(targetId: string | DictationTarget, feedbackStyle?: SelectionMode): DictationHandler;
+    dictationClicked(event: Event | EventLike, targetId: string | DictationTarget, feedbackStyle?: SelectionMode, touchFeedback?: InputOutputOption, replaceExistingHandler?: boolean): void;
+    /** toggle dictation-mode ASR */
+    toggleDictation(targetId: string | DictationTarget, feedbackStyle?: SelectionMode, replaceExistingHandler?: boolean): void;
+    initDictationTarget(targetId: string | DictationTarget, feedbackStyle?: SelectionMode, replaceExistingHandler?: boolean): DictationHandler;
+    resetDictationHandlers(): void;
     private updateCurrentDictationTarget;
     /**
      * Set the overlay for GUI feedback during dictation (speech input).
@@ -142,11 +149,25 @@ export declare class VoiceUIController<CmdImpl extends Cmd> {
      * ttsClicked(event: Event, targetId?: string | ElementRef | HTMLElement)
      * ttsClicked(targetId: string | ElementRef | HTMLElement)
      *
-     * @param  {Event} [event]
+     * @param  {Event} [event] if given, touch-feedback will be triggered
      * @param  {string | ElementRef | HTMLElement} [target]
      *                          The reading "target"/control widget (if omitted, the target of the event will be used)
+     *                          (if omitted, but event is given, `event.target` will be used as reading target)
+     * @param [readingData] if given, reading will be started for this reading data
+     * @param [feedbackOptions] options for the touch feedback
      */
-    ttsClicked(event?: Event | string | GuiElement | HTMLElement, targetId?: string | GuiElement | HTMLElement, feedbackOptions?: FeedbackOption): void;
+    /**
+     * [ttsClicked description]
+     * @param event [description]
+     * @param target [description]
+     */
+    ttsClicked(event?: Event | string | GuiElement | HTMLElement, target?: string | GuiElement | HTMLElement, readingData?: ReadingOptions, feedbackOptions?: FeedbackOption): void;
+    /**
+     * [startReading description]
+     * @param readingData [description]
+     * @param target [description]
+     */
+    startReading(readingData?: ReadingOptions, target?: string | GuiElement | HTMLElement): void;
     /**
      * Set the GUI overlay feedback for active reading
      *
