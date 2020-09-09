@@ -13,10 +13,9 @@ export class VoiceUIService<CmdImpl extends Cmd> {
   protected mmirProvider: MmirService<CmdImpl>;
 
   protected _debug: boolean = false;
-  protected get _initialized(): boolean{
+  public get isReady(): boolean{
     return this.vuiCtrl?.initialized;
   }
-
 
   public get mmirService(): MmirService<CmdImpl> { return this.mmirProvider;}
   public get mmir(): ExtMmirModule<CmdImpl> { return this.mmirProvider.mmir;}
@@ -24,14 +23,14 @@ export class VoiceUIService<CmdImpl extends Cmd> {
   public get ctrl(): VoiceUIController<CmdImpl> { return this.vuiCtrl;}
 
   public get asrActive(): boolean {
-    if(this._initialized){
+    if(this.isReady){
       return this.vuiCtrl.asrActive;
     }
     return false;
   }
 
   public get ttsActive(): boolean {
-    if(this._initialized){
+    if(this.isReady){
       return this.vuiCtrl.ttsActive;
     }
     return false;
@@ -60,26 +59,26 @@ export class VoiceUIService<CmdImpl extends Cmd> {
   }
 
   public asrCancel(): void {
-    if(this._initialized){
+    if(this.isReady){
       this.vuiCtrl.asrCancel(this.vuiCtrl.isPermanentCommandMode);
     }
   }
 
   public ttsCancel(): void {
-    if(this._initialized){
+    if(this.isReady){
       this.vuiCtrl.ttsCancel();
     }
   }
 
   public cancel(): void {
-    if(this._initialized){
+    if(this.isReady){
       this.vuiCtrl.ttsCancel();
       this.vuiCtrl.asrCancel(this.vuiCtrl.isPermanentCommandMode);
     }
   }
 
   public readPrompt(promptData: ReadingOptions){
-    if(this._initialized){
+    if(this.isReady){
       this.mmir.speechioManager.raise('read-prompt', promptData);
     } else {
       this.ready().then(() => this.mmir.speechioManager.raise('read-prompt', promptData));
