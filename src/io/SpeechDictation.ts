@@ -69,6 +69,7 @@ export class DictationHandler {
   // private stableDictText: string;
 
   private _selectionListener: (event: Event) => void;
+  private _focusListener: (event: Event) => void;
 
   isBrowserEnv: boolean;
   _isNeedFixFocus: boolean;
@@ -147,11 +148,10 @@ export class DictationHandler {
             self.setSelection(null);
           }
 
+          //reset markers for previous position/selection
+          this.dataset['MMMIR_PREV_SEL_START'] = '';
+          this.dataset['MMMIR_PREV_SEL_END'] = '';
         }
-
-        //reset markers for previous position/selection
-        this.dataset['MMMIR_PREV_SEL_START'] = '';
-        this.dataset['MMMIR_PREV_SEL_END'] = '';
 
         return;///////////////// EARLY EXIT //////////////
       }
@@ -184,6 +184,10 @@ export class DictationHandler {
     this.nativeInput.addEventListener('keyup', this._selectionListener, false);
     this.nativeInput.addEventListener('click', this._selectionListener, false);
 
+    this._focusListener = function(this: HTMLInputElement, _event: Event): void {
+      self.setSelection(null);
+    };
+    this.nativeInput.addEventListener('focus', this._focusListener, false);
   }
 
   protected setCtrl(ctrl: GuiElement){
@@ -252,11 +256,17 @@ export class DictationHandler {
     if(this._inputData){
       this._inputData.reset();
     }
-    if(this.nativeInput && this._selectionListener){
-      this.nativeInput.removeEventListener('select', this._selectionListener, false);
-      this.nativeInput.removeEventListener('keyup', this._selectionListener, false);
-      this.nativeInput.removeEventListener('click', this._selectionListener, false);
-      this._selectionListener = null;
+    if(this.nativeInput){
+      if(this._selectionListener){
+        this.nativeInput.removeEventListener('select', this._selectionListener, false);
+        this.nativeInput.removeEventListener('keyup', this._selectionListener, false);
+        this.nativeInput.removeEventListener('click', this._selectionListener, false);
+        this._selectionListener = null;
+      }
+      if(this._focusListener){
+        this.nativeInput.removeEventListener('focus', this._focusListener, false);
+        this._focusListener = null;
+      }
     }
     this.textfield = null;
     this.nativeInput = null;
@@ -539,6 +549,22 @@ export class DictationHandler {
 
       }
     }
+
+    /**
+     * HELPER for fixing the issue, that some Android devices will "pull" focus to the input-element
+     * 			when text is entered / a selection is made
+     * @param isForce
+     * @returns
+     */
+    isFocused(input?: HTMLElement): boolean {
+
+      input = input || this.nativeInput;
+      if(input){
+        return input === document.activeElement;
+      }
+      return false;
+    }
+
     /**
      * HELPER: set "system initiated" selection (see #setSysSel)
      *
@@ -618,11 +644,13 @@ export class DictationHandler {
 //
 // 				}
 
-        const input = this.nativeInput as HTMLInputElement;//NOTE may also be a HTMLTextAreaElement, but in this instance it does not matter
+        const input = this.nativeInput as HTMLInputElement;//NOTE may also be a HTMLTextAreaElement, but here the difference does not matter
 
-        let omitNativeSel: boolean = this.isNativeSelectable;
+        let omitNativeSel: boolean = false;
         if(end <= start){
+
           omitNativeSel = true;
+
         } else {
 
           //check if the this range is already selected
@@ -634,7 +662,6 @@ export class DictationHandler {
               omitNativeSel = true;
             }
           }
-
         }
 
         this.setSysSel(true);
@@ -643,19 +670,43 @@ export class DictationHandler {
         }
         try{
 
-          if(!omitNativeSel){
-            if(this._debug)  console.info('setSelection('+start+', '+end+')');
+          let applied: boolean = false;
+          if(this.isNativeSelectable && this.isFocused(input)){
 
-            //HACK: set as previous selection so that selection-handler ignores this change
-            input.dataset['MMMIR_PREV_SEL_START'] = ''+start;
-            input.dataset['MMMIR_PREV_SEL_END'] = ''+end;
+            //NOTE regarding focus & setSelectionRange():
+            //      in recent Chrome versions, setting a selection range will trigger select-events asynchronously
+            //     -> in case the actual text is set later applied to the native control than this selection is made
+            //          (which unfortunately is currently done when used in angular; see FIXME note below),
+            //          upon event-emitting, the selection will have changes to "end-cursor" range
+            //     -> then the _selectionListener() cannot determine correctly anymore, if the selection should be updated/cleared
+            //  -> WORKAROUND for now: do not set native selection, if element is not focused
 
-            input.setSelectionRange(start, end);
+            if(!omitNativeSel){
+
+              if(this._debug)  console.info('setSelection('+start+', '+end+')');
+
+              //FIX: the select-text and the actual text in the input may not (yet) be the same
+              //    -> prevent selection reset, by only selecting the maximal available text length
+              //FIXME should set selection when text is updated in control (e.g. by framework like angular), not directly when set by speech-recognition
+              const currLen = input.value.length;
+              if(end > currLen){
+                end = currLen;
+              }
+
+              input.setSelectionRange(start, end);
+              applied = true;
+            }
+
+          } else if(this.selectUtil){
+
+            //set visual selection, even when text-element is not focused:
+            this.selectUtil.setSelectionMarker(input, start, end - start, text);
+            applied = true;
           }
 
-          //set visual selection, even when text-element is not focused:
-          if(this.selectUtil){
-            this.selectUtil.setSelectionMarker(input, start, end - start, text);
+          if(applied) {
+            input.dataset['MMMIR_PREV_SEL_START'] = ''+start;
+            input.dataset['MMMIR_PREV_SEL_END'] = ''+end;
           }
 
         } catch(err){
