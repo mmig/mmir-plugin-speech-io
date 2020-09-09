@@ -65,7 +65,7 @@ export class MmirService<CmdImpl extends Cmd> {
 
   //FIXME find better way to "inject" dependencies
   public init(
-    appConfig: IAppSettings, ... _args: any[]
+    appConfig: IAppSettings | null, ... _args: any[]
   ): Promise<MmirService<CmdImpl>> {
 
     this.appConfig = appConfig;
