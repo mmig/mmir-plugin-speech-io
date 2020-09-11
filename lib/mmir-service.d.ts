@@ -3,7 +3,7 @@ import { PlayError, LogLevel, LogLevelNum } from 'mmir-lib';
 import { SpeechInputStateOptions, SpeechFeedbackOptions, RecognitionEmma, UnderstandingEmma, ReadingOptions, StopReadingOptions, ReadingStateOptions, Cmd, TactileEmma, Emma, ASRError, TTSError } from './typings/';
 import { IAppSettings } from './typings/';
 import { SpeechEventEmitter, WaitReadyOptions, ExtMmirModule } from './typings/';
-interface SpeechEventEmitterImpl<CmdImpl extends Cmd> extends SpeechEventEmitter<CmdImpl> {
+export interface SpeechEventEmitterImpl<CmdImpl extends Cmd> extends SpeechEventEmitter<CmdImpl> {
     speechInputState: BehaviorSubject<SpeechInputStateOptions>;
     changeMicLevels: BehaviorSubject<SpeechFeedbackOptions>;
     waitReadyState: BehaviorSubject<WaitReadyOptions>;
@@ -40,4 +40,3 @@ export declare class MmirService<CmdImpl extends Cmd> {
     protected mmirInit(): Promise<MmirService<CmdImpl>>;
     setSpeechIoDebugLevel(logLevel: LogLevel | LogLevelNum): void;
 }
-export {};
