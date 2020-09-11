@@ -69,49 +69,58 @@ export class SpeechInputController {
   }
 
   constructor(
-    // protected subsUtil: SubscriptionUtil,
     protected mmirProvider: MmirService<any>,
-    protected dictTargetHandler: DictationTargetHandler
+    protected dictTargetHandler: DictationTargetHandler,
+    ignoreMmirReady?: boolean
   ) {
 
-    mmirProvider.ready().then(mmirp => {
-      this._mmir = mmirp.mmir as ExtMmirModule<any>;
-      this._emma = mmirp.mmir.emma;
-      this._manager = mmirp.mmir.speechioManager;
+    if(ignoreMmirReady){
+      this.init(mmirProvider);
+    } else {
+      mmirProvider.ready().then(mmirp => {
+        this.init(mmirp);
+      });
+    }
+  }
 
-      this._speechEventSubscriptions = SubscriptionUtil.subscribe(mmirProvider.speechEvents, [
-        'dictationResult',
-        // 'speechCommand',
-        // 'commandAction'
-        //'resetGuidedInputForCurrentControl' , 'startGuidedInput' , 'resetGuidedInput' , 'isDictAutoProceed'
-      ], this);
+  private init(mmirp: MmirService<any>): void {
 
-      this.dictationResults = mmirProvider.speechEvents.dictationResult.pipe(map(dictation => this._processDictationResult(dictation)));
+    this._mmir = mmirp.mmir as ExtMmirModule<any>;
+    this._emma = mmirp.mmir.emma;
+    this._manager = mmirp.mmir.speechioManager;
 
-      //FIXME should get configuration from somewhere else?
-      const stopWord = this._mmir.conf.get([PLUGIN_ID, 'dictStopWord'], '');
-      if(stopWord){
-        const cancelWord: string = this._mmir.conf.get([PLUGIN_ID, 'dictAbortWord'], '');
-        this.setDictationCommand(stopWord, cancelWord);
-      }
+    this._speechEventSubscriptions = SubscriptionUtil.subscribe(mmirp.speechEvents, [
+      'dictationResult',
+      // 'speechCommand',
+      // 'commandAction'
+      //'resetGuidedInputForCurrentControl' , 'startGuidedInput' , 'resetGuidedInput' , 'isDictAutoProceed'
+    ], this);
 
-      if(!this._mmir.conf.getBoolean([PLUGIN_ID, 'disableUnstableFeedback'], false)){
-        const len = require('../lib/length.js') as typeof LengthModule;
-        const pos = require('../lib/caretPosition.js') as typeof CaretPositionModule;
-        this._selectionUtil = new SelectionUtil(len, pos);
+    this.dictationResults = mmirp.speechEvents.dictationResult.pipe(map(dictation => this._processDictationResult(dictation)));
 
-        //TODO move this, since it's application specific...
-        //style faux-span: must force some global-styling for SPAN to use the selection's own style
-        //                 -> set ID for faux SPAN and specify style for "reseting" global styling
-        const fauxId = PLUGIN_ID+'-sel-marker-faux';
-        const opt = this._selectionUtil.getSelectionOptions();
-        opt.fauxId = fauxId;
+    //FIXME should get configuration from somewhere else?
+    const stopWord = this._mmir.conf.get([PLUGIN_ID, 'dictStopWord'], '');
+    if(stopWord){
+      const cancelWord: string = this._mmir.conf.get([PLUGIN_ID, 'dictAbortWord'], '');
+      this.setDictationCommand(stopWord, cancelWord);
+    }
 
-        const fauxStyle = document.createElement('style');
-        fauxStyle.textContent = '#'+fauxId+' {font-size:inherit;text-align:inherit;}';
-        document.head.appendChild(fauxStyle);
-      }
-    });
+    if(!this._mmir.conf.getBoolean([PLUGIN_ID, 'disableUnstableFeedback'], false)){
+      const len = require('../lib/length.js') as typeof LengthModule;
+      const pos = require('../lib/caretPosition.js') as typeof CaretPositionModule;
+      this._selectionUtil = new SelectionUtil(len, pos);
+
+      //TODO move this, since it's application specific...
+      //style faux-span: must force some global-styling for SPAN to use the selection's own style
+      //                 -> set ID for faux SPAN and specify style for "reseting" global styling
+      const fauxId = PLUGIN_ID+'-sel-marker-faux';
+      const opt = this._selectionUtil.getSelectionOptions();
+      opt.fauxId = fauxId;
+
+      const fauxStyle = document.createElement('style');
+      fauxStyle.textContent = '#'+fauxId+' {font-size:inherit;text-align:inherit;}';
+      document.head.appendChild(fauxStyle);
+    }
   }
 
   public destroy() {
