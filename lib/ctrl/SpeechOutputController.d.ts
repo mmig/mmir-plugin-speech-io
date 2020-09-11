@@ -9,7 +9,8 @@ export declare class SpeechOutputController {
     protected _speechEventSubscriptions: Map<SpeechEventName, Subscription>;
     get debug(): boolean;
     set debug(value: boolean);
-    constructor(prompt: PromptReader, mmirProvider: MmirService<any>);
+    constructor(prompt: PromptReader, mmirProvider: MmirService<any>, ignoreMmirReady?: boolean);
+    private init;
     destroy(): void;
     /**
      * Called when text should should be read.
