@@ -4,8 +4,9 @@ import { VoiceUIController } from './ctrl/VoiceUIController';
 
 import { ReadingOptions , Cmd } from './typings/';
 import { ExtMmirModule } from './typings/';
-import { MmirService } from './mmir-service';
+import { MmirService , SpeechEventEmitterImpl } from './mmir-service';
 import { raiseInternal } from './util/SpeechIoManager';
+import { Observable } from 'rxjs';
 
 export class VoiceUIService<CmdImpl extends Cmd> {
 
@@ -21,6 +22,15 @@ export class VoiceUIService<CmdImpl extends Cmd> {
   public get mmir(): ExtMmirModule<CmdImpl> { return this.mmirProvider.mmir;}
   public get prompt(): PromptReader { return this.vuiCtrl.getPromptReader();}
   public get ctrl(): VoiceUIController<CmdImpl> { return this.vuiCtrl;}
+  public get speechEvents(): SpeechEventEmitterImpl<CmdImpl> {
+    return this.mmirProvider.speechEvents;
+  }
+  public get asrActiveChange(): Observable<boolean> {
+    return this.vuiCtrl.asrActiveChange;
+  }
+  public get ttsActiveChange(): Observable<boolean> {
+    return this.vuiCtrl.ttsActiveChange;
+  }
 
   public get asrActive(): boolean {
     if(this.isReady){

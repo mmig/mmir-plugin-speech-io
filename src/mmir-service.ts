@@ -15,7 +15,7 @@ import { createConfigSettingsImpl } from './util/SettingsUtils';
 
 // var __mmir: MmirModule = mmir as MmirModule;
 
-interface SpeechEventEmitterImpl<CmdImpl extends Cmd> extends SpeechEventEmitter<CmdImpl> {
+export interface SpeechEventEmitterImpl<CmdImpl extends Cmd> extends SpeechEventEmitter<CmdImpl> {
     speechInputState: BehaviorSubject<SpeechInputStateOptions>;
     changeMicLevels: BehaviorSubject<SpeechFeedbackOptions>;
     waitReadyState: BehaviorSubject<WaitReadyOptions>;
