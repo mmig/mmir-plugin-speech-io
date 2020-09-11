@@ -21,16 +21,22 @@ export class SpeechOutputController {
 
   constructor(
     protected prompt: PromptReader,
-    // protected subsUtil: SubscriptionUtil,
-    mmirProvider: MmirService<any>
+    mmirProvider: MmirService<any>,
+    ignoreMmirReady?: boolean
   ) {
 
-    mmirProvider.ready().then(_mmirp => {
+    if(ignoreMmirReady){
+      this.init(mmirProvider);
+    } else {
+      mmirProvider.ready().then(mmirp => {
+        this.init(mmirp);
+      });
+    }
+  }
 
-      // const mmir = _mmirp.mmir;
-      this._speechEventSubscriptions = SubscriptionUtil.subscribe(mmirProvider.speechEvents, ['read'], this);
+  private init(mmirp: MmirService<any>): void {
 
-    });
+    this._speechEventSubscriptions = SubscriptionUtil.subscribe(mmirp.speechEvents, ['read'], this);
   }
 
   public destroy() {

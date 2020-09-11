@@ -111,8 +111,8 @@ export class VoiceUIController<CmdImpl extends Cmd> {
 
       this.prompt = new PromptReader(this.speech, this.mmir.media);
       this.prompt.cancelOnNew = this.mmir.conf.getBoolean([PLUGIN_ID, 'cancelOnNewPrompt'], true);
-      this.speechIn = new SpeechInputController(mmirProvider, this.dictTargetHandler);
-      this.speechOut = new SpeechOutputController(this.prompt, mmirProvider);
+      this.speechIn = new SpeechInputController(mmirProvider, this.dictTargetHandler, true);
+      this.speechOut = new SpeechOutputController(this.prompt, mmirProvider, true);
       this._speechEventSubscriptions = SubscriptionUtil.subscribe(mmirProvider.speechEvents, [
         'speechInputState',
         // 'changeMicLevels',
