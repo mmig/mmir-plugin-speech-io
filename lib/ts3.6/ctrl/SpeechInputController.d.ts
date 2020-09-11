@@ -42,7 +42,8 @@ export declare class SpeechInputController {
     dictationResults: Observable<RecognitionEmma>;
     readonly dicationTargets: DictationTargetHandler;
     readonly emma: EmmaUtil<any>;
-    constructor(mmirProvider: MmirService<any>, dictTargetHandler: DictationTargetHandler);
+    constructor(mmirProvider: MmirService<any>, dictTargetHandler: DictationTargetHandler, ignoreMmirReady?: boolean);
+    private init;
     destroy(): void;
     createDictationTarget(target: DictationTarget, id: string, feedbackStyle?: SelectionMode): DictationHandler;
     setDictationCommand(stopCommandWord: string, cancelCommandWord?: string): void;
