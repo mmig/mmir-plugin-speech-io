@@ -159,8 +159,6 @@
             _util.isDebugVui = vuiLogDebug;
         }
 
-        _util.appConfig = data.appConfig;
-
         //apply setting for debug output:
         var isEnabled = _util.conf.get('showVuiDebugOutput');
         if(typeof isEnabled === 'boolean'){

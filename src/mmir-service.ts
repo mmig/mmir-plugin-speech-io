@@ -4,14 +4,12 @@ import { distinctUntilChanged } from 'rxjs/operators';
 
 import { MediaManager, PlayError , LogLevel , LogLevelNum, IAudio , IWaitReadyImpl } from 'mmir-lib';
 import { SpeechInputStateOptions, SpeechFeedbackOptions, RecognitionEmma, UnderstandingEmma , ReadingOptions , StopReadingOptions, ReadingStateOptions , Cmd , TactileEmma , Emma , ASRError, TTSError } from './typings/';
-import { IAppSettings } from './typings/';
 
 import { EmmaUtil } from './util/EmmaUtil';
 
 import { SpeechEventEmitter , WaitReadyOptions , SpeechIoManager , ExtMmirModule } from './typings/';
 import { createSpeechioManager , raiseInternal , upgrade } from './util/SpeechIoManager';
 import { SPEECH_IO_MANAGER_ID , SPEECH_IO_INPUT_ID , SPEECH_IO_INPUT_ENGINE_ID , SPEECH_IO_ENGINE_ID , PLUGIN_ID } from './consts';
-import { createConfigSettingsImpl } from './util/SettingsUtils';
 
 // var __mmir: MmirModule = mmir as MmirModule;
 
@@ -37,8 +35,6 @@ export interface SpeechEventEmitterImpl<CmdImpl extends Cmd> extends SpeechEvent
 export class MmirService<CmdImpl extends Cmd> {
 
   protected evt: SpeechEventEmitterImpl<CmdImpl>;
-  protected appConfig: IAppSettings;
-  protected _isCreateAppConfigImpl: boolean;
 
   protected _mmir : ExtMmirModule<CmdImpl>;
 
@@ -61,17 +57,10 @@ export class MmirService<CmdImpl extends Cmd> {
 
   constructor(mmir: ExtMmirModule<CmdImpl>) {
     this._mmir = mmir;
+    this.init();
   }
 
-  //FIXME find better way to "inject" dependencies
-  public init(
-    appConfig: IAppSettings | null, ... _args: any[]
-  ): Promise<MmirService<CmdImpl>> {
-
-    this.appConfig = appConfig;
-    if(!this.appConfig){
-      this._isCreateAppConfigImpl = true;
-    }
+  protected init(): Promise<MmirService<CmdImpl>> {
 
     this.evt = {
       'speechInputState': new BehaviorSubject<SpeechInputStateOptions>(
@@ -118,49 +107,27 @@ export class MmirService<CmdImpl extends Cmd> {
 
     } as SpeechEventEmitterImpl<CmdImpl>;
 
-    // apply setting for debug output:
-    //  (technically we should wait for the promise to finish, but since this
-    //   setting is not really important for how the class functions, we just
-    //   continue anyway)
+    // pre-set setting for debug output:
+    //  (technically we should wait for mmir initialization to finish (in order
+    //   to lookup any settings), but since this setting is not really important
+    //   for how the class functions, we just continue anyway)
     this.isDebugVui = true;
-    let initVuiDebugPromise: Promise<void>;
-    if(this._isCreateAppConfigImpl === true && !this.appConfig){
-
-      //... if no AppConfig implementation is available, we need to wait for
-      //    mmir to initialize to create the default implementation
-      initVuiDebugPromise = new Promise((resolve) => {
-
-        this._mmir.ready(() => {
-          if(this._isCreateAppConfigImpl === true && !this.appConfig){
-            this.appConfig = createConfigSettingsImpl(this._mmir.conf);
-          }
-          resolve();
-        });
-
-      })
-    }
-
-    initVuiDebugPromise = initVuiDebugPromise? initVuiDebugPromise.then(() => this.initDebugVui()) : Promise.resolve(this.initDebugVui());
 
     if(!this._initialize){
-      this._initialize = initVuiDebugPromise.then(() => this.mmirInit());
+      this._initialize = this.mmirInit();
     }
 
     return this._initialize;
   }
 
-  private initDebugVui(): void { //Promise<void> {
-    //DISABLED: cannot use async-method on appConfig, since a custom implementation
-    //          may wait on the mmir-service to be ready before execution its get() method
-    //          (-> would never initialize, since this function is called from ini() )
-    // return this.appConfig.get('showVuiDebugOutput').then(isEnabled => {
+  /** NOTE must not be called before mmir.ready() has been emitted */
+  private initDebugVui(): void {
     const isEnabled = this.mmir.conf.getBoolean('showVuiDebugOutput');
     this.isDebugVui = isEnabled;
     if(this.mmir && this.mmir.speechioManager){
       let dlg = this.mmir.speechioManager;
       dlg._isDebugVui = isEnabled;
     }
-    // });
   }
 
   public ready(): Promise<MmirService<CmdImpl>> {
@@ -168,14 +135,14 @@ export class MmirService<CmdImpl extends Cmd> {
 
       if(!this._readyWait){
 
-        console.log('Called MmirService.ready() before init(): waiting...');
+        console.warn('Called MmirService.ready() before init(): waiting...');
 
         this._readyWait = new Promise<MmirService<CmdImpl>>((resolve, reject) => {
 
           //resolve "wait for ready":
           this._resolveReadyWait = (mmirProvider: MmirService<CmdImpl>) => {
             clearTimeout(this._readyWaitTimer);
-            console.log('Resolved "wait for MmirService.ready()".');
+            mmirProvider.mmir.require('mmirf/logger').log('MmirService.ready(): resolved ready.');
             resolve(mmirProvider);
             this._readyWait = null;
             this._resolveReadyWait = null;
@@ -201,10 +168,7 @@ export class MmirService<CmdImpl extends Cmd> {
     return new Promise<MmirService<CmdImpl>>((resolve) => {
       this._mmir.ready(() => {
 
-        //DISABLED now done in init() -> when initializing VUI debug settings
-        // if(this._isCreateAppConfigImpl === true && !this.appConfig){
-        //   this.appConfig = createConfigSettingsImpl(this._mmir.conf);
-        // }
+        this.initDebugVui();
 
         createSpeechioManager(this._mmir, this.isDebugVui? 'debug' : void(0)).then(() => {
 
@@ -235,7 +199,6 @@ export class MmirService<CmdImpl extends Cmd> {
           //circumvent message-queue for init-event:
           // (this allows to pass non-stringified and non-stringifyable object instances)
           raiseInternal(this.mmir.speechioEngine, 'init', {
-            appConfig: this.appConfig,
             mmir: this._mmir,
             emma: dlg.emma,
             pluginId: PLUGIN_ID
@@ -250,7 +213,6 @@ export class MmirService<CmdImpl extends Cmd> {
             //circumvent message-queue for init-event:
             // (this allows to pass non-stringified and non-stringifyable object instances)
             raiseInternal(this.mmir.dialogEngine, 'init', {
-              appConfig: this.appConfig,
               mmir: this._mmir,
               emma: dlg.emma
             });
