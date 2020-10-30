@@ -1,7 +1,6 @@
 import { Subject, BehaviorSubject } from 'rxjs';
 import { PlayError, LogLevel, LogLevelNum } from 'mmir-lib';
 import { SpeechInputStateOptions, SpeechFeedbackOptions, RecognitionEmma, UnderstandingEmma, ReadingOptions, StopReadingOptions, ReadingStateOptions, Cmd, TactileEmma, Emma, ASRError, TTSError } from './typings/';
-import { IAppSettings } from './typings/';
 import { SpeechEventEmitter, WaitReadyOptions, ExtMmirModule } from './typings/';
 export interface SpeechEventEmitterImpl<CmdImpl extends Cmd> extends SpeechEventEmitter<CmdImpl> {
     speechInputState: BehaviorSubject<SpeechInputStateOptions>;
@@ -22,8 +21,6 @@ export interface SpeechEventEmitterImpl<CmdImpl extends Cmd> extends SpeechEvent
 }
 export declare class MmirService<CmdImpl extends Cmd> {
     protected evt: SpeechEventEmitterImpl<CmdImpl>;
-    protected appConfig: IAppSettings;
-    protected _isCreateAppConfigImpl: boolean;
     protected _mmir: ExtMmirModule<CmdImpl>;
     protected _initialize: Promise<MmirService<CmdImpl>>;
     protected _readyWait: Promise<MmirService<CmdImpl>>;
@@ -34,7 +31,8 @@ export declare class MmirService<CmdImpl extends Cmd> {
     get mmir(): ExtMmirModule<CmdImpl>;
     get speechEvents(): SpeechEventEmitterImpl<CmdImpl>;
     constructor(mmir: ExtMmirModule<CmdImpl>);
-    init(appConfig: IAppSettings | null, ..._args: any[]): Promise<MmirService<CmdImpl>>;
+    protected init(): Promise<MmirService<CmdImpl>>;
+    /** NOTE must not be called before mmir.ready() has been emitted */
     private initDebugVui;
     ready(): Promise<MmirService<CmdImpl>>;
     protected mmirInit(): Promise<MmirService<CmdImpl>>;
