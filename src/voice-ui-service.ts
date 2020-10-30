@@ -2,7 +2,7 @@
 import { PromptReader } from './io/PromptReader';
 import { VoiceUIController } from './ctrl/VoiceUIController';
 
-import { ReadingOptions , Cmd } from './typings/';
+import { ReadingOptions , Cmd , RecognitionEmma } from './typings/';
 import { ExtMmirModule } from './typings/';
 import { MmirService , SpeechEventEmitterImpl } from './mmir-service';
 import { raiseInternal } from './util/SpeechIoManager';
@@ -30,6 +30,10 @@ export class VoiceUIService<CmdImpl extends Cmd> {
   }
   public get ttsActiveChange(): Observable<boolean> {
     return this.vuiCtrl.ttsActiveChange;
+  }
+  /** NOTE will only be available when controller is [[ready]] */
+  public get dictationResults(): Observable<RecognitionEmma>{
+    return this.vuiCtrl.speechIn?.dictationResults;
   }
 
   public get asrActive(): boolean {
