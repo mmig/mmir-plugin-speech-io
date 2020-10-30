@@ -207,7 +207,6 @@ export interface SpeechIoPluginConfigurationBaseEntry {
    * Otherwise, the `mmir-service` will raise an 'init' event with event data:
    * ```
    * {
-   *  appConfig: IAppSettings,
    *  mmir: ExtMmirModule<CmdImpl>,
    *  emma: EmmaUtil<CmdImpl>
    * }
@@ -224,7 +223,6 @@ export interface SpeechIoPluginConfigurationBaseEntry {
    *   <transition event="init" target="MainApp">
    *    <script>
    *      // get event data contents:
-   *      var appConfig = _event.data.appConfig;
    *      var mmir = _event.data.mmir;
    *      var emmaUtil = _event.data.emma;
    *      //... use them somehow (e.g. could be stored in data model variable)
