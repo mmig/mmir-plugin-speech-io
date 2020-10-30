@@ -1,6 +1,6 @@
 import { PromptReader } from './io/PromptReader';
 import { VoiceUIController } from './ctrl/VoiceUIController';
-import { ReadingOptions, Cmd } from './typings/';
+import { ReadingOptions, Cmd, RecognitionEmma } from './typings/';
 import { ExtMmirModule } from './typings/';
 import { MmirService, SpeechEventEmitterImpl } from './mmir-service';
 import { Observable } from 'rxjs';
@@ -16,6 +16,7 @@ export declare class VoiceUIService<CmdImpl extends Cmd> {
     readonly speechEvents: SpeechEventEmitterImpl<CmdImpl>;
     readonly asrActiveChange: Observable<boolean>;
     readonly ttsActiveChange: Observable<boolean>;
+    readonly dictationResults: Observable<RecognitionEmma>;
     readonly asrActive: boolean;
     readonly ttsActive: boolean;
     debug: boolean;
