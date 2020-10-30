@@ -37,6 +37,14 @@ SpeechInputStateOptions.state -> SpeechInputStateOptions.active // or before ren
 
 ### Changed Method Signatures
 
+ * removed parameters and changed visibility to `protected`  
+   **NOTE** this function is no invoked automatically, i.e. manual invocation is not required any more and can be removed
+   ```
+   MmirService.init(appConfig: IAppSettings | null, ... _args: any[]) //public
+   ->
+   MmirService.init()                                                 //protected
+   ```
+
  * removed second parameter `event` in:
    ```
    EmmaUtil.setSpeechRecognition(emmaData: AnyEmma<CmdImpl>, event: any, data: RecognitionData, keepExistingFunction?: boolean): void
@@ -57,10 +65,18 @@ SpeechInputStateOptions.state -> SpeechInputStateOptions.active // or before ren
    VoiceUiController.ttsClicked(event?: Event | string | GuiElement | HTMLElement, target?: string | GuiElement | HTMLElement, readingData?: ReadingOptions, feedbackOptions?: FeedbackOption): void {
    ```
 
+### Removed Fields
+
+The following fields were removed without replacement
+
+```
+MmirService.appConfig   // internal, protected field
+```
+
 ### Removed Methods
 
 The following methods were removed without replacement
-(were mostly only debub-implementations)
+(were mostly only debug-implementations)
 
 ```
 VoiceUiController.changeMicLevels(..)
