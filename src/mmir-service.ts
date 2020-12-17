@@ -7,7 +7,7 @@ import { SpeechInputStateOptions, SpeechFeedbackOptions, RecognitionEmma, Unders
 
 import { EmmaUtil } from './util/EmmaUtil';
 
-import { SpeechEventEmitter , WaitReadyOptions , SpeechIoManager , ExtMmirModule } from './typings/';
+import { SpeechEventEmitter , WaitReadyOptions , SpeechIoManager , ExtMmirModule , ExtStateEngine } from './typings/';
 import { createSpeechioManager , raiseInternal , upgrade } from './util/SpeechIoManager';
 import { SPEECH_IO_MANAGER_ID , SPEECH_IO_INPUT_ID , SPEECH_IO_INPUT_ENGINE_ID , SPEECH_IO_ENGINE_ID , PLUGIN_ID } from './consts';
 
@@ -162,7 +162,7 @@ export class MmirService<CmdImpl extends Cmd> {
     return this._initialize;
   }
 
-  protected mmirInit(): Promise<MmirService<CmdImpl>> {
+  protected mmirInit(inputInitConfig?: {[field: string]: any} | Promise<any>, dialogInitConfig?: {[field: string]: any} | Promise<any>): Promise<MmirService<CmdImpl>> {
 
     //promise for setting up mmir
     return new Promise<MmirService<CmdImpl>>((resolve) => {
@@ -196,13 +196,19 @@ export class MmirService<CmdImpl extends Cmd> {
           dlg.emma = EmmaUtil.create(this.mmir);
           this._mmir.emma = dlg.emma;
 
-          //circumvent message-queue for init-event:
-          // (this allows to pass non-stringified and non-stringifyable object instances)
-          raiseInternal(this.mmir.speechioEngine, 'init', {
-            mmir: this._mmir,
-            emma: dlg.emma,
-            pluginId: PLUGIN_ID
-          });
+          const asyncInit: Promise<any>[] = [];
+          const initInputRes = this.raiseInternalInit(
+            this.mmir.inputEngine,
+            {
+              mmir: this._mmir,
+              emma: dlg.emma,
+              pluginId: PLUGIN_ID
+            },
+            inputInitConfig
+          );
+          if(initInputRes){
+            asyncInit.push(initInputRes);
+          }
 
           const dialog = this.mmir.dialog;
           dialog.eventEmitter = {};
@@ -212,23 +218,48 @@ export class MmirService<CmdImpl extends Cmd> {
           if(this.mmir.conf.getBoolean([PLUGIN_ID, 'preventDialogManagerInit']) !== true){
             //circumvent message-queue for init-event:
             // (this allows to pass non-stringified and non-stringifyable object instances)
-            raiseInternal(this.mmir.dialogEngine, 'init', {
-              mmir: this._mmir,
-              emma: dlg.emma
-            });
+            raiseInternal(this.mmir.dialogEngine, 'init', Object.assign(inputInitConfig? inputInitConfig : {}, ));
+
+            const initDlgRes = this.raiseInternalInit(
+              this.mmir.dialogEngine,
+              {
+                mmir: this._mmir,
+                emma: dlg.emma
+              },
+              dialogInitConfig
+            );
+            if(initDlgRes){
+              asyncInit.push(initDlgRes);
+            }
           }
 
           if(this._resolveReadyWait){
             this._resolveReadyWait(this);
           }
 
-          resolve(this);
+          if(asyncInit.length > 0){
+            Promise.all(asyncInit).then(() => resolve(this));
+          } else {
+            resolve(this);
+          }
 
         });//END   createSpeechio().then(...
 
       });//END mmir.ready(...
 
     });//END: new Promise()
+  }
+
+  /**
+   * HELPER circumvent message-queue for init-event:
+   *       (this allows to pass non-stringified and non-stringifyable object instances)
+   */
+  protected raiseInternalInit(stateMachine: ExtStateEngine, baseConfig: {mmir: ExtMmirModule<CmdImpl>, emma: EmmaUtil<CmdImpl>, [field: string]: any}, managerInitConfig?: { [field: string]: any; }): void | Promise<void> {
+
+    if(managerInitConfig && typeof managerInitConfig.then === 'function'){
+      return managerInitConfig.then((config: any) => raiseInternal(stateMachine, 'init', Object.assign(config ? config : {}, baseConfig)))
+    }
+    raiseInternal(stateMachine, 'init', Object.assign(managerInitConfig ? managerInitConfig : {}, baseConfig));
   }
 
   public setSpeechIoDebugLevel(logLevel: LogLevel | LogLevelNum): void {
