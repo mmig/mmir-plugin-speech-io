@@ -1,4 +1,5 @@
-import type { Cmd , SpeechInputStateOptions , SpeechFeedbackOptions , RecognitionEmma , UnderstandingEmma , ReadingOptions , StopReadingOptions , ReadingStateOptions , TactileEmma, Emma, Logger } from './';
+import type { Cmd , SpeechInputStateOptions , SpeechFeedbackOptions , RecognitionEmma , UnderstandingEmma , ReadingOptions , StopReadingOptions , ReadingStateOptions , TactileEmma, Emma } from './';
+import type { Logger } from 'mmir-lib';
 
 import type { Observable , Subject } from 'rxjs';
 
