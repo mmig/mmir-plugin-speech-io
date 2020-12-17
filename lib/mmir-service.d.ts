@@ -20,6 +20,19 @@ export interface SpeechEventEmitterImpl<CmdImpl extends Cmd> extends SpeechEvent
     ttsError: Subject<TTSError>;
     playError: Subject<PlayError>;
 }
+export interface EngineInitConfig {
+    dialogInitConfig?: {
+        [field: string]: any;
+    } | Promise<any>;
+    inputInitConfig?: {
+        [field: string]: any;
+    } | Promise<any>;
+}
+export interface SpeechIoInitConfig extends EngineInitConfig {
+    speechIoInitConfig?: {
+        [field: string]: any;
+    } | Promise<any>;
+}
 export declare class MmirService<CmdImpl extends Cmd> {
     protected evt: SpeechEventEmitterImpl<CmdImpl>;
     protected _mmir: ExtMmirModule<CmdImpl>;
@@ -32,15 +45,29 @@ export declare class MmirService<CmdImpl extends Cmd> {
     get mmir(): ExtMmirModule<CmdImpl>;
     get speechEvents(): SpeechEventEmitterImpl<CmdImpl>;
     constructor(mmir: ExtMmirModule<CmdImpl>);
-    protected init(): Promise<MmirService<CmdImpl>>;
+    protected init(engineConfig?: SpeechIoInitConfig): Promise<MmirService<CmdImpl>>;
     /** NOTE must not be called before mmir.ready() has been emitted */
     private initDebugVui;
     ready(): Promise<MmirService<CmdImpl>>;
-    protected mmirInit(inputInitConfig?: {
-        [field: string]: any;
-    } | Promise<any>, dialogInitConfig?: {
-        [field: string]: any;
-    } | Promise<any>): Promise<MmirService<CmdImpl>>;
+    protected mmirInit(engineConfig?: SpeechIoInitConfig): Promise<MmirService<CmdImpl>>;
+    /**
+     * send 'init' events to mmir.inputEngine and mmir.dialogEngine
+     *
+     * By default, the init-events have data attached with
+     * ```
+     * {
+     *   mmir: ExtMmirModule<CmdImpl>,
+     *   emma: EmmaUtil<CmdImpl>,
+     * }
+     * ```
+     * These init-data can be extended using param `engineConfig`.
+     * If `engineConfig` is a promise, then the promise is resolved, before sending
+     * the init event to the engines.
+     *
+     * @param [engineConfig] optional additional data for the init events
+     * @param [asyncInitTaskList] optional a list for async task: if the list is specified and additional init data is specified, their promise will be added to the list
+     */
+    protected initDialogAndInputEngine(engineConfig?: EngineInitConfig, asyncInitTaskList?: Promise<any>[]): void;
     /**
      * HELPER circumvent message-queue for init-event:
      *       (this allows to pass non-stringified and non-stringifyable object instances)
