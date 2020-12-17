@@ -1,7 +1,8 @@
 import { Subject, BehaviorSubject } from 'rxjs';
 import { PlayError, LogLevel, LogLevelNum } from 'mmir-lib';
 import { SpeechInputStateOptions, SpeechFeedbackOptions, RecognitionEmma, UnderstandingEmma, ReadingOptions, StopReadingOptions, ReadingStateOptions, Cmd, TactileEmma, Emma, ASRError, TTSError } from './typings/';
-import { SpeechEventEmitter, WaitReadyOptions, ExtMmirModule } from './typings/';
+import { EmmaUtil } from './util/EmmaUtil';
+import { SpeechEventEmitter, WaitReadyOptions, ExtMmirModule, ExtStateEngine } from './typings/';
 export interface SpeechEventEmitterImpl<CmdImpl extends Cmd> extends SpeechEventEmitter<CmdImpl> {
     speechInputState: BehaviorSubject<SpeechInputStateOptions>;
     changeMicLevels: BehaviorSubject<SpeechFeedbackOptions>;
@@ -35,6 +36,21 @@ export declare class MmirService<CmdImpl extends Cmd> {
     /** NOTE must not be called before mmir.ready() has been emitted */
     private initDebugVui;
     ready(): Promise<MmirService<CmdImpl>>;
-    protected mmirInit(): Promise<MmirService<CmdImpl>>;
+    protected mmirInit(inputInitConfig?: {
+        [field: string]: any;
+    } | Promise<any>, dialogInitConfig?: {
+        [field: string]: any;
+    } | Promise<any>): Promise<MmirService<CmdImpl>>;
+    /**
+     * HELPER circumvent message-queue for init-event:
+     *       (this allows to pass non-stringified and non-stringifyable object instances)
+     */
+    protected raiseInternalInit(stateMachine: ExtStateEngine, baseConfig: {
+        mmir: ExtMmirModule<CmdImpl>;
+        emma: EmmaUtil<CmdImpl>;
+        [field: string]: any;
+    }, managerInitConfig?: {
+        [field: string]: any;
+    }): void | Promise<void>;
     setSpeechIoDebugLevel(logLevel: LogLevel | LogLevelNum): void;
 }
