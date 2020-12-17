@@ -32,6 +32,15 @@ export interface SpeechEventEmitterImpl<CmdImpl extends Cmd> extends SpeechEvent
     playError: Subject<PlayError>;
 }
 
+export interface EngineInitConfig {
+  dialogInitConfig?: {[field: string]: any} | Promise<any>;
+  inputInitConfig?: {[field: string]: any} | Promise<any>;
+}
+
+export interface SpeechIoInitConfig extends EngineInitConfig {
+  speechIoInitConfig?: {[field: string]: any} | Promise<any>;
+}
+
 export class MmirService<CmdImpl extends Cmd> {
 
   protected evt: SpeechEventEmitterImpl<CmdImpl>;
@@ -60,7 +69,7 @@ export class MmirService<CmdImpl extends Cmd> {
     this.init();
   }
 
-  protected init(): Promise<MmirService<CmdImpl>> {
+  protected init(engineConfig?: SpeechIoInitConfig): Promise<MmirService<CmdImpl>> {
 
     this.evt = {
       'speechInputState': new BehaviorSubject<SpeechInputStateOptions>(
@@ -114,7 +123,7 @@ export class MmirService<CmdImpl extends Cmd> {
     this.isDebugVui = true;
 
     if(!this._initialize){
-      this._initialize = this.mmirInit();
+      this._initialize = this.mmirInit(engineConfig);
     }
 
     return this._initialize;
@@ -162,7 +171,7 @@ export class MmirService<CmdImpl extends Cmd> {
     return this._initialize;
   }
 
-  protected mmirInit(inputInitConfig?: {[field: string]: any} | Promise<any>, dialogInitConfig?: {[field: string]: any} | Promise<any>): Promise<MmirService<CmdImpl>> {
+  protected mmirInit(engineConfig?: SpeechIoInitConfig): Promise<MmirService<CmdImpl>> {
 
     //promise for setting up mmir
     return new Promise<MmirService<CmdImpl>>((resolve) => {
@@ -198,13 +207,13 @@ export class MmirService<CmdImpl extends Cmd> {
 
           const asyncInit: Promise<any>[] = [];
           const initInputRes = this.raiseInternalInit(
-            this.mmir.inputEngine,
+            this.mmir.speechioEngine,
             {
               mmir: this._mmir,
               emma: dlg.emma,
               pluginId: PLUGIN_ID
             },
-            inputInitConfig
+            engineConfig?.speechIoInitConfig
           );
           if(initInputRes){
             asyncInit.push(initInputRes);
@@ -216,31 +225,21 @@ export class MmirService<CmdImpl extends Cmd> {
           upgrade(dialog);
 
           if(this.mmir.conf.getBoolean([PLUGIN_ID, 'preventDialogManagerInit']) !== true){
-            //circumvent message-queue for init-event:
-            // (this allows to pass non-stringified and non-stringifyable object instances)
-            raiseInternal(this.mmir.dialogEngine, 'init', Object.assign(inputInitConfig? inputInitConfig : {}, ));
 
-            const initDlgRes = this.raiseInternalInit(
-              this.mmir.dialogEngine,
-              {
-                mmir: this._mmir,
-                emma: dlg.emma
-              },
-              dialogInitConfig
-            );
-            if(initDlgRes){
-              asyncInit.push(initDlgRes);
+            this.initDialogAndInputEngine(engineConfig, asyncInit);
+          }
+
+          const doResolve = () => {
+            if(this._resolveReadyWait){
+              this._resolveReadyWait(this);
             }
-          }
-
-          if(this._resolveReadyWait){
-            this._resolveReadyWait(this);
-          }
+            resolve(this);
+          };
 
           if(asyncInit.length > 0){
-            Promise.all(asyncInit).then(() => resolve(this));
+            Promise.all(asyncInit).then(() => doResolve());
           } else {
-            resolve(this);
+            doResolve();
           }
 
         });//END   createSpeechio().then(...
@@ -248,6 +247,53 @@ export class MmirService<CmdImpl extends Cmd> {
       });//END mmir.ready(...
 
     });//END: new Promise()
+  }
+
+  /**
+   * send 'init' events to mmir.inputEngine and mmir.dialogEngine
+   *
+   * By default, the init-events have data attached with
+   * ```
+   * {
+   *   mmir: ExtMmirModule<CmdImpl>,
+   *   emma: EmmaUtil<CmdImpl>,
+   * }
+   * ```
+   * These init-data can be extended using param `engineConfig`.
+   * If `engineConfig` is a promise, then the promise is resolved, before sending
+   * the init event to the engines.
+   *
+   * @param [engineConfig] optional additional data for the init events
+   * @param [asyncInitTaskList] optional a list for async task: if the list is specified and additional init data is specified, their promise will be added to the list
+   */
+  protected initDialogAndInputEngine(engineConfig?:EngineInitConfig, asyncInitTaskList?: Promise<any>[]): void {
+
+    const dlg: SpeechIoManager<CmdImpl> = this.mmir.speechioManager;
+
+    const initIptRes = this.raiseInternalInit(
+      this.mmir.inputEngine,
+      {
+        mmir: this._mmir,
+        emma: dlg.emma
+      },
+      engineConfig?.inputInitConfig
+    );
+    if(asyncInitTaskList && initIptRes){
+      asyncInitTaskList.push(initIptRes);
+    }
+
+    const initDlgRes = this.raiseInternalInit(
+      this.mmir.dialogEngine,
+      {
+        mmir: this._mmir,
+        emma: dlg.emma
+      },
+      engineConfig?.dialogInitConfig
+    );
+
+    if(asyncInitTaskList && initDlgRes){
+      asyncInitTaskList.push(initDlgRes);
+    }
   }
 
   /**
