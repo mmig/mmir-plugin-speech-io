@@ -1,6 +1,6 @@
 import { Subject } from 'rxjs';
-import { MmirModule, DialogManager } from 'mmir-lib';
-import { StateManager, ManagerFactory } from '../typings/';
+import { MmirModule, DialogManager, StateManager } from 'mmir-lib';
+import { ManagerFactory } from '../typings/';
 import { ExtMmirModule , SpeechIoManager , ExtStateEngine , EventManager } from '../typings/';
 import { SPEECH_IO_INPUT_STATES_ID , SPEECH_IO_INPUT_ID , SPEECH_IO_STATES_ID , SPEECH_IO_MANAGER_ID , SPEECH_IO_ENGINE_ID , SPEECH_IO_INPUT_ENGINE_ID } from '../consts';
 
