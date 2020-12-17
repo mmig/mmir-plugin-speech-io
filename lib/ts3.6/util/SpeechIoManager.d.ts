@@ -1,5 +1,4 @@
-import { MmirModule, DialogManager } from 'mmir-lib';
-import { StateManager } from '../typings/';
+import { MmirModule, DialogManager, StateManager } from 'mmir-lib';
 import { ExtStateEngine, EventManager } from '../typings/';
 export declare function createInstance(mmirLib: MmirModule): Promise<StateManager>;
 /**
