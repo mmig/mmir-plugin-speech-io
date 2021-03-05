@@ -24,11 +24,11 @@ indent_style = tab
 
 [www/lib/**]
 indent_style = space
-insert_final_newline = false
+insert_final_newline = unset
 trim_trailing_whitespace = false
 
 [*.md]
 trim_trailing_whitespace = false
 
 [package.json]
-insert_final_newline = false
+insert_final_newline = unset
