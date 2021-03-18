@@ -1,20 +1,42 @@
-import { MediaManager } from 'mmir-lib';
+import { MediaManager, TTSOptions } from 'mmir-lib';
 import { StopReadingOptions } from '../typings/';
 import { IPromptHandler, SpeechIoManager } from '../typings/';
+import { ConfigurationManager_NEW } from '../util/CongiurationManagerCompat';
 export declare class PromptReader {
     private dlg;
+    private config;
     private media;
     protected _ttsActive: boolean;
+    /** if TTS is currently active */
     get active(): boolean;
+    protected _ttsCtx?: string;
     /** context for tts(): set to FALSY for default context
      * @see mmir.media.setDefaultCtx(ctx: string | null)
+     *
+     * @example
+     * // set via configurationManager
+     * mmir.conf.set('speechio.ttsEngine', ttsCtx)
      */
-    ttsCtx?: string;
-    voice?: string;
-    pauseDuration?: number;
+    get ttsEngine(): string;
+    protected _ttsDefaultOptions?: TTSOptions;
+    /** default options for the TTS engine
+     * @see mmir.media.tts(options: TTSOptions)
+     *
+     * NOTE: should not set `language` or `voice` here!
+     *
+     * (options for `text` or callbacks will be ignored)
+     *
+     * @example
+     * // set via configurationManager
+     * mmir.conf.set('speechio.ttsDefaultOptions', ttsOptions)
+     */
+    getDefaultOptions(): TTSOptions | undefined;
+    protected _cancelOnNew: boolean;
+    /** if a prompt is active, when a new one is requested: cancel the current one, or discard the new one?  */
+    get cancelOnNew(): boolean;
     handler: IPromptHandler;
-    /** if a prompt is active, when a new one is requested: cancel the current one, or discard the new one?  */ cancelOnNew: boolean;
-    constructor(dlg: SpeechIoManager<any>, media: MediaManager);
+    constructor(dlg: SpeechIoManager<any>, config: ConfigurationManager_NEW, media: MediaManager);
+    private initSettings;
     setActive(newState?: boolean): boolean;
     cancel(options?: StopReadingOptions): void;
     /**

@@ -97,9 +97,6 @@ export declare class VoiceUIController<CmdImpl extends Cmd> {
      * and cancels active ASR (if not <code>isPermanentCommandMode</code>) as well as active prompts/TTS.
      */
     leaveView(): void;
-    protected _asrEngine(engine: string | null): void;
-    _ttsEngine(engine: string | null): void;
-    protected _enableBargeIn(enable: boolean): void;
     protected doUnsubscribeCurrentPage(): void;
     protected releasePageResources(): void;
     protected releaseUiResources(force: boolean): void;
