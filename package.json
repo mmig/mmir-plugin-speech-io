@@ -41,15 +41,15 @@
     "rxjs": "^6.0"
   },
   "devDependencies": {
-    "@types/fs-extra": "^9.0.5",
+    "@types/fs-extra": "^9.0.8",
     "copyfiles": "^2.4.1",
-    "fs-extra": "^9.0.1",
+    "fs-extra": "^9.1.0",
     "mmir-lib": "^6.2.0",
-    "mmir-plugin-exports": "^2.1.1",
-    "mmir-tooling": "^6.2.1",
-    "mmir-webpack": "^6.2.0",
+    "mmir-plugin-exports": "^2.5.2",
+    "mmir-tooling": "^6.2.5",
+    "mmir-webpack": "^6.2.1",
     "text-caret-pos": "^1.0.1",
-    "typescript": "^3.9.7",
+    "typescript": "^3.9.9",
     "web-units": "^1.0.0"
   },
   "peerDependencies": {
