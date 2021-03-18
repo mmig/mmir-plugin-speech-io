@@ -65,12 +65,27 @@ SpeechInputStateOptions.state -> SpeechInputStateOptions.active // or before ren
    VoiceUiController.ttsClicked(event?: Event | string | GuiElement | HTMLElement, target?: string | GuiElement | HTMLElement, readingData?: ReadingOptions, feedbackOptions?: FeedbackOption): void {
    ```
 
+### Changed Usage
+
+```
+PromptReader.ttsCtx -> instead use: mmir.conf.set('speechio.ttsEngine', <tts engine>)
+PromptReader.voice -> instead use: mmir.conf.set('speechio.ttsDefaultOption.voice', <voice>)
+PromptReader.pauseDuration -> instead use: mmir.conf.set('speechio.ttsDefaultOption.pauseDuration', <pauseDuration>)
+```
+
 ### Removed Fields
 
 The following fields were removed without replacement
 
 ```
 MmirService.appConfig   // internal, protected field
+```
+
+The following fields were removed, because they were replaced by new fields/methods (see section [Changed Usage](#changed_usage))
+```
+PromptReader.ttsCtx -> replaced by config value (see Changed Usage)
+PromptReader.voice -> replaced by config value (see Changed Usage)
+PromptReader.pauseDuration -> replaced by config value (see Changed Usage)
 ```
 
 ### Removed Methods
@@ -83,4 +98,10 @@ VoiceUiController.changeMicLevels(..)
 VoiceUiController.evalSemantics(..)     // see example in README.md instead
 SpeechInputController.speechCommand(..) // or before renaming of speech event: SpeechInputController.determineSpeechCmd(..)
 SpeechInputController.commandAction(..) // or before renaming of speech event: SpeechInputController.execSpeechCmd(..)
+```
+
+The following methods were removed, because they were replaced by new fields/methods (see section [Changed Usage](#changed_usage))
+```
+PromptReader.voice -> replaced by config value (see Changed Usage)
+PromptReader.pauseDuration -> replaced by config value (see Changed Usage)
 ```

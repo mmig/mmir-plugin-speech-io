@@ -97,6 +97,40 @@ export interface SpeechIoPluginConfigurationEntry {
 export interface SpeechIoPluginConfigurationBaseEntry {
 
   /**
+   * The execution context/name (see {@link mmir.MediaManager.setDefaultCtx}) for the
+   * recognition functions (i.e. `mmir.media.recognize()` | `mmir.media.startRecord()` | `mmir.media.stopRecord()` | `mmir.media.cancelRecognition()`).
+   *
+   * @default undefined (i.e. use default context)
+   */
+  asrEngine?: string;
+
+  /**
+   * The execution context/name (see {@link mmir.MediaManager.setDefaultCtx}) for the
+   * speech sythesis functions (i.e. `mmir.media.tts()` | `mmir.media.cancelSpeech()`).
+   *
+   * @default undefined (i.e. use default context)
+   */
+  ttsEngine?: string;
+
+  /**
+   * Custom / default options for ASR (speech recognition):
+   * note that configuration for [[SpeechIoPluginConfigurationEntry]] superceed these default options.
+   *
+   * @default undefined
+   */
+  asrDefaultOptions?: string;
+
+  /**
+   * Custom / default options for TTS (speech synthesis):
+   * note should not set `language` or `voice` options with this!
+   *
+   * (i.e. should only be used for (custom) options that are independet of language setting)
+   *
+   * @default undefined
+   */
+  ttsDefaultOptions?: string;
+
+  /**
    * During active speech-input in 'dictation' mode:
    * if detected as single input/sentence, will stop speech-input for the input-control.
    *
@@ -189,6 +223,20 @@ export interface SpeechIoPluginConfigurationBaseEntry {
    * @default false
    */
   showVuiDebugOutput?: boolean;
+
+  /**
+   * enable "barge in" during speech prompt (TTS / speech synthesis output):
+   *
+   * by default, speech input (i.e. recognition) will be disabled during speech synthesis
+   * in order to prevent recording the synthesized speech.
+   *
+   * If echo-cancellation is used when recording the speech, or synthesis is outputed through headphones
+   * or similiar, "barge in" can be enabled:
+   * in this case the micropohne stays open (i.e. speech recognition stays active) during speech synthesis.
+   *
+   * @default false
+   */
+  enableBargeIn?: boolean;
 
   /**
    * if enabled:

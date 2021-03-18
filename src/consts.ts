@@ -13,3 +13,9 @@ export const SPEECH_IO_STATES_ID = 'mmirf/state/speechio';
 export const SPEECH_IO_INPUT_ID = 'mmirf/speechioInput';
 export const SPEECH_IO_INPUT_ENGINE_ID = 'mmirf/speechioInput';
 export const SPEECH_IO_INPUT_STATES_ID = 'mmirf/state/speechioInput';
+
+export const BARGE_IN_CONFIG = 'enableBargeIn';
+export const ASR_ENGINE_CONFIG = 'asrEngine';
+export const TTS_ENGINE_CONFIG = 'ttsEngine';
+export const TTS_DEFAULT_OPTIONS_CONFIG = 'ttsDefaultOptions';
+export const CANCEL_ON_NEW_PROMPT_CONFIG = 'cancelOnNewPrompt';

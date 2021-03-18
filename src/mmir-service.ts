@@ -10,6 +10,7 @@ import { EmmaUtil } from './util/EmmaUtil';
 import { SpeechEventEmitter , WaitReadyOptions , SpeechIoManager , ExtMmirModule , ExtStateEngine } from './typings/';
 import { createSpeechioManager , raiseInternal , upgrade } from './util/SpeechIoManager';
 import { SPEECH_IO_MANAGER_ID , SPEECH_IO_INPUT_ID , SPEECH_IO_INPUT_ENGINE_ID , SPEECH_IO_ENGINE_ID , PLUGIN_ID } from './consts';
+import { makeConfigurationManagerCompat } from './util/CongiurationManagerCompat';
 
 // var __mmir: MmirModule = mmir as MmirModule;
 
@@ -71,6 +72,10 @@ export class MmirService<CmdImpl extends Cmd> {
 
   protected init(engineConfig?: SpeechIoInitConfig): Promise<MmirService<CmdImpl>> {
 
+    if(this._initialize){
+      return this._initialize; ///////////////////// EARLY EXIT ////////////
+    }
+
     this.evt = {
       'speechInputState': new BehaviorSubject<SpeechInputStateOptions>(
           {active: false, mode: 'command', inputMode: ''}//<-initial state
@@ -122,9 +127,7 @@ export class MmirService<CmdImpl extends Cmd> {
     //   for how the class functions, we just continue anyway)
     this.isDebugVui = true;
 
-    if(!this._initialize){
-      this._initialize = this.mmirInit(engineConfig);
-    }
+    this._initialize = this.mmirInit(engineConfig);
 
     return this._initialize;
   }
@@ -176,6 +179,8 @@ export class MmirService<CmdImpl extends Cmd> {
     //promise for setting up mmir
     return new Promise<MmirService<CmdImpl>>((resolve) => {
       this._mmir.ready(() => {
+
+        makeConfigurationManagerCompat(this._mmir.conf);
 
         this.initDebugVui();
 
