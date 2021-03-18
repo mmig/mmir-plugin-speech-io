@@ -196,10 +196,11 @@ import { ExtMmirModule } from '../typings/';
       score = data[1],
       type = data[2],
       alternatives = data[3],
-      unstable = data[4];
+      unstable = data[4],
+      custom = data[5];
 
     var asrList = [];
-    addRecognition(asrList, result, score, type, unstable);
+    addRecognition(asrList, result, score, type, unstable, custom);
 
     if(alternatives) for(var i=0, size=alternatives.length; i < size; ++i){
       addRecognition(asrList, alternatives[i]);
@@ -212,7 +213,7 @@ import { ExtMmirModule } from '../typings/';
   }
 
   /** @memberOf Emma# */
-  function addRecognition(emmaRecogList: SpeechRecognitionResult[], result: string | {result: string, score: number}, score?: number, resultType?: RecognitionType, unstablePart?: string){
+  function addRecognition(emmaRecogList: SpeechRecognitionResult[], result: string | {result: string, score: number}, score?: number, resultType?: RecognitionType, unstablePart?: string, custom?: any){
 
     //normalize arguments
     if(_isAlternativeRecognitionResult(result)){
@@ -224,10 +225,11 @@ import { ExtMmirModule } from '../typings/';
     //create data object
     var data: SpeechRecognitionResult = {
         id: nextId(),
+        text: result as string,
         confidence: score,
-        unstable: unstablePart,
         type: resultType,
-        text: result as string
+        unstable: unstablePart,
+        custom: custom
     };
     // data[SPEECH_RECOGNITION_RESULT_NAME] = result;
 

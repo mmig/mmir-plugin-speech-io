@@ -382,10 +382,11 @@ export interface RecognitionFunc extends Func {
 
 export interface SpeechRecognitionResult {
     id: any;
+    text: string;
     confidence: number;
     type: RecognitionType;
-    text: string;
     unstable?: string;
+    custom?: any;
 }
 
 export interface UnderstandingFunc<CmdImpl extends Cmd> extends Func {
