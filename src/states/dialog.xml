@@ -414,7 +414,7 @@
                 var asrFunc = eosEnabled? 'recognize' : 'startRecord';
 
                 var asrOptions = _util.toAsrOptions({
-                    success: function(result, score, type, alt, unstable){
+                    success: function(result, score, type, alt, unstable, custom){
 
                         if(_util.isDebugVui) console.info('speechioManager.'+asrFunc+'['+speechInputMode+' - current: '+speech_mode+']: '+JSON.stringify(arguments));
 
@@ -425,7 +425,7 @@
                         var isFireEvent = isNotEmpty || isFinal || (allowInterim &&  unstable);
 
                         if(isFireEvent){
-                            var emmaEvt = _util.emma.toEmma({type: 'speech', mode: speechInputMode, target: speechTargetElem}, [result, score, type, alt, unstable]);
+                            var emmaEvt = _util.emma.toEmma({type: 'speech', mode: speechInputMode, target: speechTargetElem}, [result, score, type, alt, unstable, custom]);
                             _util.input.raise('speech',emmaEvt);
                         }
                         else {
@@ -481,7 +481,7 @@
                 var speechInputMode = speech_mode;
 
                 _util.media.perform(asr_ctx, 'stopRecord', [{
-                    success: function(result, score, type, alt, unstable){
+                    success: function(result, score, type, alt, unstable, custom){
 
                         if(_util.isDebugVui) console.info('speechioManager.stopRecord['+speechInputMode+' - current: '+speech_mode+']: '+JSON.stringify(arguments));
 
@@ -491,7 +491,7 @@
                         var isFireEvent = isNotEmpty || isFinal || (speechInputMode === 'dictation' && isNotEmpty);
 
                         if(isFireEvent){
-                            var emmaEvt = _util.emma.toEmma({type: 'speech', mode: speechInputMode, target: speechTargetElem}, [result, score, type, alt, unstable]);
+                            var emmaEvt = _util.emma.toEmma({type: 'speech', mode: speechInputMode, target: speechTargetElem}, [result, score, type, alt, unstable, custom]);
                             _util.input.raise('speech',emmaEvt);
                         }
                         else {
