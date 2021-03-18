@@ -12,14 +12,14 @@
     }
   },
   "scripts": {
-    "build": "npm run build-ts && npm run update-src-libs && npm run build-typings && npm run copy-libs && npm run downlevel-dts && npm run build-metadata",
-    "build-ts": "tsc",
-    "build-typings": "node scripts/update-typings.js",
-    "copy-libs": "copyfiles -u 1 \"src/lib/**/*.*\" lib",
-    "update-libs": "npm update text-caret-pos web-units && npm run update-src-libs",
-    "update-src-libs": "node scripts/update-libs.js",
-    "downlevel-dts": "dtsdownlevel lib --force",
-    "build-metadata": "createplugincompat ./ && pluginexport --ignore-deps ./"
+    "build": "npm run build:ts && npm run update:src:libs && npm run build:typings && npm run copy:libs && npm run downlevel-dts && npm run build:metadata",
+    "build:ts": "tsc",
+    "build:typings": "node scripts/update-typings.js",
+    "build:metadata": "createplugincompat ./ && pluginexport --ignore-deps ./",
+    "copy:libs": "copyfiles -u 1 \"src/lib/**/*.*\" lib",
+    "update:libs": "npm update text-caret-pos web-units && npm run update:src:libs",
+    "update:src:libs": "node scripts/update:libs.js",
+    "downlevel-dts": "dtsdownlevel lib --force"
   },
   "repository": {
     "type": "git",
