@@ -36,136 +36,153 @@
 
         /** HELPER util with functions for creating "state-description objects" */
         _util = {
-            /** @returns creates JSON either from eventData OR from current data-model/SC-state:
-             *              {
-             *                  mode: <mode>,           "command" | "dictation"
-             *                  targetId: <STRING>      the DOM element's ID attribute
-             *              }
-             */
-            createVuiOptions: function(eventData){return {
-                mode:      eventData && eventData.mode?       eventData.mode       : speech_mode,
-                inputMode: eventData && eventData.inputMode?  eventData.inputMode  : input_mode,
-                targetId:  eventData && eventData.targetId?   eventData.targetId   : target_id,
-              };
-            },
-            /** @returns TRUE if event.data.interpretation.speechMode is "command" */
-            isSpeechCommand: function(eventData){
-              return this.isSpeechMode(eventData, 'command');
-            },
-            /** @returns TRUE if event.data.interpretation.speechMode is "dictation" */
-            isSpeechDictation: function(eventData){
-              return this.isSpeechMode(eventData, 'dictation');
-            },
-            /** @returns TRUE if event.data.interpretation.inputMode is "guided" */
-            isSpeechGuided: function(eventData){
-              return (eventData && eventData.inputMode === 'guided') || input_mode === 'guided';
-            },
-            /** @returns TRUE if event.data.interpretation.speechMode is <mode>, where <mode>: "command" | "dictation"*/
-            isSpeechMode: function(eventData, theSpeechMode){
-              if(eventData && eventData.interpretation && eventData.interpretation.speechMode){
-                return eventData.interpretation.speechMode === theSpeechMode;
-              }
-              return speech_mode === theSpeechMode;
-            },
-            /** HELPER: IFF event has on option-setting for inputMode for input_mode -> apply it to the state-variable */
-            applyInputMode: function(event){
-              if(event.data && typeof event.data.inputMode !== 'undefined'){
-                input_mode = event.data.inputMode;
-              }
-              return input_mode;
-            },
-            /** HELPER: get ASR configuration value depending on speech-mode, fallback etc. */
-            getAsrConfig: function(configName, defaultValue, speechMode){
-              speechMode = speechMode || speech_mode;
-              var val = this.conf.get([_pluginId, speechMode, configName]);
-              if(typeof val === 'undefined'){
-                val = this.conf.get([_pluginId, configName]);
-              }
-              if(typeof val === 'undefined'){
-                return defaultValue;
-              }
-              return val;
-            },
-            /** @returns TRUE if event.data.interpretation.medium is "tactile" */
-            isTouch: function(eventData){
-              if(eventData && eventData.interpretation){
-                return eventData.interpretation.medium === 'tactile';
-              }
-              return false;
-            },
-            /** @returns TRUE if isTouch() and eventData.interpretation.value is defined, but eventData.interpretation.value.gesture is NOT defined */
-            isTouchRaw: function(eventData){
-                return this.isTouch(eventData) && eventData.interpretation.value && !eventData.interpretation.value.gesture;
-            },
-            /** @returns TRUE if isTouch() and eventData.interpretation.value.gesture is defined */
-            isTouchUnderstanding: function(eventData){
-                return this.isTouch(eventData) && eventData.interpretation.value && eventData.interpretation.value.gesture;
-            },
-            /** HELPER: get PromptHandler of PromptReader from VoiceUIService (may be undefined if none is set) */
-            getPromptHandler: function(){
-              if(this.vui && this.vui.prompt){
-                return this.vui.prompt.handler;
-              }
-            },
-            /** HELPER: check if prompt is allowed to interrupt active ASR via PromptHandler (if one is set), DEFAULT false*/
-            isCommandInterruptionPrompt: function(contextId, promptId){
-              var handler = this.getPromptHandler();
-              if(handler){
-                return handler.willReadPrompt(contextId, promptId, false);
-              }
-              return false;
-            },
-            /** HELPER: check if interrupting prompt should change ASR mode to 'command' via PromptHandler (if one is set), DEFAULT false*/
-            isCommandPrompt: function(promptId){
-              var handler = this.getPromptHandler();
-              if(handler && handler.isCommandPrompt){
-                return handler.isCommandPrompt(promptId);
-              }
-              return false;
-            },
-            speechCtrlName: 'SpeechInput',
-            readCtrlName: 'SpeechOutput',
-            guidedCtrlName: 'GuidedInput',//FIXME no impl. yet
-            defaultAsrEngine: 'nuance',
-            defaultSpeechMode: speech_mode, //<- use the speech_mode that is set when engine is initialized as default!
-            defaultTargetId: target_id,     //<- use the target_id that is set when engine is initialized as default!
+          /** @returns creates JSON either from eventData OR from current data-model/SC-state:
+           *              {
+           *                  mode: <mode>,           "command" | "dictation"
+           *                  targetId: <STRING>      the DOM element's ID attribute
+           *              }
+           */
+          createVuiOptions: function(eventData){
+            return {
+              mode:      eventData && eventData.mode?       eventData.mode       : speech_mode,
+              inputMode: eventData && eventData.inputMode?  eventData.inputMode  : input_mode,
+              targetId:  eventData && eventData.targetId?   eventData.targetId   : target_id,
+            };
+          },
+          /** @returns TRUE if event.data.interpretation.speechMode is "command" */
+          isSpeechCommand: function(eventData){
+            return this.isSpeechMode(eventData, 'command');
+          },
+          /** @returns TRUE if event.data.interpretation.speechMode is "dictation" */
+          isSpeechDictation: function(eventData){
+            return this.isSpeechMode(eventData, 'dictation');
+          },
+          /** @returns TRUE if event.data.interpretation.inputMode is "guided" */
+          isSpeechGuided: function(eventData){
+            return (eventData && eventData.inputMode === 'guided') || input_mode === 'guided';
+          },
+          /** @returns TRUE if event.data.interpretation.speechMode is <mode>, where <mode>: "command" | "dictation"*/
+          isSpeechMode: function(eventData, theSpeechMode){
+            if(eventData && eventData.interpretation && eventData.interpretation.speechMode){
+              return eventData.interpretation.speechMode === theSpeechMode;
+            }
+            return speech_mode === theSpeechMode;
+          },
+          /** HELPER: IFF event has on option-setting for inputMode for input_mode -> apply it to the state-variable */
+          applyInputMode: function(event){
+            if(event.data && typeof event.data.inputMode !== 'undefined'){
+              input_mode = event.data.inputMode;
+            }
+            return input_mode;
+          },
+          /** HELPER: get ASR configuration value depending on speech-mode, fallback etc. */
+          getAsrConfig: function(configName, defaultValue, speechMode){
+            speechMode = speechMode || speech_mode;
+            var val = this.conf.get([_pluginId, speechMode, configName]);
+            if(typeof val === 'undefined'){
+              val = this.conf.get([_pluginId, configName]);
+            }
+            if(typeof val === 'undefined'){
+              return defaultValue;
+            }
+            return val;
+          },
+          /** HELPER: get ASR configuration value depending on speech-mode, fallback etc. */
+          toAsrOptions: function(options){
+            var defaultOptions = this.conf.get([_pluginId, 'asrDefaultOptions']);
+            if(!defaultOptions){
+              return options;
+            } else {
+              var opt = this.extend({}, defaultOptions);
+              return this.extend(opt, options);
+            }
+          },
+          /** @returns TRUE if event.data.interpretation.medium is "tactile" */
+          isTouch: function(eventData){
+            if(eventData && eventData.interpretation){
+              return eventData.interpretation.medium === 'tactile';
+            }
+            return false;
+          },
+          /** @returns TRUE if isTouch() and eventData.interpretation.value is defined, but eventData.interpretation.value.gesture is NOT defined */
+          isTouchRaw: function(eventData){
+            return this.isTouch(eventData) && eventData.interpretation.value && !eventData.interpretation.value.gesture;
+          },
+          /** @returns TRUE if isTouch() and eventData.interpretation.value.gesture is defined */
+          isTouchUnderstanding: function(eventData){
+            return this.isTouch(eventData) && eventData.interpretation.value && eventData.interpretation.value.gesture;
+          },
+          /** HELPER: get PromptHandler of PromptReader from VoiceUIService (may be undefined if none is set) */
+          getPromptHandler: function(){
+            if(this.vui && this.vui.prompt){
+              return this.vui.prompt.handler;
+            }
+          },
+          /** HELPER: check if prompt is allowed to interrupt active ASR via PromptHandler (if one is set), DEFAULT false*/
+          isCommandInterruptionPrompt: function(contextId, promptId){
+            var handler = this.getPromptHandler();
+            if(handler){
+              return handler.willReadPrompt(contextId, promptId, false);
+            }
+            return false;
+          },
+          /** HELPER: check if interrupting prompt should change ASR mode to 'command' via PromptHandler (if one is set), DEFAULT false*/
+          isCommandPrompt: function(promptId){
+            var handler = this.getPromptHandler();
+            if(handler && handler.isCommandPrompt){
+              return handler.isCommandPrompt(promptId);
+            }
+            return false;
+          },
+          speechCtrlName: 'SpeechInput',
+          readCtrlName: 'SpeechOutput',
+          guidedCtrlName: 'GuidedInput',//FIXME no impl. yet
+          defaultSpeechMode: speech_mode, //<- use the speech_mode that is set when engine is initialized as default!
+          defaultTargetId: target_id,     //<- use the target_id that is set when engine is initialized as default!
 
-            media: mmir.media,
-            present: mmir.present,
-            dlg: mmir.speechioManager,
-            input: mmir.speechioInput,
-            conf: mmir.conf,
+          media: mmir.media,
+          present: mmir.present,
+          dlg: mmir.speechioManager,
+          input: mmir.speechioInput,
+          conf: mmir.conf,
 
-            vui: void(0), //<- will be set via set-vui-service event (see below)
+          // attach EMMA tools:
+          emma: data.emma,
+          //logEmma: function(emma){},//stub
 
-            isDebugVui: false
+          // attach helper function for cloning objects
+          extend: mmir.require('mmirf/util/extend'),
+
+          //get env:
+          // env.isBrowserEnv: BOOLEAN
+          // env.isCordovaEnv: BOOLEAN
+          env: mmir.require('mmirf/env'),
+
+          vui: void(0), //<- will be set via set-vui-service event (see below)
+
+          isDebugVui: false
         };
-
-        //initialize / extend internal _utils with EMMA tools:
-        _util.emma = data.emma;
 
         //set plugin ID (e.g. for querying config values)
         _pluginId = data.pluginId;
 
-        //get env:
-        // env.isBrowserEnv: BOOLEAN
-        // env.isCordovaEnv: BOOLEAN
-        _util.env = mmir.require('mmirf/env');//NOTE: need to use requirejs(), since scion brings its own require-function
+        //apply setting for asr_ctx:
+        _util.conf.on([_pluginId, 'asrEngine'], function(newValue){
+          asr_ctx = newValue;
+        }, true);
 
+        //apply setting for allow_barge_in:
+        _util.conf.on([_pluginId, 'enableBargeIn'], function(newValue){
+          allow_barge_in = newValue;
+        }, true);
 
-        //apply config for debug-logging:
-        var vuiLogDebug;//TODO = mmir.logConfig['DlgStateMachine.VUI'];
-        if(typeof vuiLogDebug !== 'undefined'){
-            _util.isDebugVui = vuiLogDebug;
-        }
+        //apply config for debug-logging: FIXME use logger for printing debug output, e.g.
+        // _logger = mmir.require('mmirf/logger').create(_pluginId + '.vui');
 
         //apply setting for debug output:
-        var isEnabled = _util.conf.get('showVuiDebugOutput');
-        if(typeof isEnabled === 'boolean'){
-          _util.isDebugVui = isEnabled;
-        }
-
-        //_util.logEmma = function(emma){};//stub
+        _util.conf.on([_pluginId, 'showVuiDebugOutput'], function(newValue){
+          _util.isDebugVui = typeof newValue === 'boolean'? newValue : false;
+        }, true);
 
         if(_util.isDebugVui) console.info('SpeechIOEngine initialized.');
 
@@ -192,18 +209,18 @@
       </onentry>
 
       <transition event="leaveView" name="leaveView">
-          <script>
-              //remove listener for micro-level changes:
-              _util.dlg.raise('showMicLevelsInactive');
+        <script>
+            //remove listener for micro-level changes:
+            _util.dlg.raise('showMicLevelsInactive');
 
-              //close cmd-dialog ect. if necessary, before leaving:
-              var options = _util.createVuiOptions(_event.data);
-              options.active = false;
-              _util.dlg.emit('speechInputState', options);
+            //close cmd-dialog ect. if necessary, before leaving:
+            var options = _util.createVuiOptions(_event.data);
+            options.active = false;
+            _util.dlg.emit('speechInputState', options);
 
-              //stop reading
-              _util.dlg.raise('stop-reading');
-          </script>
+            //stop reading
+            _util.dlg.raise('stop-reading');
+        </script>
       </transition>
 
       <transition event="showSpeechStateActive" name="showSpeechStateActive">
@@ -352,21 +369,6 @@
 
       </datamodel>
 
-      <transition event="setAsrEngine" name="setAsrEngine">
-        <script>
-            var engine = _event.data;
-            asr_ctx = engine;
-            if(_util.isDebugVui) console.warn('asr_ctx -> ', asr_ctx);
-        </script>
-      </transition>
-
-      <transition event="enableBargeIn" name="enableBargeIn">
-        <script>
-            allow_barge_in = !!_event.data;
-            if(_util.isDebugVui) console.warn('allow_barge_in -> ', allow_barge_in);
-        </script>
-      </transition>
-
       <state id="AsrActive" name="AsrActive">
           <onentry>
             <script>//<![CDATA[
@@ -411,7 +413,7 @@
 
                 var asrFunc = eosEnabled? 'recognize' : 'startRecord';
 
-                _util.media.perform(asr_ctx, asrFunc, [{
+                var asrOptions = _util.toAsrOptions({
                     success: function(result, score, type, alt, unstable){
 
                         if(_util.isDebugVui) console.info('speechioManager.'+asrFunc+'['+speechInputMode+' - current: '+speech_mode+']: '+JSON.stringify(arguments));
@@ -448,7 +450,9 @@
                     results: altResults,
                     eosPause: useLongPause? 'long' : 'short',
                     mode: langModel,
-                }]);
+                });
+
+                _util.media.perform(asr_ctx, asrFunc, [asrOptions]);
 
                 _util.dlg.raise('showMicLevelsActive', {mode: speech_mode, targetId: speechTargetElem});
 

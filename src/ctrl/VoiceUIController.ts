@@ -2,12 +2,13 @@
 import { Subscription , BehaviorSubject } from 'rxjs';
 
 import { RecognitionEmma , UnderstandingEmma , SpeechInputStateOptions, ReadingStateOptions , StopReadingOptions, ReadingOptions, Cmd } from '../typings/';
-import { SPEECH_ACTIVE , READ_ACTIVE , PLUGIN_ID } from '../consts';
+import { SPEECH_ACTIVE , READ_ACTIVE , PLUGIN_ID , BARGE_IN_CONFIG , ASR_ENGINE_CONFIG , TTS_ENGINE_CONFIG } from '../consts';
 import { triggerClickFeedback , FeedbackOption } from '../io/HapticFeedback';
 import { PromptReader } from '../io/PromptReader';
 import { SpeechInputController } from '../ctrl/SpeechInputController';
 import { SpeechOutputController } from '../ctrl/SpeechOutputController';
 import { SubscriptionUtil } from '../util/SubscriptionUtil';
+import { ConfigurationManager_NEW } from '../util/CongiurationManagerCompat';
 import { DictationTargetHandler , DictationHandler, DictationTarget , SelectionMode } from '../io/SpeechDictation';
 import { ReadTargetHandler , ReadHandler } from '../io/SpeechReading';
 import { EventLike } from '../typings/';
@@ -109,8 +110,7 @@ export class VoiceUIController<CmdImpl extends Cmd> {
 
       this._initialized = true;
 
-      this.prompt = new PromptReader(this.speech, this.mmir.media);
-      this.prompt.cancelOnNew = this.mmir.conf.getBoolean([PLUGIN_ID, 'cancelOnNewPrompt'], true);
+      this.prompt = new PromptReader(this.speech, this.mmir.conf as ConfigurationManager_NEW, this.mmir.media);
       this.speechIn = new SpeechInputController(mmirProvider, this.dictTargetHandler, true);
       this.speechOut = new SpeechOutputController(this.prompt, mmirProvider, true);
       this._speechEventSubscriptions = SubscriptionUtil.subscribe(mmirProvider.speechEvents, [
@@ -169,39 +169,21 @@ export class VoiceUIController<CmdImpl extends Cmd> {
   }
 
   public asrEngine(engine: string | null): void {
-    if(this.mmir.speechioManager){
-      this._asrEngine(engine);
-    } else if(this.initializing) {
-      this.initializing.then(() => {
-          this._asrEngine(engine);
-      });
-    } else {
-      console.error('VoiceUIController.asrEngine: cannot set ASR engine "'+engine+'", because mmir.speechioManager is not availabe!');
+    if(this.asrActive){
+      this.asrCancel(false);
     }
+    this.mmir.conf.set([PLUGIN_ID, ASR_ENGINE_CONFIG], engine);
   }
 
   public ttsEngine(engine: string | null): void {
-    if(this.prompt){
-      this._ttsEngine(engine);
-    } else if(this.initializing) {
-      this.initializing.then(() => {
-        this._ttsEngine(engine);
-      });
-    } else {
-      console.error('VoiceUIController.ttsEngine: cannot set TTS engine "'+engine+'", because prompt (PromptReader) is not availabe!');
+    if(this.ttsActive){
+      this.ttsCancel();
     }
+    this.mmir.conf.set([PLUGIN_ID, TTS_ENGINE_CONFIG], engine);
   }
 
   public enableBargeIn(enable: boolean): void {
-    if(this.mmir.speechioManager){
-      this._enableBargeIn(enable);
-    } else if(this.initializing) {
-      this.initializing.then(() => {
-          this._enableBargeIn(enable);
-      });
-    } else {
-      console.error('VoiceUIController.enableBargeIn: cannot set enableBargeIn to '+enable+', because mmir.speechioManager is not availabe!');
-    }
+    this.mmir.conf.set([PLUGIN_ID, BARGE_IN_CONFIG], enable);
   }
 
   /** @deprecated use [[ enterView ]] */
@@ -285,24 +267,6 @@ export class VoiceUIController<CmdImpl extends Cmd> {
     //NOTE would need special treatment, if pending ASR results should be stored/used!!!
     this.asrCancel(this.isPermanentCommandMode);
     this.ttsCancel();
-  }
-
-  protected _asrEngine(engine: string | null): void {
-    if(this.asrActive){
-      this.asrCancel(false);
-    }
-    this.mmir.speechioManager.raise('setAsrEngine', engine);
-  }
-
-  public _ttsEngine(engine: string | null): void {
-    if(this.ttsActive){
-      this.ttsCancel();
-    }
-    this.prompt.ttsCtx = engine;
-  }
-
-  protected _enableBargeIn(enable: boolean): void {
-    this.mmir.speechioManager.raise('enableBargeIn', enable);
   }
 
   protected doUnsubscribeCurrentPage(){
