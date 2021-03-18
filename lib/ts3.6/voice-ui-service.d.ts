@@ -16,6 +16,7 @@ export declare class VoiceUIService<CmdImpl extends Cmd> {
     readonly speechEvents: SpeechEventEmitterImpl<CmdImpl>;
     readonly asrActiveChange: Observable<boolean>;
     readonly ttsActiveChange: Observable<boolean>;
+    /*NOTE will only be available when controller is [[ready]] */
     readonly dictationResults: Observable<RecognitionEmma>;
     readonly asrActive: boolean;
     readonly ttsActive: boolean;

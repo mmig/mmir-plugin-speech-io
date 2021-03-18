@@ -5,7 +5,7 @@
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "typesVersions": {
-    "<3.8": {
+    "<3.9": {
       "lib/*": [
         "lib/ts3.6/*"
       ]
