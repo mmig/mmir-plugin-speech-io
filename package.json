@@ -18,7 +18,7 @@
     "build:metadata": "createplugincompat ./ && pluginexport --ignore-deps ./",
     "copy:libs": "copyfiles -u 1 \"src/lib/**/*.*\" lib",
     "update:libs": "npm update text-caret-pos web-units && npm run update:src:libs",
-    "update:src:libs": "node scripts/update:libs.js",
+    "update:src:libs": "node scripts/update-libs.js",
     "downlevel-dts": "dtsdownlevel lib --force"
   },
   "repository": {
