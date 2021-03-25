@@ -32,7 +32,7 @@ export function makeConfigurationManagerCompat(config: ConfigurationManager_NEW 
 
         // use empty string as "any change" event type:
         const path: string[] =typeof propertyName === 'string'? propertyName.split('.') : propertyName;
-        listener(this.get(path), void(0), path.join('.'));
+        listener(this.get(path), void(0), path.join('.') as any);// NOTE convert path from new API argument format (string[]) to old format (dot-seprated string)
       }
     } as any;
 
