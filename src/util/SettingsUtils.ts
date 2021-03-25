@@ -44,8 +44,8 @@ export class AppSettingsConfig implements IAppSettings {
     }
 
     this.conf.then(() => {
-      this.onChangeListener = (newValue: any, oldValue?: any, propertyName?: string) => {
-        this.onChangeSubject.next(new SettingsChange(propertyName, newValue, oldValue));
+      this.onChangeListener = (newValue: any, oldValue?: any, propertyPath?: string[]) => {
+        this.onChangeSubject.next(new SettingsChange(propertyPath.join('.'), newValue, oldValue));
       };
       this._conf.on(this.onChangeListener);
     });
