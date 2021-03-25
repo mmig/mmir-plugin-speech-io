@@ -1,7 +1,7 @@
 import { MediaManager, TTSOptions } from 'mmir-lib';
 import { StopReadingOptions } from '../typings/';
 import { IPromptHandler, SpeechIoManager } from '../typings/';
-import { ConfigurationManager_NEW } from '../util/CongiurationManagerCompat';
+import { ConfigurationManager_NEW } from '../util/ConfigurationManagerCompat';
 export declare class PromptReader {
     private dlg;
     private config;
