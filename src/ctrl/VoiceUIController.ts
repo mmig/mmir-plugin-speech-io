@@ -8,7 +8,7 @@ import { PromptReader } from '../io/PromptReader';
 import { SpeechInputController } from '../ctrl/SpeechInputController';
 import { SpeechOutputController } from '../ctrl/SpeechOutputController';
 import { SubscriptionUtil } from '../util/SubscriptionUtil';
-import { ConfigurationManager_NEW } from '../util/CongiurationManagerCompat';
+import { ConfigurationManager_NEW } from '../util/ConfigurationManagerCompat';
 import { DictationTargetHandler , DictationHandler, DictationTarget , SelectionMode } from '../io/SpeechDictation';
 import { ReadTargetHandler , ReadHandler } from '../io/SpeechReading';
 import { EventLike } from '../typings/';

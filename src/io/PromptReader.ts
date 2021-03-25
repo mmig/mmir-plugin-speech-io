@@ -3,7 +3,7 @@ import { MediaManager, TTSOptions } from 'mmir-lib';
 import { StopReadingOptions } from '../typings/';
 import { IPromptHandler , SpeechIoManager } from '../typings/';
 import { PLUGIN_ID , CANCEL_ON_NEW_PROMPT_CONFIG , TTS_ENGINE_CONFIG , TTS_DEFAULT_OPTIONS_CONFIG } from '../consts';
-import { ConfigurationManager_NEW } from '../util/CongiurationManagerCompat';
+import { ConfigurationManager_NEW } from '../util/ConfigurationManagerCompat';
 
 export class PromptReader {
 

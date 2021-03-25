@@ -10,7 +10,7 @@ import { EmmaUtil } from './util/EmmaUtil';
 import { SpeechEventEmitter , WaitReadyOptions , SpeechIoManager , ExtMmirModule , ExtStateEngine } from './typings/';
 import { createSpeechioManager , raiseInternal , upgrade } from './util/SpeechIoManager';
 import { SPEECH_IO_MANAGER_ID , SPEECH_IO_INPUT_ID , SPEECH_IO_INPUT_ENGINE_ID , SPEECH_IO_ENGINE_ID , PLUGIN_ID } from './consts';
-import { makeConfigurationManagerCompat } from './util/CongiurationManagerCompat';
+import { makeConfigurationManagerCompat } from './util/ConfigurationManagerCompat';
 
 // var __mmir: MmirModule = mmir as MmirModule;
 
