@@ -90,10 +90,11 @@ export class PromptReader {
    * @param options the reading options (NOTE if continuesReading is set, no stopped notification will be emitted)
    */
   stoppedPrompt(options?: StopReadingOptions): void {
-    if(!(options && options.continuesReading)){//do not send status-updates, if there is a "next reading"
+    if(!(options && options.continuesReading)){//do not set status-updates, if there is a "next reading"
       this.setActive(false);
-      this.dlg.raise('reading-stopped');
     }
+    //NOTE reading-stopped will start reading the next prompt, in case options.continuesReading was TRUE
+    this.dlg.raise('reading-stopped');
   }
 
   public setHandler(handler: IPromptHandler): void {
