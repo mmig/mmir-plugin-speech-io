@@ -110,7 +110,7 @@ export class VoiceUIController<CmdImpl extends Cmd> {
 
       this._initialized = true;
 
-      this.prompt = new PromptReader(this.speech, this.mmir.conf as ConfigurationManager_NEW, this.mmir.media);
+      this.prompt = new PromptReader(this.speech, this.mmir.conf as ConfigurationManager_NEW, this.mmir.media, this.mmir.lang);
       this.speechIn = new SpeechInputController(mmirProvider, this.dictTargetHandler, true);
       this.speechOut = new SpeechOutputController(this.prompt, mmirProvider, true);
       this._speechEventSubscriptions = SubscriptionUtil.subscribe(mmirProvider.speechEvents, [
@@ -566,7 +566,7 @@ export class VoiceUIController<CmdImpl extends Cmd> {
       const ctrl = readTarget.ctrl;
       if(this.readOverlay){
         // this.readOverlay.target = ctrl;
-        this.readOverlay.startReading(event, ctrl);
+        this.readOverlay.startReading(readingData, ctrl);
       }
     }
   }

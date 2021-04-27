@@ -126,9 +126,11 @@ Configuration values:
    * Custom / default options for ASR (speech recognition):
    * note that configuration for [[SpeechIoPluginConfigurationEntry]] superceed these default options.
    *
+   * NOTE: if specified, the same default options are used regardless of current language setting (see {@link mmir.LanguageManager#getLanguage})
+   *
    * @default undefined
    */
-  asrDefaultOptions?: string;
+  asrDefaultOptions?: Partial<ASROptions>;
 
   /**
    * Custom / default options for TTS (speech synthesis):
@@ -136,9 +138,11 @@ Configuration values:
    *
    * (i.e. should only be used for (custom) options that are independet of language setting)
    *
+   * NOTE: if **not** specified per language, the default options should not contain any language dependend settings (e.g. like `voice`)
+   *
    * @default undefined
    */
-  ttsDefaultOptions?: string;
+  ttsDefaultOptions?: Partial<TTSOptions> | {[languageCode: string]: Partial<TTSOptions>};
 
   /**
    * During active speech-input in 'dictation' mode:
