@@ -1,5 +1,5 @@
 
-import { MediaManager, TTSOptions } from 'mmir-lib';
+import { MediaManager, TTSOptions, LanguageManager } from 'mmir-lib';
 import { StopReadingOptions } from '../typings/';
 import { IPromptHandler , SpeechIoManager } from '../typings/';
 import { PLUGIN_ID , CANCEL_ON_NEW_PROMPT_CONFIG , TTS_ENGINE_CONFIG , TTS_DEFAULT_OPTIONS_CONFIG } from '../consts';
@@ -48,7 +48,7 @@ export class PromptReader {
 
   public handler: IPromptHandler;
 
-  constructor(private dlg: SpeechIoManager<any>, private config: ConfigurationManager_NEW, private media: MediaManager){
+  constructor(private dlg: SpeechIoManager<any>, private config: ConfigurationManager_NEW, private media: MediaManager, private lang: LanguageManager){
     this._ttsActive = false;
     this._cancelOnNew = false;
 
@@ -159,11 +159,22 @@ export class PromptReader {
     //   }
     // }
     if(this._ttsDefaultOptions){
-      const defOpt = Object.assign({}, this._ttsDefaultOptions, opt);
+      const defOpt = Object.assign({}, this.doGetDefaultReadingOptions(), opt);
       Object.assign(opt, defOpt);
     }
 
     this.media.perform(this._ttsCtx, 'tts', [opt]);
+  }
+
+  protected doGetDefaultReadingOptions(): any {
+    if(this._ttsDefaultOptions){
+      const lang = this.lang.getLanguage();
+      if(this._ttsDefaultOptions[lang] && typeof this._ttsDefaultOptions[lang] === 'object'){
+        return this._ttsDefaultOptions[lang];
+      }
+      return this._ttsDefaultOptions;
+    }
+    return undefined;
   }
 
   //////////////// TODO create own logger for PromptReader?
