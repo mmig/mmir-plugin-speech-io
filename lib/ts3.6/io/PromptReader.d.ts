@@ -1,4 +1,4 @@
-import { MediaManager, TTSOptions } from 'mmir-lib';
+import { MediaManager, TTSOptions, LanguageManager } from 'mmir-lib';
 import { StopReadingOptions } from '../typings/';
 import { IPromptHandler, SpeechIoManager } from '../typings/';
 import { ConfigurationManager_NEW } from '../util/ConfigurationManagerCompat';
@@ -6,6 +6,7 @@ export declare class PromptReader {
     private dlg;
     private config;
     private media;
+    private lang;
     protected _ttsActive: boolean;
     /*if TTS is currently active */
     readonly active: boolean;
@@ -35,7 +36,7 @@ export declare class PromptReader {
     /*if a prompt is active, when a new one is requested: cancel the current one, or discard the new one?  */
     readonly cancelOnNew: boolean;
     handler: IPromptHandler;
-    constructor(dlg: SpeechIoManager<any>, config: ConfigurationManager_NEW, media: MediaManager);
+    constructor(dlg: SpeechIoManager<any>, config: ConfigurationManager_NEW, media: MediaManager, lang: LanguageManager);
     private initSettings;
     setActive(newState?: boolean): boolean;
     cancel(options?: StopReadingOptions): void;
@@ -47,6 +48,7 @@ export declare class PromptReader {
     setHandler(handler: IPromptHandler): void;
     readPrompt(text: string | Array<string>): void;
     protected doRead(text: string | Array<string>): void;
+    protected doGetDefaultReadingOptions(): any;
     protected _isLog(): boolean;
     protected _isLogError(): boolean;
     protected _log(msg: string): void;
