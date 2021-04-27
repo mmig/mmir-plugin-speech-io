@@ -188,11 +188,11 @@ export class PromptReader {
   }
 
   protected _log(msg: string): void {
-    if(this._isLog()) (this.media as any)._log.debug(".PromptReader: " + msg);
+    if(this._isLog()) (this.media as any)._log.debug(".PromptReader: " + msg, 1);
   }
 
   protected _logError(msg: string, err?: any): void {
-    if(this._isLogError()) (this.media as any)._log.error(".PromptReader: " + msg, err);
+    if(this._isLogError()) (this.media as any)._log.error(".PromptReader: " + msg, err, 1);
   }
 
 }
