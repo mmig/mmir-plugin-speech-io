@@ -1054,9 +1054,9 @@
             <raise event="cancel-speech-input" />
           </transition>
 
-          <!--  should not be neccessary within this state, but just to be save:  define cancel speech input transition: -->
+          <!-- if INACTIVE: do clear any pending asr-restarts (and ensure asr status & engine are deactivated) -->
           <transition event="cancel-speech-input" name="cancel-speech-input">
-            <!-- FIXME: this should work: assign location="temp_restart_speech_with_id" expr="''" /-->
+            <assign location="temp_restart_speech_with_id" expr="''" />
             <script>
                 _util.dlg.raise('showMicLevelsInactive');
                 _util.media.perform(asr_ctx, 'cancelRecognition');
