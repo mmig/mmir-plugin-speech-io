@@ -12,6 +12,9 @@ export declare class PromptReader {
     readonly active: boolean;
     protected _ttsCtx?: string;
     /*context for tts(): set to FALSY for default context
+    *
+    * Change by set config value "ttsEngine".
+    *
     * @see mmir.media.setDefaultCtx(ctx: string | null)
     *
     * @example
@@ -27,13 +30,25 @@ export declare class PromptReader {
      *
      * (options for `text` or callbacks will be ignored)
      *
+     * Change by set config value "ttsDefaultOptions" for
+     * the corresponding language code.
+     *
      * @example
-     * // set via configurationManager
-     * mmir.conf.set('speechio.ttsDefaultOptions', ttsOptions)
+     * // set via configurationManager for language "en"
+     * mmir.conf.set('speechio.ttsDefaultOptions.en', ttsOptions)
      */
     getDefaultOptions(): TTSOptions | undefined;
     protected _cancelOnNew: boolean;
-    /*if a prompt is active, when a new one is requested: cancel the current one, or discard the new one?  */
+    /*
+    * if a prompt is active, when a new one is requested:
+    * cancel the current one, or discard the new one?
+    *
+    * Change by set config value "cancelOnNewPrompt".
+    * @example
+    * // set via configurationManager
+    * mmir.conf.set('speechio.cancelOnNewPrompt', true);
+    * @return [description]
+    */
     readonly cancelOnNew: boolean;
     handler: IPromptHandler;
     constructor(dlg: SpeechIoManager<any>, config: ConfigurationManager_NEW, media: MediaManager, lang: LanguageManager);
