@@ -13,6 +13,9 @@ export class PromptReader {
 
   protected _ttsCtx?: string;
   /** context for tts(): set to FALSY for default context
+   *
+   * Change by set config value "ttsEngine".
+   *
    * @see mmir.media.setDefaultCtx(ctx: string | null)
    *
    * @example
@@ -31,9 +34,12 @@ export class PromptReader {
    *
    * (options for `text` or callbacks will be ignored)
    *
+   * Change by set config value "ttsDefaultOptions" for
+   * the corresponding language code.
+   *
    * @example
-   * // set via configurationManager
-   * mmir.conf.set('speechio.ttsDefaultOptions', ttsOptions)
+   * // set via configurationManager for language "en"
+   * mmir.conf.set('speechio.ttsDefaultOptions.en', ttsOptions)
    */
   public getDefaultOptions(): TTSOptions | undefined {
     return this._ttsDefaultOptions;
@@ -41,7 +47,16 @@ export class PromptReader {
 
   //TODO impl. queuing-mode for new prompts?
   protected _cancelOnNew: boolean;
-  /** if a prompt is active, when a new one is requested: cancel the current one, or discard the new one?  */
+  /**
+   * if a prompt is active, when a new one is requested:
+   * cancel the current one, or discard the new one?
+   *
+   * Change by set config value "cancelOnNewPrompt".
+   * @example
+   * // set via configurationManager
+   * mmir.conf.set('speechio.cancelOnNewPrompt', true);
+   * @return [description]
+   */
   public get cancelOnNew(): boolean {
     return this._cancelOnNew;
   }
