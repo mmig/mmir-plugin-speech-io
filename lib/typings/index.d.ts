@@ -1113,7 +1113,8 @@ export interface InputOutputOption extends FeedbackOption {
   //  */
   // asrCancel?: boolean;
   /**
-   * if explicitly set to FALSE, active TTS will not be canceled
+   * if explicitly set to `true`, active TTS will be canceled, before executing the speech-operation
+   * (NOTE that e.g. starting ASR will automatically stop TTS, if it active)
    */
   ttsCancel?: boolean
 }
