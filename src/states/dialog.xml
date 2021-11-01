@@ -371,6 +371,8 @@
 
       <state id="AsrActive" name="AsrActive">
           <onentry>
+            <assign location="temp_restart_speech_with_id" expr="''" />
+            <assign location="temp_resume_speech_with_id" expr="''" />
             <script>//<![CDATA[
 
                 if(_event.data){
@@ -388,7 +390,7 @@
                 //if(_util.isDebugVui) console.debug('Speech input activated (mode: '+speechInputMode+'; event: '+JSON.stringify(_event)+')');
 
                 //cancel TTS (has no effect, if TTS is not active)
-                if(!allow_barge_in && !_util.getAsrConfig('disableCancelPrompt', false, speechInputMode)){
+                if(reading_status && !allow_barge_in && !_util.getAsrConfig('disableCancelPrompt', false, speechInputMode)){
                   _util.dlg.raise('stop-reading');
                 }
 
@@ -1007,7 +1009,7 @@
                 target_id = _event.data.targetId;
                 temp_restart_speech_with_id = target_id;
                 temp_resume_speech_with_id = target_id;
-                _util.dlg.raise('showSpeechStateActive');
+                // _util.dlg.raise('showSpeechStateActive');// NOTE using raise-elem below will trigger event immediately instead of queuing it!
 
                 //use generic prompt-ID by default
                 var promptId = _event.data.promptId || 'command-prompt';
@@ -1023,6 +1025,7 @@
                 _util.dlg.raise('read-prompt', options);
 
             </script>
+            <raise event="showSpeechStateActive" />
           </transition>
 
           <transition event="cancel-non-guided-dictation" name="cancel-non-guided-dictation">
@@ -1219,7 +1222,8 @@
                 _util.dlg.raise('read', options);
             }
             else if(temp_restart_speech_with_id){
-                if(_util.isDebugVui) console.warn('starting speech-input now for '+temp_restart_speech_with_id +' (targetId is '+target_id+', mode: "'+speech_mode+'")');
+                if(_util.isDebugVui) console.warn('starting speech-input now for '+temp_restart_speech_with_id +' (current targetId is '+target_id+', mode: "'+speech_mode+'")');
+                target_id = temp_restart_speech_with_id;
                 temp_restart_speech_with_id = '';
                 _util.dlg.raise('toggleSpeechInputState', _util.createVuiOptions());
                 _util.dlg.raise('showSpeechState');
