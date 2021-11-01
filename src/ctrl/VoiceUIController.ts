@@ -345,7 +345,7 @@ export class VoiceUIController<CmdImpl extends Cmd> {
 
     //if(this._debugMsg) console.log('commandClicked');
 
-    if(this.ttsActive && (!feedbackOptions || (feedbackOptions && feedbackOptions.ttsCancel !== false))){
+    if(this.ttsActive && feedbackOptions?.ttsCancel === true){
       this.ttsCancel();
     }
 
