@@ -172,7 +172,7 @@ export interface DictationTarget {
      *  NOTE:
      *  if not specified, speech input will not be able to be aware of changes made by other input types e.g. keyboard
      */
-    onInputChange?: Observable<any>;
+    onInputChange?: Observable<string>;
     /**
      * custom handler for applying text of the speech recognition to the input field/textara control
      *
