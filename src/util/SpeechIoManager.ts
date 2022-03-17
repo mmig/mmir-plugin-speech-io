@@ -58,12 +58,12 @@ export function upgrade<T extends EventManager>(mng: DialogManager) : T {
       try{d = JSON.stringify(data)} catch(err){}
       this._log.log('emit action for '+actionName+' ' + d);
     }
-    let speechEmitter: Subject<any> = this.eventEmitter[actionName];
+    let speechEmitter: Subject<any | void> = this.eventEmitter[actionName];
     if(speechEmitter){
       if(typeof data !== 'undefined'){
         speechEmitter.next(data);
       } else {
-        speechEmitter.next();
+        (speechEmitter as Subject<void>).next();
       }
     } else if(this._log.isw()) {
       let d: any;
