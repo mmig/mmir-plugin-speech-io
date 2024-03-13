@@ -87,6 +87,8 @@ export declare class VoiceUIController<CmdImpl extends Cmd> {
      * Remembers the subscription for the current/active view, and
      * unsubscribes when #leaveView is triggered.
      *
+     * If array: entries with FALSY values will be ignored.
+     *
      * @param {Subscription} subscription
      */
     addViewSubscription(subscription: Subscription[] | Subscription): void;
