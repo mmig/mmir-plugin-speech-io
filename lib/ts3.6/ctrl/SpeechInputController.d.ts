@@ -5,7 +5,7 @@ import { DictationTargetHandler, DictationHandler, DictationTarget, CurrentInput
 import { SelectionUtil } from '../util/SelectionUtil';
 import { SpeechEventName, ExtMmirModule, SpeechIoManager } from '../typings/';
 import { MmirService } from '../mmir-service';
-export declare type RecognitionTypeExt = RecognitionType | 'RECOGNITION_ERROR';
+export type RecognitionTypeExt = RecognitionType | 'RECOGNITION_ERROR';
 export interface ASRResult extends SpeechRecognitionResult {
     isAutoComplete?: boolean;
 }
