@@ -11,7 +11,8 @@
     "moduleResolution": "node",
     "sourceMap": true,
     "target": "es5",
-    "outDir": "lib"
+    "outDir": "lib",
+    "newLine": "crlf"
   },
   "include": [
     "src/**/*.ts"
