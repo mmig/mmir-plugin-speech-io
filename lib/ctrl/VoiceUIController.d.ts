@@ -116,7 +116,7 @@ export declare class VoiceUIController<CmdImpl extends Cmd> {
      * dictationClicked(event: Event, target: DictationTarget, feedbackMode?: SelectionMode)
      *
      * @param  {Event} event
-     * @param  {DictationTarget | string} target
+     * @param  {DictationTarget | string} targetId
      *                          The dication target.
      *                          If called the first time for this target, the argument must be a DictationTarget object
      * @param  {SelectionMode} [feedbackStyle]
@@ -192,7 +192,7 @@ export declare class VoiceUIController<CmdImpl extends Cmd> {
      *
      * NOTE: overwrite for changing the default behavior.
      *
-     * @param  {StopReadingOptions} data the data specifying, which TTS engine should be stopped
+     * @param  {StopReadingOptions} options the data specifying, which TTS engine should be stopped
      */
     stopReading(options: StopReadingOptions): void;
     /**
