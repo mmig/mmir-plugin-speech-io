@@ -106,8 +106,8 @@ export declare class DictationHandler {
      */
     setSelection(start: number, end: number, text?: string): void;
 }
-export declare type SelectionMode = 'none' | 'unstable' | 'interim';
-export declare type InputSelection = {
+export type SelectionMode = 'none' | 'unstable' | 'interim';
+export type InputSelection = {
     start: number;
     end: number;
     index?: number;

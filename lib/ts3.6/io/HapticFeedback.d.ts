@@ -1,7 +1,7 @@
 export declare var IS_SOUND_FEEDBACK: boolean;
 export declare var IS_HAPTIC_FEEDBACK: boolean;
 export declare var CLICK_VIBRATE_DURATION: number;
-export declare type FeedbackOption = {
+export type FeedbackOption = {
     sound?: boolean;
     haptic?: boolean;
 };
