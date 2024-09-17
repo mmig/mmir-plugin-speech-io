@@ -137,11 +137,10 @@ export declare class VoiceUIController<CmdImpl extends Cmd> {
      *                             the `DictationHandler` for the specifed `DictationTarget` (or ID) will be reset/destroyed
      * @param [doNotResetActiveCss] OPTIONAL if `false`, will not reset the speech-activation CSS-classes
      *                                       on the UI HTMLElements of the `DictationHandler` (can/should be set, if the GUI elements are immediatly disposed anyway)
-     * @param [destroyDictationTarget] OPTIONAL if `true` and `target` is a `DictationTarget`, then all its field be reset to `undefined`
      */
     resetDictationHandlers(): void;
     resetDictationHandlers(target: string, doNotResetActiveCss?: boolean): void;
-    resetDictationHandlers(target: DictationTarget, doNotResetActiveCss?: boolean, destroyDictationTarget?: boolean): void;
+    resetDictationHandlers(target: DictationTarget, doNotResetActiveCss?: boolean): void;
     private updateCurrentDictationTarget;
     /**
      * Set the overlay for GUI feedback during dictation (speech input).

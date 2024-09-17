@@ -45,7 +45,16 @@ export declare class DictationHandler {
     protected setCtrl(ctrl: GuiElement): void;
     protected initFromTarget(currentText: string, textChangeObservable: Observable<string>): void;
     setTargetRef(target: DictationTarget): void;
-    destroy(): void;
+    /**
+     * release dictation-handler & (interal) dictation-target resources
+     *
+     * @param  [doNotResetActiveCss]  OPTIONAL if `true`, do not reset CSS classes on HTMLElement that indication `speech-active`
+     *                                (e.g. if HTMLElements will be dispose anyway, there is no need to reset their state)
+     * @param  [keepDictationTarget]  OPTIONAL if specified, will not destroy the `DictationTarget`, if it is the same instance as
+     *                                `keepDictationTarget` (by reference or its ID)
+     *                                (can/should be used, if the dictation-target will still be used later on).
+     */
+    destroy(doNotResetActiveCss?: boolean, keepDictationTarget?: DictationTarget | string | boolean): void;
     prepare(): void;
     showDictationFeedback(display: boolean): void;
     private getInputSelection;
