@@ -419,7 +419,7 @@ export class VoiceUIController<CmdImpl extends Cmd> {
 
     let handler: DictationHandler = this.dictTargetHandler.get(targetId);
     if(handler && replaceExistingHandler){
-      handler.destroy();
+      handler.destroy(true, targetRef || targetId);
       handler = null;
     }
     if(!handler){
@@ -448,12 +448,11 @@ export class VoiceUIController<CmdImpl extends Cmd> {
    *                             the `DictationHandler` for the specifed `DictationTarget` (or ID) will be reset/destroyed
    * @param [doNotResetActiveCss] OPTIONAL if `false`, will not reset the speech-activation CSS-classes
    *                                       on the UI HTMLElements of the `DictationHandler` (can/should be set, if the GUI elements are immediatly disposed anyway)
-   * @param [destroyDictationTarget] OPTIONAL if `true` and `target` is a `DictationTarget`, then all its field be reset to `undefined`
    */
   public resetDictationHandlers() : void;
   public resetDictationHandlers(target: string, doNotResetActiveCss?: boolean) : void;
-  public resetDictationHandlers(target: DictationTarget, doNotResetActiveCss?: boolean, destroyDictationTarget?: boolean): void
-  public resetDictationHandlers(target?: string | DictationTarget, doNotResetActiveCss?: boolean, destroyDictationTarget?: boolean): void {
+  public resetDictationHandlers(target: DictationTarget, doNotResetActiveCss?: boolean): void
+  public resetDictationHandlers(target?: string | DictationTarget, doNotResetActiveCss?: boolean): void {
     if(!target){
 
       this.dictTargetHandler.reset();
@@ -464,18 +463,8 @@ export class VoiceUIController<CmdImpl extends Cmd> {
       const handler = this.dictTargetHandler.get(targetId);
 
       if(handler){
-        if(!doNotResetActiveCss){
-          handler.nativeInput?.classList.remove(SPEECH_ACTIVE);
-          handler.nativeCtrl?.classList.remove(SPEECH_ACTIVE);
-        }
         this.dictTargetHandler.delete(handler);
-        handler.destroy();
-      }
-
-      if(destroyDictationTarget && target && typeof target !== 'string'){
-        for(const key in target){
-          target[key] = void(0);
-        }
+        handler.destroy(doNotResetActiveCss);
       }
     }
 

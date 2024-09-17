@@ -41,8 +41,6 @@ export class DictationTargetHandler {
   public reset(){
     if(this.targets.size > 0){
       this.targets.forEach(handler => {
-        handler.nativeInput?.classList.remove(SPEECH_ACTIVE);
-        handler.nativeCtrl?.classList.remove(SPEECH_ACTIVE);
         handler.destroy();
       });
       this.targets.clear();
@@ -241,7 +239,16 @@ export class DictationHandler {
   //   }
   // }
 
-  public destroy(){
+  /**
+   * release dictation-handler & (interal) dictation-target resources
+   *
+   * @param  [doNotResetActiveCss]  OPTIONAL if `true`, do not reset CSS classes on HTMLElement that indication `speech-active`
+   *                                (e.g. if HTMLElements will be dispose anyway, there is no need to reset their state)
+   * @param  [keepDictationTarget]  OPTIONAL if specified, will not destroy the `DictationTarget`, if it is the same instance as
+   *                                `keepDictationTarget` (by reference or its ID)
+   *                                (can/should be used, if the dictation-target will still be used later on).
+   */
+  public destroy(doNotResetActiveCss?: boolean, keepDictationTarget?: DictationTarget | string | boolean): void {
     if(this.asrResultSubs){
       this.asrResultSubs.unsubscribe();
       this.asrResultSubs = null;
@@ -251,17 +258,26 @@ export class DictationHandler {
       this.onTextChangeSubs = null;
     }
     if(this.target){
-      // this.target.changeDect = null;
-      this.target.container = null;
-      this.target.form = null;
-      this.target.ctrl = null;
-      this.target.input = null;
+      const isDestroyTarget = (typeof keepDictationTarget === 'string' && keepDictationTarget !== this.target.id) || keepDictationTarget !== this.target;
+      if(isDestroyTarget && keepDictationTarget !== true){
+        // unlink all fields from DictationTarget, except `id`:
+        for(const key in this.target){
+          if(key === 'id'){
+            continue;
+          }
+          this.target[key] = void(0);
+        }
+      }
+      // in any case: de-reference target from the handler itself
       this.target = null;
     }
     if(this._inputData){
       this._inputData.reset();
     }
     if(this.nativeInput){
+      if(!doNotResetActiveCss){
+        this.nativeInput.classList.remove(SPEECH_ACTIVE);
+      }
       if(this._selectionListener){
         this.nativeInput.removeEventListener('select', this._selectionListener, false);
         this.nativeInput.removeEventListener('keyup', this._selectionListener, false);
@@ -272,6 +288,9 @@ export class DictationHandler {
         this.nativeInput.removeEventListener('focus', this._focusListener, false);
         this._focusListener = null;
       }
+    }
+    if(this.nativeCtrl && !doNotResetActiveCss){
+      this.nativeCtrl.classList.remove(SPEECH_ACTIVE);
     }
     this.textfield = null;
     this.nativeInput = null;
