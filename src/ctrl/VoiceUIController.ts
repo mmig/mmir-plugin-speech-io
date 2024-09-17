@@ -437,8 +437,47 @@ export class VoiceUIController<CmdImpl extends Cmd> {
     return handler;
   }
 
-  public resetDictationHandlers(): void {
-    this.dictTargetHandler.reset();
+  /**
+   * reset dication-handlers for a specific `DictationTarget` or all currently cached `DictationHandler`s
+   *
+   * NOTE: if destroying all `DictationHandler`s their handlers' `HTMLElements` speech-activation CSS-classes
+   *       will also be reset (i.e. visually reset to no speech-active).
+   *       This is __not__ done, if a specific `DictationHandler` is reset.
+   *
+   * @param [target]  OPTIONAL if omitted, all `DictationHandler`s, otherwise the
+   *                             the `DictationHandler` for the specifed `DictationTarget` (or ID) will be reset/destroyed
+   * @param [doNotResetActiveCss] OPTIONAL if `false`, will not reset the speech-activation CSS-classes
+   *                                       on the UI HTMLElements of the `DictationHandler` (can/should be set, if the GUI elements are immediatly disposed anyway)
+   * @param [destroyDictationTarget] OPTIONAL if `true` and `target` is a `DictationTarget`, then all its field be reset to `undefined`
+   */
+  public resetDictationHandlers() : void;
+  public resetDictationHandlers(target: string, doNotResetActiveCss?: boolean) : void;
+  public resetDictationHandlers(target: DictationTarget, doNotResetActiveCss?: boolean, destroyDictationTarget?: boolean): void
+  public resetDictationHandlers(target?: string | DictationTarget, doNotResetActiveCss?: boolean, destroyDictationTarget?: boolean): void {
+    if(!target){
+
+      this.dictTargetHandler.reset();
+
+    } else {
+
+      const targetId: string = typeof target === 'string'? target : target.id;
+      const handler = this.dictTargetHandler.get(targetId);
+
+      if(handler){
+        if(!doNotResetActiveCss){
+          handler.nativeInput?.classList.remove(SPEECH_ACTIVE);
+          handler.nativeCtrl?.classList.remove(SPEECH_ACTIVE);
+        }
+        handler.destroy();
+      }
+
+      if(destroyDictationTarget && target && typeof target !== 'string'){
+        for(const key in target){
+          target[key] = void(0);
+        }
+      }
+    }
+
   }
 
   private updateCurrentDictationTarget(targetId: string, active: boolean){
