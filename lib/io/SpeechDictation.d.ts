@@ -7,7 +7,7 @@ export declare const UNSTABLE_RESULT_HTML_SUFFIX = "</span>";
 export declare class DictationTargetHandler {
     private targets;
     constructor();
-    get(id: string): DictationHandler;
+    get(id: string): DictationHandler | undefined;
     has(id: string): boolean;
     put(id: string, el: DictationHandler): void;
     reset(): void;
