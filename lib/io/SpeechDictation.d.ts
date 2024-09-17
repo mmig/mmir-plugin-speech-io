@@ -10,6 +10,7 @@ export declare class DictationTargetHandler {
     get(id: string): DictationHandler | undefined;
     has(id: string): boolean;
     put(id: string, el: DictationHandler): void;
+    delete(elem: DictationHandler | string): boolean;
     reset(): void;
     apply(func: (handler: DictationHandler) => void): void;
     destroy(): void;
