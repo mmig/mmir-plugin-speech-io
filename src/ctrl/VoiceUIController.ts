@@ -417,7 +417,11 @@ export class VoiceUIController<CmdImpl extends Cmd> {
 
     feedbackStyle = feedbackStyle? feedbackStyle : this._defaultDictationFeedbackStyle;
 
-    let handler: DictationHandler = replaceExistingHandler? null : this.dictTargetHandler.get(targetId);
+    let handler: DictationHandler = this.dictTargetHandler.get(targetId);
+    if(handler && replaceExistingHandler){
+      handler.destroy();
+      handler = null;
+    }
     if(!handler){
       if(targetRef){
         handler = this.speechIn.createDictationTarget(targetRef, targetId, feedbackStyle);
