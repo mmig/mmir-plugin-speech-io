@@ -21,7 +21,7 @@ export class DictationTargetHandler {
     this.targets = new Map<string, DictationHandler>()
   }
 
-  public get(id: string): DictationHandler {
+  public get(id: string): DictationHandler | undefined {
     return this.targets.get(id);
   }
 
