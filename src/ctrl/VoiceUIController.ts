@@ -468,6 +468,7 @@ export class VoiceUIController<CmdImpl extends Cmd> {
           handler.nativeInput?.classList.remove(SPEECH_ACTIVE);
           handler.nativeCtrl?.classList.remove(SPEECH_ACTIVE);
         }
+        this.dictTargetHandler.delete(handler);
         handler.destroy();
       }
 

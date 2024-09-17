@@ -33,6 +33,11 @@ export class DictationTargetHandler {
     this.targets.set(id, el);
   }
 
+  public delete(elem: DictationHandler | string): boolean {
+    const id = typeof elem === 'string'? elem : elem.id;
+    return this.targets.delete(id);
+  }
+
   public reset(){
     if(this.targets.size > 0){
       this.targets.forEach(handler => {
