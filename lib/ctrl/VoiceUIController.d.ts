@@ -127,7 +127,22 @@ export declare class VoiceUIController<CmdImpl extends Cmd> {
     /** toggle dictation-mode ASR */
     toggleDictation(targetId: string | DictationTarget, feedbackStyle?: SelectionMode, replaceExistingHandler?: boolean): void;
     initDictationTarget(targetId: string | DictationTarget, feedbackStyle?: SelectionMode, replaceExistingHandler?: boolean): DictationHandler;
+    /**
+     * reset dication-handlers for a specific `DictationTarget` or all currently cached `DictationHandler`s
+     *
+     * NOTE: if destroying all `DictationHandler`s their handlers' `HTMLElements` speech-activation CSS-classes
+     *       will also be reset (i.e. visually reset to no speech-active).
+     *       This is __not__ done, if a specific `DictationHandler` is reset.
+     *
+     * @param [target]  OPTIONAL if omitted, all `DictationHandler`s, otherwise the
+     *                             the `DictationHandler` for the specifed `DictationTarget` (or ID) will be reset/destroyed
+     * @param [doNotResetActiveCss] OPTIONAL if `false`, will not reset the speech-activation CSS-classes
+     *                                       on the UI HTMLElements of the `DictationHandler` (can/should be set, if the GUI elements are immediatly disposed anyway)
+     * @param [destroyDictationTarget] OPTIONAL if `true` and `target` is a `DictationTarget`, then all its field be reset to `undefined`
+     */
     resetDictationHandlers(): void;
+    resetDictationHandlers(target: string, doNotResetActiveCss?: boolean): void;
+    resetDictationHandlers(target: DictationTarget, doNotResetActiveCss?: boolean, destroyDictationTarget?: boolean): void;
     private updateCurrentDictationTarget;
     /**
      * Set the overlay for GUI feedback during dictation (speech input).
